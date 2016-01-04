@@ -1,0 +1,18 @@
+﻿生成启动时间为 2015/12/29 10:26:06。
+     1>项目“I:\VS2013工程文件\键盘过滤驱动\MyDriver1\MyDriver1.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         I:\Microsoft Visual stdio 2013\VC\bin\x86_amd64\CL.exe /c /Ix64\Win8Debug\ /Zi /nologo /W4 /WX /Od /Oi /Oy- /D _WIN64 /D _AMD64_ /D AMD64 /D DEPRECATE_DDK_FUNCTIONS=1 /D MSC_NOOPT /D _WIN32_WINNT=0x0602 /D WINVER=0x0602 /D WINNT=1 /D NTDDI_VERSION=0x06020000 /D DBG=1 /GF /Gm- /Zp8 /GS /Gy /fp:precise /Zc:wchar_t- /Zc:forScope- /GR- /Fo"x64\Win8Debug\\" /Fd"x64\Win8Debug\vc120.pdb" /Gz /wd4748 /wd4603 /wd4627 /wd4986 /wd4987 /wd4996 /FII:\WDK\Include\Shared\warning.h /errorReport:prompt /kernel -cbstring -d2epilogunwind /d1import_no_registry /d2AllowCompatibleILVersions /d2Zi+ dasda.c
+         dasda.c
+       Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"I:\VS2013工程文件\键盘过滤驱动\x64\Win8Debug\MyDriver1.sys" /VERSION:"6.3" /INCREMENTAL:NO /NOLOGO /WX /SECTION:"INIT,d" I:\WDK\lib\win8\KM\x64\BufferOverflowFastFailK.lib I:\WDK\lib\win8\KM\x64\ntoskrnl.lib I:\WDK\lib\win8\KM\x64\hal.lib I:\WDK\lib\win8\KM\x64\wmilib.lib /NODEFAULTLIB /MANIFEST:NO /DEBUG /PDB:"I:\VS2013工程文件\键盘过滤驱动\x64\Win8Debug\MyDriver1.pdb" /SUBSYSTEM:NATIVE,"6.02" /Driver /OPT:REF /OPT:ICF /ENTRY:"GsDriverEntry" /RELEASE /IMPLIB:"I:\VS2013工程文件\键盘过滤驱动\x64\Win8Debug\MyDriver1.lib" /MERGE:"_TEXT=.text;_PAGE=PAGE" /MACHINE:X64 /PROFILE /kernel /IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221,4108,4088,4218,4218,4235 /osversion:6.3 /pdbcompress /debugtype:pdata x64\Win8Debug\dasda.obj
+         MyDriver1.vcxproj -> I:\VS2013工程文件\键盘过滤驱动\x64\Win8Debug\MyDriver1.sys
+       DriverTestSign:
+         I:\WDK\bin\x86\signtool.exe sign /ph /sha1 "4ED069F228DC651F6F5F1F932A54980D6913FF46" 
+         Done Adding Additional Store
+         Successfully signed: I:\VS2013\\x64\Win8Debug\MyDriver1.sys
+         
+     1>已完成生成项目“I:\VS2013工程文件\键盘过滤驱动\MyDriver1\MyDriver1.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.52
