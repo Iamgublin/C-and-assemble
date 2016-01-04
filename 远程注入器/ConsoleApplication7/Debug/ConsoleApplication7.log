@@ -1,0 +1,11 @@
+﻿生成启动时间为 2016/1/1 21:14:53。
+     1>项目“I:\VS2013工程文件\远程注入器\ConsoleApplication7\ConsoleApplication7.vcxproj”在节点 2 上(ClCompile 个目标)。
+     1>ClCompile:
+         I:\Microsoft Visual stdio 2013\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\ConsoleApplication7.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ConsoleApplication7.cpp
+         正在跳过...(未检测到相关更改)
+         ConsoleApplication7.cpp
+     1>已完成生成项目“I:\VS2013工程文件\远程注入器\ConsoleApplication7\ConsoleApplication7.vcxproj”(ClCompile 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:00.18
