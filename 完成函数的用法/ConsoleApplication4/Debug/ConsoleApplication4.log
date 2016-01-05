@@ -1,0 +1,14 @@
+﻿生成启动时间为 2016/1/3 10:52:59。
+     1>项目“I:\VS2013工程文件\ConsoleApplication4\ConsoleApplication4\ConsoleApplication4.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         I:\Microsoft Visual stdio 2013\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MT /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\ConsoleApplication4.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ConsoleApplication4.cpp
+         ConsoleApplication4.cpp
+       Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"I:\VS2013工程文件\ConsoleApplication4\Debug\ConsoleApplication4.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"I:\VS2013工程文件\ConsoleApplication4\Debug\ConsoleApplication4.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"I:\VS2013工程文件\ConsoleApplication4\Debug\ConsoleApplication4.lib" /MACHINE:X86 Debug\ConsoleApplication4.obj
+         Debug\stdafx.obj
+         ConsoleApplication4.vcxproj -> I:\VS2013工程文件\ConsoleApplication4\Debug\ConsoleApplication4.exe
+     1>已完成生成项目“I:\VS2013工程文件\ConsoleApplication4\ConsoleApplication4\ConsoleApplication4.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:03.99

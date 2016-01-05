@@ -1,0 +1,79 @@
+﻿生成启动时间为 2016/1/1 14:47:59。
+     1>项目“I:\VS2013工程文件\计算器系统\计算器系统\计算器系统.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         I:\Microsoft Visual stdio 2013\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"Release\计算器系统.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         I:\Microsoft Visual stdio 2013\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\计算器系统.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt "计算器系统.cpp"
+         计算器系统.cpp
+     1>计算器系统.cpp(227): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+     1>计算器系统.cpp(241): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+     1>计算器系统.cpp(249): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>计算器系统.cpp(340): warning C4101: “p”: 未引用的局部变量
+     1>计算器系统.cpp(338): warning C4101: “PNT”: 未引用的局部变量
+     1>计算器系统.cpp(339): warning C4101: “hdc”: 未引用的局部变量
+     1>计算器系统.cpp(383): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(388): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(393): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(398): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(403): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(408): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(413): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(418): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(423): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(428): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(433): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(438): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(443): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(448): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(453): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(458): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(463): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 I:\Microsoft Visual stdio 2013\VC\include\string.h(284) : 参见“wcscat”的声明
+     1>计算器系统.cpp(476): warning C4996: 'swprintf': swprintf has been changed to conform with the ISO C standard, adding an extra character count parameter. To use traditional Microsoft swprintf, set _CRT_NON_CONFORMING_SWPRINTFS.
+                 I:\Microsoft Visual stdio 2013\VC\include\swprintf.inl(85) : 参见“swprintf”的声明
+     1>计算器系统.cpp(502): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>计算器系统.cpp(504): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>计算器系统.cpp(556): warning C4244: “=”: 从“double”转换到“LONG”，可能丢失数据
+     1>计算器系统.cpp(557): warning C4244: “=”: 从“double”转换到“LONG”，可能丢失数据
+     1>计算器系统.cpp(601): warning C4244: “=”: 从“double”转换到“LONG”，可能丢失数据
+     1>计算器系统.cpp(602): warning C4244: “=”: 从“double”转换到“LONG”，可能丢失数据
+     1>计算器系统.cpp(649): warning C4244: “=”: 从“double”转换到“LONG”，可能丢失数据
+     1>计算器系统.cpp(650): warning C4244: “=”: 从“double”转换到“LONG”，可能丢失数据
+     1>计算器系统.cpp(644): warning C4101: “k”: 未引用的局部变量
+       ResourceCompile:
+         I:\WDK\bin\x86\rc.exe /D _UNICODE /D UNICODE /l"0x0409" /nologo /fo"Release\计算器系统.res" "计算器系统.rc" 
+       Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"I:\VS2013工程文件\计算器系统\Release\计算器系统.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"I:\VS2013工程文件\计算器系统\Release\计算器系统.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"I:\VS2013工程文件\计算器系统\Release\计算器系统.lib" /MACHINE:X86 /SAFESEH "Release\计算器系统.res"
+         Release\stdafx.obj
+         "Release\计算器系统.obj"
+         正在生成代码
+     1>i:\vs2013工程文件\计算器系统\计算器系统\nibolan.h(122): warning C4715: “popNumber”: 不是所有的控件路径都返回值
+     1>i:\vs2013工程文件\计算器系统\计算器系统\nibolan.h(98): warning C4715: “popOperator”: 不是所有的控件路径都返回值
+     1>i:\vs2013工程文件\计算器系统\计算器系统\nibolan.h(73): warning C4715: “getOpNum”: 不是所有的控件路径都返回值
+     1>i:\vs2013工程文件\计算器系统\计算器系统\nibolan.h(55): warning C4715: “getPriority”: 不是所有的控件路径都返回值
+     1>i:\vs2013工程文件\计算器系统\计算器系统\nibolan.h(186): warning C4715: “opertate1Num”: 不是所有的控件路径都返回值
+     1>i:\vs2013工程文件\计算器系统\计算器系统\nibolan.h(171): warning C4715: “opertate2Num”: 不是所有的控件路径都返回值
+     1>i:\vs2013工程文件\计算器系统\计算器系统\nibolan.h(198): warning C4715: “operate”: 不是所有的控件路径都返回值
+         已完成代码的生成
+         计算器系统.vcxproj -> I:\VS2013工程文件\计算器系统\Release\计算器系统.exe
+     1>已完成生成项目“I:\VS2013工程文件\计算器系统\计算器系统\计算器系统.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.90
