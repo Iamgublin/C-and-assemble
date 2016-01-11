@@ -1,0 +1,88 @@
+1:ƒVƒXƒeƒ€‚Ìî•ñ‚ðo—Í‚µ‚Ü‚·
+1:	‚c‚wƒ‰ƒCƒuƒ‰ƒŠ Ver3.04d
+2:	˜_—ƒvƒƒZƒbƒT‚Ì” : 4
+3:	‚n‚r  Windows ( Build 9200  )
+104:	‚b‚o‚t“®ì‘¬“xF‘å‘Ì2.89GHz
+105:	‚l‚l‚w–½—ß‚ðŽg—p‚µ‚Ü‚·
+105:	‚r‚r‚d–½—ß‚ªŽg—p‰Â”\‚Å‚·
+106:	‚r‚r‚d‚Q–½—ß‚ªŽg—p‰Â”\‚Å‚·
+107:	‚b‚o‚tƒxƒ“ƒ_FGenuineIntel
+109:	‚b‚o‚t–¼FIntel(R) Core(TM) i5-4210H CPU @ 2.90GHz
+111:‚b‚n‚l‚Ì‰Šú‰»... ¬Œ÷‚µ‚Ü‚µ‚½
+114:ƒƒ‚ƒŠ‘—Ê:4096.00MB  ‹ó‚«ƒƒ‚ƒŠ—Ìˆæ:4096.00MB 
+115:ƒ^ƒCƒ}[‚Ì¸“x‚ðŒŸ¸‚µ‚Ü‚·
+115:¸“xŒ‹‰Ê XV‰ñ” ƒ}ƒ‹ƒ`ƒƒfƒBƒAƒ^ƒCƒ}[F0  ƒpƒtƒH[ƒ}ƒ“ƒXƒJƒEƒ“ƒ^[F60
+116: ƒpƒtƒH[ƒ}ƒ“ƒXƒJƒEƒ“ƒ^[‚ðŽg—p‚µ‚Ü‚· ƒ^ƒCƒ}[•ª‰ð”\ : 2825.502000 KHz 
+117: ƒ\ƒtƒg‚Ì“ñd‹N“®ŒŸ¸... “ñd‹N“®‚Í‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ‚Å‚µ‚½
+119:ƒEƒCƒ“ƒhƒEƒNƒ‰ƒX‚ð“o˜^‚µ‚Ü‚·... “o˜^‚É¬Œ÷‚µ‚Ü‚µ‚½
+120:ƒEƒCƒ“ƒhƒEƒ‚[ƒh‹N“®—p‚ÌƒEƒCƒ“ƒhƒE‚ðì¬‚µ‚Ü‚·
+126:ƒEƒCƒ“ƒhƒE‚Ìì¬‚É¬Œ÷‚µ‚Ü‚µ‚½
+133:‚h‚l‚d‚ð–³Œø‚É‚µ‚Ü‚µ‚½
+133:ƒEƒCƒ“ƒhƒEƒXƒ^ƒCƒ‹‚ðƒEƒCƒ“ƒhƒEƒ‚[ƒh—p‚É•ÏX‚µ‚Ü‚·... Š®—¹
+135:DirectInputŠÖŒW‰Šú‰»ˆ—
+136:	DirectInput7 ‚ÌŽæ“¾’†... ¬Œ÷
+149:		ˆø‚«‘±‚«‰Šú‰»ˆ—... ‰Šú‰»¬Œ÷
+153:	ƒWƒ‡ƒCƒpƒbƒh‚Ì‰Šú‰»... 
+157:	ƒWƒ‡ƒCƒpƒbƒh‚Ì‰Šú‰»‚Í³í‚ÉI—¹‚µ‚Ü‚µ‚½
+158:	ƒ}ƒEƒXƒfƒoƒCƒX‚Ì‰Šú‰»... ‰Šú‰»¬Œ÷
+159:	ƒL[ƒ{[ƒhƒfƒoƒCƒX‚Ì‰Šú‰»... ‰Šú‰»¬Œ÷
+160:DirectInput ŠÖ˜A‚Ì‰Šú‰»‚Í³í‚ÉI—¹‚µ‚Ü‚µ‚½
+161:DirectSound ‚Ì‰Šú‰»‚ðs‚¢‚Ü‚·
+161:DirectSound ƒCƒ“ƒ^[ƒtƒF[ƒX‚ÌŽæ“¾‚ðs‚¢‚Ü‚·....  ¬Œ÷
+163:ˆø‚«‘±‚«ƒCƒ“ƒ^[ƒtƒF[ƒX‚Ì‰Šú‰»ˆ—...  ¬Œ÷
+202:	DirectSound ƒfƒoƒCƒX‚ð—ñ‹“‚µ‚Ü‚·
+203:		ƒ‚ƒWƒ…[ƒ‹–¼:                 ƒhƒ‰ƒCƒo‹Lq:Ö÷ÉùÒôÇý¶¯³ÌÐò 
+203:		ƒ‚ƒWƒ…[ƒ‹–¼:{0.0.0.00000000}.{ec1f2d75-db94-4277-9319-454c0fbd5760}  ƒhƒ‰ƒCƒo‹Lq:ÑïÉùÆ÷/ÌýÍ² (Realtek High Definition Audio) 
+204:	Å‘åƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg:200.00KHz Å¬ƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg:0.10KHz 
+204:	‘ƒTƒEƒ“ƒhƒƒ‚ƒŠ—Ìˆæ:0.00KB ‹ó‚«ƒTƒEƒ“ƒhƒƒ‚ƒŠ—Ìˆæ:0.00KB 
+
+205:	—˜—p‰Â”\ƒTƒ“ƒvƒŠƒ“ƒO¸“x
+205:	 ƒvƒ‰ƒCƒ}ƒŠ ‚P‚Ubit = OK  ‚Wbit = OK 
+205:	 ƒZƒJƒ“ƒ_ƒŠ ‚P‚Ubit = OK  ‚Wbit = OK 
+
+206:	—˜—p‰Â”\ƒ`ƒƒƒ“ƒlƒ‹
+206:	 ƒvƒ‰ƒCƒ}ƒŠ MONO = OK  STEREO = OK 
+207:	 ƒZƒJƒ“ƒ_ƒŠ MONO = OK  STEREO = OK 
+
+208:DirectSound ‚Ì‰Šú‰»‚Í³í‚ÉI—¹‚µ‚Ü‚µ‚½
+211:DirectDraw ƒIƒuƒWƒFƒNƒg‚ÌŽæ“¾‚ðs‚¢‚Ü‚·....  ¬Œ÷
+214:ˆø‚«‘±‚«‰Šú‰»ˆ—... ‰Šú‰»‚É¬Œ÷‚µ‚Ü‚µ‚½
+226:IDirect3D9Ex ƒIƒuƒWƒFƒNƒg‚ðŽæ“¾‚µ‚Ü‚·.... ¬Œ÷
+232:IDirect3DDevice9Ex ƒIƒuƒWƒFƒNƒg‚ðŽæ“¾‚µ‚Ü‚·.... ƒn[ƒhƒEƒGƒA’¸“_‰‰ŽZ‚ðŽg—p‚µ‚Ü‚·
+523:¬Œ÷
+524:Driver:igdumdim32.dll  Description:Intel(R) HD Graphics 4600
+525:‰æ–Ê‚ÌƒtƒH[ƒ}ƒbƒg‚Í D3DFMT_X8R8G8B8 ‚Å‚·
+525:‚yƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒg‚Í D3DFMT_D16 ‚Å‚·
+526:16bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_R5G6B5 ‚Å‚·
+526:32bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_X8R8G8B8 ‚Å‚·
+527:ƒAƒ‹ƒtƒ@•t‚« 16bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_A4R4G4B4 ‚Å‚·
+527:ƒAƒ‹ƒtƒ@•t‚« 32bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_A8R8G8B8 ‚Å‚·
+528:ƒAƒ‹ƒtƒ@ƒeƒXƒg—p 16bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_A1R5G5B5 ‚Å‚·
+528:ƒAƒ‹ƒtƒ@ƒeƒXƒg—p 32bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_A8R8G8B8 ‚Å‚·
+528:‚c‚w‚s‚PƒeƒNƒXƒ`ƒƒƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_DXT1 ‚Å‚·
+529:‚c‚w‚s‚QƒeƒNƒXƒ`ƒƒƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_DXT2 ‚Å‚·
+529:‚c‚w‚s‚RƒeƒNƒXƒ`ƒƒƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_DXT3 ‚Å‚·
+530:‚c‚w‚s‚SƒeƒNƒXƒ`ƒƒƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_DXT4 ‚Å‚·
+530:‚c‚w‚s‚TƒeƒNƒXƒ`ƒƒƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_DXT5 ‚Å‚·
+531:•`‰æ—p 16bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_R5G6B5 ‚Å‚·
+531:•`‰æ—p 32bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_X8R8G8B8 ‚Å‚·
+532:•`‰æ—pƒAƒ‹ƒtƒ@•t‚« 32bit ƒJƒ‰[ƒtƒH[ƒ}ƒbƒg‚Í D_D3DFMT_A8R8G8B8 ‚Å‚·
+545:ƒoƒbƒNƒoƒbƒtƒ@ƒƒbƒN“]‘—‚ÌŽžŠÔ:1276nsec  ˆêŽž“I‚È•`‰æ‰Â”\ƒoƒbƒtƒ@‚ðŽg—p‚µ‚½“]‘—‚ÌŽžŠÔ:1648nsec
+546:ƒoƒbƒNƒoƒbƒtƒ@ƒƒbƒN‚ðŽg—p‚µ‚Ü‚·
+546:‚yƒoƒbƒtƒ@‚ðì¬‚µ‚Ü‚·.... ¬Œ÷
+555:ƒvƒƒOƒ‰ƒ}ƒuƒ‹ƒVƒF[ƒ_[‚ðŽg—p‚µ‚Ü‚·
+
+610:ƒtƒHƒ“ƒg‚Ì‰Šú‰»‚ðs‚¢‚Ü‚·
+612:ƒtƒHƒ“ƒg‚Ì‰Šú‰»‚Í³í‚ÉI—¹‚µ‚Ü‚µ‚½
+612:•¶ŽšƒR[ƒhƒoƒbƒtƒ@‚Ì‰Šú‰»‚ðs‚¢‚Ü‚·... Š®—¹‚µ‚Ü‚µ‚½
+91528:ƒEƒCƒ“ƒhƒE‚ð•Â‚¶‚æ‚¤‚Æ‚µ‚Ä‚¢‚Ü‚·
+91531:ƒEƒCƒ“ƒhƒE‚ª”jŠü‚³‚ê‚æ‚¤‚Æ‚µ‚Ä‚¢‚Ü‚·
+91531:ƒ\ƒtƒg‚ðI—¹‚·‚é€”õ‚ª®‚¢‚Ü‚µ‚½
+91565:ƒtƒHƒ“ƒg‚Ì‰Šú‰»‚ðs‚¢‚Ü‚·
+91566:ƒtƒHƒ“ƒg‚Ì‰Šú‰»‚Í³í‚ÉI—¹‚µ‚Ü‚µ‚½
+91583:DirectInput ŠÖ˜A‚ÌI—¹ˆ—... Š®—¹
+91644:DirectSound ‚ÌI—¹ˆ—‚Í³í‚ÉI—¹‚µ‚Ü‚µ‚½
+91645:
+91646:Alloc memory dump
+91647:	Total size:0(0.000kb)  Alloc num:0
+91647:

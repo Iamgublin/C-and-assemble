@@ -1,0 +1,48 @@
+﻿生成启动时间为 2015/11/28 9:50:42。
+     1>项目“E:\迅雷下载\project\1復\RyuJin.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         I:\Microsoft Visual stdio 2013\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt mydat\source\boss_shot.cpp mydat\source\boss_shotH.cpp mydat\source\char.cpp mydat\source\cshot.cpp mydat\source\enemy.cpp mydat\source\enemy_act_pattern.cpp mydat\source\fps.cpp mydat\source\graph.cpp mydat\source\graph_back.cpp mydat\source\ini.cpp mydat\source\key.cpp mydat\source\load.cpp mydat\source\main.cpp mydat\source\music.cpp mydat\source\out.cpp mydat\source\shot.cpp mydat\source\shotH.cpp
+         shotH.cpp
+         shot.cpp
+         out.cpp
+         music.cpp
+         main.cpp
+         load.cpp
+         key.cpp
+         ini.cpp
+         graph_back.cpp
+         graph.cpp
+         fps.cpp
+         enemy_act_pattern.cpp
+         enemy.cpp
+         cshot.cpp
+         char.cpp
+         boss_shotH.cpp
+         boss_shot.cpp
+         正在生成代码...
+       Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\迅雷下载\project\1復\Debug\RyuJin.exe" /INCREMENTAL /NOLOGO /LIBPATH:../include/ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\迅雷下载\project\1復\Debug\RyuJin.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\迅雷下载\project\1復\Debug\RyuJin.lib" /MACHINE:X86 /SAFESEH Debug\boss_shot.obj
+         Debug\boss_shotH.obj
+         Debug\char.obj
+         Debug\cshot.obj
+         Debug\enemy.obj
+         Debug\enemy_act_pattern.obj
+         Debug\fps.obj
+         Debug\graph.obj
+         Debug\graph_back.obj
+         Debug\ini.obj
+         Debug\key.obj
+         Debug\load.obj
+         Debug\main.obj
+         Debug\music.obj
+         Debug\out.obj
+         Debug\shot.obj
+         Debug\shotH.obj
+     1>boss_shot.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/SAFESEH”规范)
+     1>LIBCMTD.lib(wincrt0.obj) : error LNK2019: 无法解析的外部符号 _WinMain@16，该符号在函数 ___tmainCRTStartup 中被引用
+     1>E:\迅雷下载\project\1復\Debug\RyuJin.exe : fatal error LNK1120: 1 个无法解析的外部命令
+     1>已完成生成项目“E:\迅雷下载\project\1復\RyuJin.vcxproj”(Build 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:09.81
