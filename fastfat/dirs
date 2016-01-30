@@ -1,0 +1,5 @@
+DIRS= \
+     Win7 \
+     wlh \
+     wnet \
+     wxp
