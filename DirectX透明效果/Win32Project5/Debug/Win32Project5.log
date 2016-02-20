@@ -1,0 +1,17 @@
+﻿生成启动时间为 2016/2/14 8:59:46。
+     1>项目“I:\VS2013工程文件\DirectX透明效果\Win32Project5\Win32Project5.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         I:\Microsoft Visual stdio 2013\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\Win32Project5.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Win32Project5.cpp
+         Win32Project5.cpp
+     1>i:\vs2013工程文件\directx透明效果\win32project5\win32project5.cpp(219): warning C4305: “=”: 从“double”到“float”截断
+     1>i:\vs2013工程文件\directx透明效果\win32project5\win32project5.cpp(274): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+       Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"I:\VS2013工程文件\DirectX透明效果\Debug\Win32Project5.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"I:\VS2013工程文件\DirectX透明效果\Debug\Win32Project5.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"I:\VS2013工程文件\DirectX透明效果\Debug\Win32Project5.lib" /MACHINE:X86 Debug\Win32Project5.res
+         Debug\stdafx.obj
+         Debug\Win32Project5.obj
+         Win32Project5.vcxproj -> I:\VS2013工程文件\DirectX透明效果\Debug\Win32Project5.exe
+     1>已完成生成项目“I:\VS2013工程文件\DirectX透明效果\Win32Project5\Win32Project5.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:05.07
