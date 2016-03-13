@@ -122,6 +122,7 @@ VOID NTAPI Wfp_Sample_Established_ClassifyFn_V4(
 	USHORT wDirection = 0;
 	WORD wRemotePort = 0;
 	WORD wProtocol = 0;
+	UNICODE_STRING str;
 	if (!(classifyOut->rights&FWPS_RIGHT_ACTION_WRITE))
 	{
 		return;
@@ -131,7 +132,22 @@ VOID NTAPI Wfp_Sample_Established_ClassifyFn_V4(
 	wProtocol = inFixedValues->incomingValue[FWPS_FIELD_ALE_FLOW_ESTABLISHED_V4_IP_PROTOCOL].value.uint16;
 	classifyOut->actionType = FWP_ACTION_PERMIT;
 	DbgPrint("dir:%s\n", (wDirection == 1) ? "inbound" : "outbound");
-	DbgPrint("protocol:%d\n", wProtocol);
+	switch (wProtocol)
+	{
+	case IPPROTO_ICMP:
+		RtlInitUnicodeString(&str, L"ICMP");
+		break;
+	case IPPROTO_TCP:
+		RtlInitUnicodeString(&str, L"TCP");
+		break;
+	case IPPROTO_UDP:
+		RtlInitUnicodeString(&str, L"UDP");
+		break;
+	default:
+		RtlInitUnicodeString(&str, L"Ohter");
+		break;
+	}
+	DbgPrint("protocol:%wZ\n", str);
 	DbgPrint("port:%d\n", wRemotePort);
 	if ((wProtocol == IPPROTO_TCP) &&
 		(wDirection == FWP_DIRECTION_OUTBOUND) &&
