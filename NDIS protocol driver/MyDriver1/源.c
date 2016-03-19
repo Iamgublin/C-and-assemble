@@ -93,6 +93,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 }
 NTSTATUS unload(PDRIVER_OBJECT driver)
 {
+	DbgBreakPoint();
 	UNICODE_STRING windevname;
 	NTSTATUS sta;
 	NDIS_STATUS ndissta;
@@ -103,6 +104,13 @@ NTSTATUS unload(PDRIVER_OBJECT driver)
 	IoDeleteDevice(Globals.dev);
 	for (int num = 0; num < Globals.contextnum; num++)
 	{
+		if (Globals.context[num]->packnum != 0)
+		{
+			clearallpacket(Globals.context[num]);
+			NdisFreeBufferPool(Globals.context[num]->recvbufferpool);
+			NdisFreePacketPool(Globals.context[num]->recvpacketpool);
+			NdisFreePacketPool(Globals.context[num]->sendpacketpool);
+		}
 		ExFreePool(Globals.context[num]);
 	}
 	return STATUS_SUCCESS;
@@ -166,6 +174,10 @@ NTSTATUS ndisdevcon(PDEVICE_OBJECT device, PIRP irp)
 	   }
 	case IOCTL_NDISPROT_OUTPUT_CURRENT_NETWORKCARD:
 		DbgPrint("current networkcard:%d\n", Globals.bindinghandlenum);
+		for (int i = 0; i < Globals.contextnum; i++)
+		{
+			DbgPrint("cuurent contect[%d]packet:%d\n", i, Globals.context[i]->packnum);
+		}
 		break;
 	default:
 		break;
