@@ -8,10 +8,6 @@
 #define NUIOO_PACKET_FILTER  (NDIS_PACKET_TYPE_DIRECTED|    \
                               NDIS_PACKET_TYPE_MULTICAST|   \
                               NDIS_PACKET_TYPE_BROADCAST)
-typedef struct _READINFO
-{
-	int packetwantread;
-}READINFO,*PREADINFO;
 NTSTATUS unload(PDRIVER_OBJECT driver);
 NTSTATUS ndiscreate(PDEVICE_OBJECT device, PIRP irp);
 NTSTATUS ndisclose(PDEVICE_OBJECT device, PIRP irp);
@@ -131,10 +127,7 @@ NTSTATUS ndisclose(PDEVICE_OBJECT device, PIRP irp)
 NTSTATUS ndisread(PDEVICE_OBJECT device, PIRP irp)
 {
 	NTSTATUS sta = STATUS_SUCCESS;
-	PUCHAR buffer = NULL;
-	UINT bufsize;
-	UINT byteread=0;
-	static int readnum=0;
+	PVOID buffer = NULL;
 	do
 	{
 		if (irp->MdlAddress == NULL)
@@ -144,32 +137,11 @@ NTSTATUS ndisread(PDEVICE_OBJECT device, PIRP irp)
 			break;
 		}
 		buffer = MmGetSystemAddressForMdlSafe(irp->MdlAddress, NormalPagePriority);
-		bufsize = MmGetMdlByteCount(irp->MdlAddress);
 		if (buffer == NULL)
 		{
 			DbgPrint("mdl get error!\n");
 			sta = STATUS_UNSUCCESSFUL;
 			break;
-		}
-		if (bufsize <= sizeof(Globals.context[0]->buffer[0]))
-		{
-			DbgPrint("the buf is too small!\n");
-			DbgPrint("buffer need:%d", bufsize);
-			sta = STATUS_UNSUCCESSFUL;
-			break;
-		}
-		if (Globals.context[0]->packnum > readnum)
-		{
-			NdisMoveMemory(buffer, Globals.context[0]->buffer[0],byteread);
-			buffer += byteread;
-			irp->IoStatus.Information = bufsize;
-			irp->IoStatus.Status = STATUS_SUCCESS;
-			IoCompleteRequest(irp, IO_NO_INCREMENT);
-			readnum++;
-		}
-		else
-		{
-			readnum = 0;
 		}
 	} while (FALSE);
 	return sta;
