@@ -16,6 +16,7 @@ typedef struct
 	LIST_ENTRY write;
 	PNDIS_PACKET pack[20];
 	int packnum;
+	PVOID buffer[20];
 	NDIS_HANDLE sendpacketpool;
 	NDIS_HANDLE recvpacketpool;
 	NDIS_HANDLE recvbufferpool;
@@ -160,6 +161,7 @@ IN UINT                                     PacketSize
 		DbgPrint("type:0x%x\n", et->type);
 		PVOID revbuf;
 		NdisAllocateMemoryWithTag(&revbuf, PacketSize + HeaderBufferSize, 0);
+		context->buffer[context->packnum] = revbuf;
 		NdisAllocatePacket(&ndsta, &ndispacket, context->recvpacketpool);
 		NdisAllocateBuffer(&ndsta, &ndisbuf, context->recvbufferpool, revbuf,PacketSize+HeaderBufferSize );
 		NdisAllocateBuffer(&ndsta, &ndisbuf1, context->recvbufferpool, (char*)revbuf + HeaderBufferSize, PacketSize);
@@ -167,6 +169,10 @@ IN UINT                                     PacketSize
 		NdisChainBufferAtBack(ndispacket, ndisbuf1);
 		((PNPROT_RECV_PACKET_RSVD)&(ndispacket->ProtocolReserved[0]))->pOriginalBuffer = ndisbuf;
 		NdisTransferData(&ndsta, Globals.bindinghandle[context->contextno], MacReceiveContext, 0, PacketSize, ndispacket, &bytetransfer);
+		if (ndsta != NDIS_STATUS_PENDING)
+		{
+			NdisProtTransferDataComplete(context, ndispacket, ndsta, bytetransfer);
+		}
 	}
 	return NDIS_STATUS_SUCCESS;
 }
@@ -279,6 +285,23 @@ IN PNDIS_PACKET                 pNdisPacket
 )
 {
 	DbgPrint("enter receive packet\n");
+	padapercontext context = ProtocolBindingContext;
+	PNDIS_BUFFER pNdisbuffer;
+	PNDIS_BUFFER buffer;
+	PNDIS_PACKET pack;
+	NDIS_STATUS ndissta;
+	PVOID buf;
+	UINT firstsize;
+	UINT totalsize;
+	UINT bytecopy;
+	NdisGetFirstBufferFromPacketSafe(pNdisPacket, &pNdisbuffer, &buf, &firstsize, &totalsize, NormalPagePriority);
+	ndissta=NdisAllocateMemoryWithTag(&buf, totalsize, 0);
+	context->buffer[context->packnum] = buf;
+	NdisAllocateBuffer(&ndissta, &buffer, context->recvbufferpool, buf, totalsize);
+	NdisAllocatePacket(&ndissta, &pack, context->recvpacketpool);
+	NdisChainBufferAtBack(pack, buffer);
+	NdisCopyFromPacketToPacketSafe(pack, 0, totalsize, pNdisPacket, 0, &bytecopy, NormalPagePriority);
+	packetadd(context, pack);
 	return 0;
 }
 NDIS_STATUS
@@ -357,6 +380,7 @@ VOID clearallpacket(padapercontext context)
 				NdisUnchainBufferAtBack(context->pack[j], &buf);
 				NdisFreeBuffer(buf);
 				NdisFreePacket(context->pack[j]);
+				ExFreePool(context->buffer[j]);
 			}
 		}
 	} while (FALSE);
