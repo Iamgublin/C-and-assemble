@@ -12,10 +12,9 @@
 #define MIN_PACKET_POOL_SIZE 0x000000FF//×îÐ¡256×Ö½Ú
 typedef struct 
 {
-	LIST_ENTRY read;
-	LIST_ENTRY write;
 	PNDIS_PACKET pack[20];
 	int packnum;
+	PVOID buffer[20];
 	NDIS_HANDLE sendpacketpool;
 	NDIS_HANDLE recvpacketpool;
 	NDIS_HANDLE recvbufferpool;
@@ -32,7 +31,6 @@ typedef struct _NPROT_SEND_PACKET_RSVD
 } NPROT_SEND_PACKET_RSVD, *PNPROT_SEND_PACKET_RSVD;
 typedef struct _NPROT_RECV_PACKET_RSVD
 {
-	LIST_ENTRY              Link;
 	PNDIS_BUFFER            pOriginalBuffer;    
 
 } NPROT_RECV_PACKET_RSVD, *PNPROT_RECV_PACKET_RSVD;
@@ -105,6 +103,7 @@ IN UINT                         BytesTransferred
 	PNDIS_BUFFER buf=((PNPROT_RECV_PACKET_RSVD)&(pNdisPacket->ProtocolReserved[0]))->pOriginalBuffer;
 	NdisUnchainBufferAtBack(pNdisPacket, &prebuf);
 	NdisChainBufferAtBack(pNdisPacket, buf);
+	DbgPrint("buffer:%x\n", (char*)(context->buffer[context->packnum])+14);
 	if (prebuf != buf)
 	{
 		NdisFreeBuffer(prebuf);
@@ -142,7 +141,6 @@ IN UINT                                     LookaheadBufferSize,
 IN UINT                                     PacketSize
 )
 {
-	DbgBreakPoint();
 	NDIS_STATUS ndsta;
 	PNDIS_BUFFER ndisbuf;
 	PNDIS_BUFFER ndisbuf1;
@@ -155,11 +153,12 @@ IN UINT                                     PacketSize
 	if (HeaderBufferSize == 14)
 	{
 		PETHeader et = pHeaderBuffer;
-		DbgPrint("source mac:%x-%x-%x-%x-%x-%x\n", et->shost[0],et->shost[1],et->shost[2],et->shost[3],et->shost[4],et->shost[5]);
-		DbgPrint("dest mac:%x-%x-%x-%x-%x-%x\n", et->dhost[0], et->dhost[1], et->dhost[2], et->dhost[3], et->dhost[4], et->dhost[5]);
+		DbgPrint("source mac:%2x-%2x-%2x-%2x-%2x-%2x\n", et->shost[0],et->shost[1],et->shost[2],et->shost[3],et->shost[4],et->shost[5]);
+		DbgPrint("dest mac:%2x-%2x-%2x-%2x-%2x-%2x\n", et->dhost[0], et->dhost[1], et->dhost[2], et->dhost[3], et->dhost[4], et->dhost[5]);
 		DbgPrint("type:0x%x\n", et->type);
 		PVOID revbuf;
 		NdisAllocateMemoryWithTag(&revbuf, PacketSize + HeaderBufferSize, 0);
+		context->buffer[context->packnum] = revbuf;
 		NdisAllocatePacket(&ndsta, &ndispacket, context->recvpacketpool);
 		NdisAllocateBuffer(&ndsta, &ndisbuf, context->recvbufferpool, revbuf,PacketSize+HeaderBufferSize );
 		NdisAllocateBuffer(&ndsta, &ndisbuf1, context->recvbufferpool, (char*)revbuf + HeaderBufferSize, PacketSize);
@@ -167,6 +166,10 @@ IN UINT                                     PacketSize
 		NdisChainBufferAtBack(ndispacket, ndisbuf1);
 		((PNPROT_RECV_PACKET_RSVD)&(ndispacket->ProtocolReserved[0]))->pOriginalBuffer = ndisbuf;
 		NdisTransferData(&ndsta, Globals.bindinghandle[context->contextno], MacReceiveContext, 0, PacketSize, ndispacket, &bytetransfer);
+		if (ndsta != NDIS_STATUS_PENDING)
+		{
+			NdisProtTransferDataComplete(context, ndispacket, ndsta, bytetransfer);
+		}
 	}
 	return NDIS_STATUS_SUCCESS;
 }
@@ -185,14 +188,14 @@ __in_bcount(StatusBufferSize) IN PVOID  StatusBuffer,
 IN UINT                                 StatusBufferSize
 )
 {
-	DbgPrint("1\n");
+	DbgPrint("enter status\n");
 }
 VOID
 NdisProtStatusComplete(
 IN NDIS_HANDLE                  ProtocolBindingContext
 )
 {
-	DbgPrint("1\n");
+	DbgPrint("enter status complete\n");
 }
 VOID
 NdisProtBindAdapter(
@@ -209,7 +212,8 @@ IN PVOID                        SystemSpecific2
 	NDIS_STATUS sta;
 	NDIS_STATUS errorcode;
 	UINT seletemediumundex;
-	padapercontext context=ExAllocatePool(NonPagedPool,sizeof(padapercontext));
+	padapercontext context;
+	NdisAllocateMemoryWithTag(&context, sizeof(adapercontext), 0);
 	context->contextno = Globals.contextnum;
 	context->packnum = 0;
 	NdisZeroMemory(context->pack, sizeof(context->pack));
@@ -227,7 +231,7 @@ IN PVOID                        SystemSpecific2
 		{
 			break;
 		}
-		NdisAllocateBufferPool(&sta, &context->recvbufferpool, 20);
+		NdisAllocateBufferPool(&sta, &context->recvbufferpool, 200);
 		DbgPrint("0x%x\n", sta);
 		if (sta != NDIS_STATUS_SUCCESS)
 		{
@@ -279,6 +283,23 @@ IN PNDIS_PACKET                 pNdisPacket
 )
 {
 	DbgPrint("enter receive packet\n");
+	padapercontext context = ProtocolBindingContext;
+	PNDIS_BUFFER pNdisbuffer;
+	PNDIS_BUFFER buffer;
+	PNDIS_PACKET pack;
+	NDIS_STATUS ndissta;
+	PVOID buf;
+	UINT firstsize;
+	UINT totalsize;
+	UINT bytecopy;
+	NdisGetFirstBufferFromPacketSafe(pNdisPacket, &pNdisbuffer, &buf, &firstsize, &totalsize, NormalPagePriority);
+	ndissta=NdisAllocateMemoryWithTag(&buf, totalsize, 0);
+	context->buffer[context->packnum] = buf;
+	NdisAllocateBuffer(&ndissta, &buffer, context->recvbufferpool, buf, totalsize);
+	NdisAllocatePacket(&ndissta, &pack, context->recvpacketpool);
+	NdisChainBufferAtBack(pack, buffer);
+	NdisCopyFromPacketToPacketSafe(pack, 0, totalsize, pNdisPacket, 0, &bytecopy, NormalPagePriority);
+	packetadd(context, pack);
 	return 0;
 }
 NDIS_STATUS
@@ -338,12 +359,13 @@ NDIS_STATUS ndisprotDoRequest(
 }
 VOID packetadd(padapercontext context, PNDIS_PACKET pack)
 {
-	context->pack[context->packnum] = pack;
-	context->packnum++;
 	if (context->packnum == 20)
 	{
 		clearallpacket(context);
 	}
+	context->pack[context->packnum] = pack;
+	context->packnum++;
+	context->packnum = 0;
 }
 VOID clearallpacket(padapercontext context)
 {
@@ -357,6 +379,7 @@ VOID clearallpacket(padapercontext context)
 				NdisUnchainBufferAtBack(context->pack[j], &buf);
 				NdisFreeBuffer(buf);
 				NdisFreePacket(context->pack[j]);
+				ExFreePool(context->buffer[j]);
 			}
 		}
 	} while (FALSE);
