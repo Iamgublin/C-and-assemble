@@ -1,0 +1,14 @@
+﻿生成启动时间为 2016/4/2 11:59:37。
+     1>项目“I:\VS2013工程文件\KMDF Driver2\KMDF Driver2\KMDF Driver2.vcxproj”在节点 2 上(Build 个目标)。
+     1>StampInf:
+         I:\WDK\bin\x86\stampinf.exe -d "*" -a "amd64" -v "*" -k "1.11" -u "1.11.0" -f x64\Win8Debug\Ndisedge.inf 
+         Stamping x64\Win8Debug\Ndisedge.inf [Version] section with DriverVer=04/02/2016,11.59.37.311
+       Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"I:\VS2013工程文件\KMDF Driver2\x64\Win8Debug\KMDFDriver2.sys" /VERSION:"6.3" /INCREMENTAL:NO /NOLOGO /WX /SECTION:"INIT,d" ndis.lib I:\WDK\lib\win8\KM\x64\BufferOverflowFastFailK.lib I:\WDK\lib\win8\KM\x64\ntoskrnl.lib I:\WDK\lib\win8\KM\x64\hal.lib I:\WDK\lib\win8\KM\x64\wmilib.lib I:\WDK\lib\wdf\kmdf\x64\1.11\WdfLdr.lib I:\WDK\lib\wdf\kmdf\x64\1.11\WdfDriverEntry.lib /NODEFAULTLIB /MANIFEST:NO /DEBUG /PDB:"I:\VS2013工程文件\KMDF Driver2\x64\Win8Debug\KMDFDriver2.pdb" /SUBSYSTEM:NATIVE,"6.02" /Driver /OPT:REF /OPT:ICF /ENTRY:"FxDriverEntry" /RELEASE /IMPLIB:"I:\VS2013工程文件\KMDF Driver2\x64\Win8Debug\KMDFDriver2.lib" /MERGE:"_TEXT=.text;_PAGE=PAGE" /MACHINE:X64 /PROFILE /kernel /IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221,4108,4088,4218,4218,4235 /osversion:6.3 /pdbcompress /debugtype:pdata "x64\Win8Debug\源.obj"
+     1>源.obj : error LNK2019: 无法解析的外部符号 ZlzPostWriteRequest，该符号在函数 MPSendPackets 中被引用
+     1>I:\VS2013工程文件\KMDF Driver2\x64\Win8Debug\KMDFDriver2.sys : fatal error LNK1120: 1 个无法解析的外部命令
+     1>已完成生成项目“I:\VS2013工程文件\KMDF Driver2\KMDF Driver2\KMDF Driver2.vcxproj”(Build 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:00.27
