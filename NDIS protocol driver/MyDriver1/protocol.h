@@ -10,6 +10,7 @@
 #pragma warning(disable:4100)
 #define MAX_PACKET_POOL_SIZE 0x0000FFFF//最大64K
 #define MIN_PACKET_POOL_SIZE 0x000000FF//最小256字节
+#define Tranverse16(X)                 ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))
 typedef struct 
 {
 	PNDIS_PACKET pack[20];
@@ -104,7 +105,7 @@ IN UINT                         BytesTransferred
 	NdisUnchainBufferAtBack(pNdisPacket, &prebuf);
 	NdisChainBufferAtBack(pNdisPacket, buf);
 	DbgPrint("buffer:%x\n", (char*)(context->buffer[context->packnum])+14);
-	if (prebuf != buf)
+	if (prebuf != NULL)
 	{
 		NdisFreeBuffer(prebuf);
 	}
@@ -153,9 +154,11 @@ IN UINT                                     PacketSize
 	if (HeaderBufferSize == 14)
 	{
 		PETHeader et = pHeaderBuffer;
-		DbgPrint("source mac:%2x-%2x-%2x-%2x-%2x-%2x\n", et->shost[0],et->shost[1],et->shost[2],et->shost[3],et->shost[4],et->shost[5]);
-		DbgPrint("dest mac:%2x-%2x-%2x-%2x-%2x-%2x\n", et->dhost[0], et->dhost[1], et->dhost[2], et->dhost[3], et->dhost[4], et->dhost[5]);
-		DbgPrint("type:0x%x\n", et->type);
+		DbgPrint("source mac:%2x-%2x-%2x-%2x-%2x-%2x\n", et->shost[0], et->shost[1], et->shost[2],
+			et->shost[3], et->shost[4], et->shost[5]);
+		DbgPrint("dest mac:%2x-%2x-%2x-%2x-%2x-%2x\n", et->dhost[0], et->dhost[1], et->dhost[2],
+			et->dhost[3], et->dhost[4], et->dhost[5]);
+		DbgPrint("type:0x%x\n", Tranverse16(et->type));
 		PVOID revbuf;
 		NdisAllocateMemoryWithTag(&revbuf, PacketSize + HeaderBufferSize, 0);
 		context->buffer[context->packnum] = revbuf;

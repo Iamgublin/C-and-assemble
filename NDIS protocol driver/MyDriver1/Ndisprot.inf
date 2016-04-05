@@ -8,7 +8,7 @@ Signature   = "$Windows NT$"
 Class       = NetTrans
 ClassGUID   = {4d36e975-e325-11ce-bfc1-08002be10318}
 Provider    = %Msft%
-DriverVer=04/05/2016,9.57.11.230
+DriverVer   =10/01/2002,6.0.5019.0
 
 [Manufacturer]
 %Msft%=MSFT,NTx86,NTia64,NTamd64

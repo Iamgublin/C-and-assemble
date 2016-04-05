@@ -276,6 +276,9 @@
   <ItemGroup>
     <ClInclude Include="protocol.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Inf Include="Ndisprot.inf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
