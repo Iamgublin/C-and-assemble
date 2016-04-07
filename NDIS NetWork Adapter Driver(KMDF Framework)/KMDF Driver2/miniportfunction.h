@@ -155,7 +155,18 @@ typedef struct _TCB
 	ULONG                   ulSize;
 	UCHAR                   Data[NIC_BUFFER_SIZE];
 } TCB, *PTCB;
-
+typedef struct _RCB
+{
+	LIST_ENTRY              List; // This must be the first entry
+	LONG                    Ref;
+	PVOID                   Adapter;
+	WDFREQUEST              Request;
+	PNDIS_BUFFER            Buffer;
+	PNDIS_PACKET            Packet;
+	PUCHAR                  pData;
+	ULONG                   ulSize;
+	UCHAR                   Data[NIC_BUFFER_SIZE];
+} RCB, *PRCB;
 typedef struct _WDF_DEVICE_INFO{
 
 	PMP_ADAPTER Adapter;
@@ -168,7 +179,14 @@ NTSTATUS ZlzDeviceIoControl(WDFIOTARGET target,ULONG ioctl,    \
 	PVOID inputbuffer,ULONG inputbuffersize,PVOID outputbuffer,ULONG outputbuffersize);
 NTSTATUS ZlzOpenProtocolInterface(PMP_ADAPTER adapter);
 VOID ZlzPostWriteRequest(PMP_ADAPTER adapter, PTCB ptcb);
+VOID ZlzRequestWriteComplete(WDFREQUEST Request, WDFIOTARGET Target, PWDF_REQUEST_COMPLETION_PARAMS Params, WDFCONTEXT Context);
 BOOLEAN ZlzCopyPacket(PMP_ADAPTER adapter, PTCB tcb, PNDIS_PACKET packet);
+VOID Zlzndissendpacket(PRCB prcb, ULONG bytetoindicate);
+VOID ZlzReadRequestComplete(WDFREQUEST Request, WDFIOTARGET Target, PWDF_REQUEST_COMPLETION_PARAMS Params, WDFCONTEXT Context);
+NTSTATUS  ZlzPostReadRequest(PMP_ADAPTER adapter, PRCB prcb);
+NTSTATUS Zlzinitwork(PMP_ADAPTER adapter);
+VOID ZlzWorkItemCallback(WDFWORKITEM WorkItem);
+VOID ZlzFreeRcb(PRCB ptcb);
 NDIS_STATUS
 MPInitialize(
 OUT PNDIS_STATUS OpenErrorStatus,
@@ -203,6 +221,7 @@ IN NDIS_HANDLE WrapperConfigurationContext)    //注册表获取信息
 	NdisInitializeListHead(&adapter->SendWaitList);
 	NdisAllocateSpinLock(&adapter->Lock);
 	NdisAllocateSpinLock(&adapter->SendLock);
+	NdisAllocateSpinLock(&adapter->RecvLock);
 	*SelectedMediumIndex = sum;
 	adapter->AdapterHandle = MiniportAdapterHandle;
 	NdisMGetDeviceProperty(MiniportAdapterHandle, &adapter->Pdo, &adapter->Fdo, &adapter->NextDeviceObject, NULL, NULL);
@@ -211,6 +230,7 @@ IN NDIS_HANDLE WrapperConfigurationContext)    //注册表获取信息
 	NdisMSetAttributesEx(MiniportAdapterHandle, adapter, 0, NDIS_ATTRIBUTE_DESERIALIZE |
 		NDIS_ATTRIBUTE_USES_SAFE_BUFFER_APIS, NdisInterfaceInternal);
 	ZlzOpenProtocolInterface(adapter);
+	Zlzinitwork(adapter);
 	return NDIS_STATUS_SUCCESS;
 }
 VOID
@@ -220,18 +240,9 @@ IN  NDIS_HANDLE MiniportAdapterContext
 {
 	DbgBreakPoint();
 	PMP_ADAPTER adapter = (PMP_ADAPTER)MiniportAdapterContext;
-	if (&adapter->SendLock)
-	{
-		NdisReleaseSpinLock(&adapter->SendLock);
-	}
-	if (&adapter->Lock)
-	{
-		NdisReleaseSpinLock(&adapter->Lock);
-	}
-	if (&adapter->RecvLock)
-	{
-		NdisReleaseSpinLock(&adapter->RecvLock);
-	}
+	NdisReleaseSpinLock(&adapter->SendLock);
+	NdisReleaseSpinLock(&adapter->Lock);
+	NdisReleaseSpinLock(&adapter->RecvLock);
 	NdisFreeMemory(global.adapter[adapter->adapternum], sizeof(MP_ADAPTER), 0);
 	if (adapter->IoTarget != NULL)
 	{
@@ -294,13 +305,10 @@ IN  UINT                    NumberOfPackets)
 					ZlzPostWriteRequest(adapter, ptcb);
 					NDIS_SET_PACKET_STATUS(packet, NDIS_STATUS_SUCCESS);
 					NdisMSendComplete(adapter->AdapterHandle, packet, NDIS_STATUS_SUCCESS);
-
 				}
 			}
 		}
-
 	}
-
 }
 VOID
 MPReturnPacket(
@@ -308,7 +316,13 @@ IN NDIS_HANDLE  MiniportAdapterContext,
 IN PNDIS_PACKET Packet
 )
 {
-
+	DbgPrint("enter packet return");
+	PRCB prcb = NULL;
+	PMP_ADAPTER adapter;
+	prcb = *(PRCB*)Packet->MiniportReserved;
+	adapter = prcb->Adapter;
+	adapter->nPacketsReturned++;
+	ZlzFreeRcb(prcb);
 }
 BOOLEAN
 MPCheckForHang(
@@ -381,6 +395,7 @@ BOOLEAN ZlzCopyPacket(PMP_ADAPTER adapter, PTCB ptcb, PNDIS_PACKET packet)
 	UINT firstbufferlength;
 	UINT totalbufferlength;
 	BOOLEAN result = TRUE;
+	UINT bytecopy = 0; 
 
 	PVOID buffervirtualaddress=NULL;
 	UINT currentlength=0;
@@ -399,6 +414,7 @@ BOOLEAN ZlzCopyPacket(PMP_ADAPTER adapter, PTCB ptcb, PNDIS_PACKET packet)
 		{
 			NdisMoveMemory(dest, buffervirtualaddress, currentlength);
 			sizeremain -= currentlength;
+			bytecopy += currentlength;
 			dest += currentlength;
 		}
 		NdisGetNextBuffer(buffer, &buffer);
@@ -408,4 +424,136 @@ BOOLEAN ZlzCopyPacket(PMP_ADAPTER adapter, PTCB ptcb, PNDIS_PACKET packet)
 		NdisInterlockedInsertTailList(&adapter->SendBusyList, &ptcb->List, &adapter->Lock);
 	}
 	return result;
+}
+VOID ZlzPostWriteRequest(PMP_ADAPTER adapter, PTCB ptcb)
+{
+	PIO_STACK_LOCATION nextsta;
+	PIRP irp;
+	WdfRequestCreate(NULL, adapter->IoTarget, &ptcb->Request);
+	WdfIoTargetFormatRequestForWrite(adapter->IoTarget, ptcb->Request, NULL, NULL, NULL);
+	irp=WdfRequestWdmGetIrp(ptcb->Request);
+	PMDL mdl = NULL;
+	mdl = IoAllocateMdl(ptcb->Data, NIC_BUFFER_SIZE, FALSE, FALSE, irp);
+	ptcb->Mdl = mdl;
+	nextsta = IoGetNextIrpStackLocation(irp);
+	nextsta->Parameters.Write.Length = ptcb->ulSize;
+	WdfRequestSetCompletionRoutine(ptcb->Request, ZlzRequestWriteComplete, ptcb);
+	if (!WdfRequestSend(ptcb->Request, adapter->IoTarget, WDF_NO_SEND_OPTIONS))
+	{
+		DbgPrint("Send Error!\n");
+	}
+}
+VOID ZlzRequestWriteComplete(WDFREQUEST Request, WDFIOTARGET Target, PWDF_REQUEST_COMPLETION_PARAMS Params, WDFCONTEXT Context)
+{
+	PTCB ptcb = (PTCB)Context;
+	if (ptcb->Mdl)
+	{
+		IoFreeMdl(ptcb->Mdl);
+	}
+}
+VOID Zlzndissendpacket(PRCB prcb,ULONG bytetoindicate)
+{
+	PMP_ADAPTER adapter = prcb->Adapter;
+	PNDIS_PACKET packtet = NULL;
+	PNDIS_BUFFER firstbuf = NULL;
+	UINT totallength;
+	NdisAdjustBufferLength(prcb->Buffer, bytetoindicate);
+	NdisReinitializePacket(packtet);
+	*((PRCB*)packtet->MiniportReserved) = prcb;
+	NdisChainBufferAtBack(packtet, prcb->Buffer);
+	NdisQueryPacket(packtet, NULL, NULL, &firstbuf, &totallength);
+	NDIS_SET_PACKET_STATUS(packtet, STATUS_SUCCESS);
+	adapter->nPacketsIndicated++;
+	NdisMIndicateReceivePacket(adapter->AdapterHandle, &prcb->Packet, 1);
+}
+VOID ZlzReadRequestComplete(WDFREQUEST Request, WDFIOTARGET Target, PWDF_REQUEST_COMPLETION_PARAMS Params, WDFCONTEXT Context)
+{
+	DbgBreakPoint();
+	PRCB prcb = (PRCB)Context;
+	PMP_ADAPTER Adapter = prcb->Adapter;
+	ULONG byteread = 0;
+	BOOLEAN bIndicateReceive = FALSE;
+	NTSTATUS status;
+	UNREFERENCED_PARAMETER(Target);
+	UNREFERENCED_PARAMETER(Request);
+	status = Params->IoStatus.Status;
+	if (!NT_SUCCESS(status))
+	{
+		Adapter->nReadsCompletedWithError++;
+	}
+	else
+	{
+		byteread = (ULONG)Params->IoStatus.Information;
+		Adapter->GoodReceives++;
+		bIndicateReceive = TRUE;
+		Adapter->nBytesRead += byteread;
+	}
+	if (bIndicateReceive)
+	{
+		Zlzndissendpacket(prcb, byteread);
+	}
+	ZlzFreeRcb(prcb);
+}
+VOID ZlzFreeRcb(PRCB prcb)
+{
+	IoFreeMdl(prcb->Buffer);
+	WdfWorkItemEnqueue(((PMP_ADAPTER)prcb->Adapter)->ReadWorkItem);
+}
+NTSTATUS ZlzPostReadRequest(PMP_ADAPTER adapter, PRCB prcb)
+{
+	DbgBreakPoint();
+	NTSTATUS status = STATUS_SUCCESS;
+	PIRP irp = NULL;
+	PIO_STACK_LOCATION nextstack;
+	status = WdfIoTargetFormatRequestForRead(adapter->IoTarget, prcb->Request, NULL, NULL, NULL);
+	if (!NT_SUCCESS(status))
+	{
+		return status;
+	}
+	irp = WdfRequestWdmGetIrp(prcb->Request);
+	nextstack = IoGetNextIrpStackLocation(irp);
+	PMDL mdl = NULL;
+	mdl = IoAllocateMdl(prcb->Data, NIC_BUFFER_SIZE, FALSE, FALSE, irp);
+	prcb->Buffer = mdl;
+	nextstack->Parameters.Read.Length = NIC_BUFFER_SIZE;
+	WdfRequestSetCompletionRoutine(prcb->Request, ZlzReadRequestComplete, prcb);
+	if (WdfRequestSend(prcb->Request, adapter->IoTarget, WDF_NO_SEND_OPTIONS) == FALSE)
+	{
+		status = WdfRequestGetStatus(prcb->Request);
+	}
+	return status;
+}
+NTSTATUS Zlzinitwork(PMP_ADAPTER adapter)
+{
+	WDF_WORKITEM_CONFIG workconfig;
+	WDF_OBJECT_ATTRIBUTES attributes;
+	WDF_WORKITEM_CONFIG_INIT(&workconfig, ZlzWorkItemCallback);
+	WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
+	attributes.ParentObject = adapter->WdfDevice;
+	WdfWorkItemCreate(&workconfig,&attributes,&adapter->ReadWorkItem);
+	WdfWorkItemEnqueue(adapter->ReadWorkItem);
+	return STATUS_SUCCESS;
+}
+VOID ZlzWorkItemCallback(WDFWORKITEM WorkItem)
+{
+	DbgBreakPoint();
+	PMP_ADAPTER adapter;
+	NTSTATUS sta;
+	PRCB prcb = NULL;
+	adapter = GetWdfDeviceInfo(WdfWorkItemGetParentObject(WorkItem))->Adapter;
+	NdisAcquireSpinLock(&adapter->RecvLock);
+	while (IsListEmpty(&adapter->RecvFreeList))
+	{
+		prcb = (PRCB)RemoveHeadList(&adapter->RecvFreeList);
+		InsertTailList(&adapter->RecvBusyList, &prcb->List);
+		NdisReleaseSpinLock(&adapter->RecvLock);
+		adapter->nReadsPosted++;
+		sta = ZlzPostReadRequest(adapter, prcb);
+		NdisAcquireSpinLock(&adapter->RecvLock);
+		if (NT_SUCCESS(sta))
+		{
+			break;
+		}
+	}
+	NdisReleaseSpinLock(&adapter->RecvLock);
 }
