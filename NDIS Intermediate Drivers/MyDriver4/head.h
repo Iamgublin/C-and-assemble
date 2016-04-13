@@ -8,6 +8,8 @@
 #define MIN_PACKET_POOL_SIZE 200
 #define MAX_PACKET_POOL_SIZE 400
 #define NIC_MEDIA_TYPE       NdisMedium802_3
+KEVENT queryeve;
+KEVENT seteve;
 typedef struct _NPROT_SEND_PACKET_RSVD
 {
 	PIRP                    pIrp;
@@ -34,10 +36,15 @@ typedef struct
 	NDIS_STRING DeviceName;
 	NDIS_EVENT ndiseve;
 	NDIS_EVENT unbindeve;
+	NDIS_HANDLE relateminiporthandle;
 }adapercontext, *padapercontext;
 typedef struct
 {
 	int contextno;
+	NDIS_HANDLE Miniportadapterhandle;
+	NDIS_HANDLE relateadapterhandle;
+	NDIS_REQUEST queryinformationrequest;
+	NDIS_REQUEST setinformationrequest;
 }miniportcontext, *pminiportcontext;
 typedef struct _GLOBAL
 {
@@ -51,6 +58,19 @@ typedef struct _GLOBAL
 }GLOBAL, *PGLOBAL;
 GLOBAL global;
 PGLOBAL pglobal = &global;
+typedef struct _Information
+{
+	PULONG sebyteread;
+	PULONG seBytesNeeded;
+	PULONG quBytesWritten;
+	PULONG quBytesNeeded;
+}Information,*pInformation;
+Information requestinfo;
+VOID
+NdisProtRequestComplete(
+IN NDIS_HANDLE                  ProtocolBindingContext,
+IN PNDIS_REQUEST                pNdisRequest,
+IN NDIS_STATUS                  Status);
 NDIS_STATUS ZlzOpenConfiguration(PNDIS_STRING str, PVOID sys1);
 NDIS_STATUS
 MPInitialize(
@@ -65,6 +85,12 @@ IN NDIS_HANDLE WrapperConfigurationContext)    //注册表获取信息
 	pminiportcontext context;
 	NdisAllocateMemoryWithTag(&context, sizeof(miniportcontext), 0);
 	context->contextno = global.mininum;
+	padapercontext relateadaptercontext = NdisIMGetDeviceContext(MiniportAdapterHandle);
+	relateadaptercontext->relateminiporthandle = MiniportAdapterHandle;
+	context->Miniportadapterhandle = MiniportAdapterHandle;
+	context->relateadapterhandle = global.bindinghandle[relateadaptercontext->contextno];
+	KeInitializeEvent(&seteve, SynchronizationEvent, TRUE);
+	KeInitializeEvent(&queryeve, SynchronizationEvent, TRUE);
 	UINT sum;
 	for (sum = 0; sum < MediumArraySize; ++sum)
 	{
@@ -78,6 +104,7 @@ IN NDIS_HANDLE WrapperConfigurationContext)    //注册表获取信息
 		DbgPrint("cannon find 802.3");
 		return NDIS_STATUS_UNSUPPORTED_MEDIA;
 	}
+	*SelectedMediumIndex = sum;
 	NdisMSetAttributesEx(MiniportAdapterHandle, context, 0, NDIS_ATTRIBUTE_IGNORE_PACKET_TIMEOUT |
 		NDIS_ATTRIBUTE_IGNORE_REQUEST_TIMEOUT |
 		NDIS_ATTRIBUTE_INTERMEDIATE_DRIVER |
@@ -104,15 +131,61 @@ OUT PULONG BytesRead,
 OUT PULONG BytesNeeded)
 {
 	DbgPrint("enter set information\n");
-	return STATUS_SUCCESS;
+	DbgPrint("oid number:0x%x\n", Oid);
+	NDIS_STATUS ndissta;
+	pminiportcontext context = MiniportAdapterContext;
+	KeWaitForSingleObject(&seteve, Executive, KernelMode, FALSE, NULL);
+	context->setinformationrequest.RequestType = NdisRequestSetInformation;
+	context->setinformationrequest.DATA.SET_INFORMATION.Oid = Oid;
+	context->setinformationrequest.DATA.SET_INFORMATION.InformationBuffer = InformationBuffer;
+	context->setinformationrequest.DATA.SET_INFORMATION.InformationBufferLength = InformationBufferLength;
+	requestinfo.seBytesNeeded = BytesNeeded;
+	requestinfo.sebyteread = BytesRead;
+	NdisRequest(&ndissta, context->relateadapterhandle, &context->setinformationrequest);
+	if (ndissta != NDIS_STATUS_PENDING)
+	{
+		NdisProtRequestComplete(context, &context->setinformationrequest, ndissta);
+		ndissta = NDIS_STATUS_PENDING;
+	}
+	KeSetEvent(&seteve, IO_NO_INCREMENT, FALSE);
+	return ndissta;
 }
+NDIS_STATUS
+MPQueryInformation(
+IN NDIS_HANDLE  MiniportAdapterContext,
+IN NDIS_OID     Oid,
+IN PVOID        InformationBuffer,
+IN ULONG        InformationBufferLength,
+OUT PULONG      BytesWritten,
+OUT PULONG      BytesNeeded)
+{
+	DbgPrint("enter query information\n");
+	DbgPrint("oid number:0x%x\n", Oid);
+	NDIS_STATUS ndissta;
+	pminiportcontext context = MiniportAdapterContext;
+	KeWaitForSingleObject(&queryeve, Executive, KernelMode, FALSE, NULL);
+	context->queryinformationrequest.RequestType = NdisRequestQueryInformation;
+	context->queryinformationrequest.DATA.QUERY_INFORMATION.Oid = Oid;
+	context->queryinformationrequest.DATA.QUERY_INFORMATION.InformationBuffer = InformationBuffer;
+	context->queryinformationrequest.DATA.QUERY_INFORMATION.InformationBufferLength = InformationBufferLength;
+	requestinfo.quBytesNeeded = BytesNeeded;
+	requestinfo.quBytesWritten = BytesWritten;
+	NdisRequest(&ndissta, context->relateadapterhandle, &context->queryinformationrequest);
+	if (ndissta != NDIS_STATUS_PENDING)
+	{
+		NdisProtRequestComplete(context, &context->queryinformationrequest, ndissta);
+		ndissta = NDIS_STATUS_PENDING;
+	}
+	return ndissta;
+}
+
 VOID
 MPSendPackets(
 IN  NDIS_HANDLE             MiniportAdapterContext,
 IN  PPNDIS_PACKET           PacketArray,
 IN  UINT                    NumberOfPackets)
 {
-
+	DbgPrint("enter send packet\n");
 }
 VOID
 MPReturnPacket(
@@ -132,21 +205,8 @@ IN UINT                       ByteOffset,
 IN UINT                       BytesToTransfer
 )
 {
-	return STATUS_SUCCESS;
+	return STATUS_UNSUCCESSFUL;
 }
-NDIS_STATUS
-MPQueryInformation(
-IN NDIS_HANDLE  MiniportAdapterContext,
-IN NDIS_OID     Oid,
-IN PVOID        InformationBuffer,
-IN ULONG        InformationBufferLength,
-OUT PULONG      BytesWritten,
-OUT PULONG      BytesNeeded)
-{
-	DbgPrint("enter query information\n");
-	return NDIS_STATUS_SUCCESS;
-}
-
 
 
 
@@ -191,6 +251,23 @@ IN NDIS_STATUS                  Status
 )
 {
 	DbgPrint("enter request complete\n");
+	DbgPrint("status: 0x%x\n", Status);
+	padapercontext context = ProtocolBindingContext;
+	switch (pNdisRequest->RequestType)
+	{
+	case NdisRequestSetInformation:
+		*requestinfo.seBytesNeeded = pNdisRequest->DATA.SET_INFORMATION.BytesNeeded;
+		*requestinfo.sebyteread = pNdisRequest->DATA.SET_INFORMATION.BytesRead;
+		NdisMSetInformationComplete(context->relateminiporthandle, Status);
+		KeSetEvent(&seteve, IO_NO_INCREMENT, FALSE);
+		break;
+	case NdisRequestQueryInformation:
+		*requestinfo.quBytesNeeded = pNdisRequest->DATA.QUERY_INFORMATION.BytesNeeded;
+		*requestinfo.quBytesWritten = pNdisRequest->DATA.QUERY_INFORMATION.BytesWritten;
+		NdisMQueryInformationComplete(context->relateminiporthandle, Status);
+		KeSetEvent(&queryeve, IO_NO_INCREMENT, FALSE);
+		break;
+	}
 }
 NDIS_STATUS
 NdisProtReceive(
@@ -265,7 +342,12 @@ IN PVOID                        SystemSpecific2
 		KeInitializeSpinLock(&context->lock);
 		NdisInitializeEvent(&context->ndiseve);
 		context->contextno = global.contextnum;
-		RtlCopyUnicodeString(&context->DeviceName, &devname);
+
+		NdisAllocateMemoryWithTag(&context->DeviceName.Buffer, devname.Length, 0);
+		NdisMoveMemory(context->DeviceName.Buffer, devname.Buffer, devname.Length);
+		context->DeviceName.Length = devname.Length;
+		NdisFreeMemory(devname.Buffer, devname.Length, 0);
+
 		NdisAllocatePacketPoolEx(&ndissta, &context->sendpacketpool, MIN_PACKET_POOL_SIZE, MAX_PACKET_POOL_SIZE - MIN_PACKET_POOL_SIZE, sizeof(NPROT_SEND_PACKET_RSVD));
 		DbgPrint("0x%x\n", ndissta);
 		if (ndissta != NDIS_STATUS_SUCCESS)
@@ -296,13 +378,13 @@ IN PVOID                        SystemSpecific2
 				DbgPrint("PENDING\n");
 				NdisWaitEvent(&context->ndiseve, 0);
 				ndissta = context->status;
+				NdisResetEvent(&context->ndiseve);
 			}
 			else
 			{
 				break;
 			}
 		}
-		NdisResetEvent(&context->ndiseve);
 		NdisIMInitializeDeviceInstanceEx(global.driverhandle, &context->DeviceName, context);
 		global.adaptercontext[global.contextnum] = context;
 		global.contextnum++;
@@ -374,7 +456,7 @@ NDIS_STATUS ZlzOpenConfiguration(PNDIS_STRING str, PVOID sys1)
 	NDIS_HANDLE ConfigurationHandle;
 	NDIS_STATUS ndissta;
 	NDIS_STRING DeviceStr = NDIS_STRING_CONST("UpperBindings");
-	PNDIS_CONFIGURATION_PARAMETER   Param;
+	PNDIS_CONFIGURATION_PARAMETER   Param=NULL;
 	NdisOpenProtocolConfiguration(&ndissta,
 		&ConfigurationHandle,
 		sys1);
@@ -387,15 +469,20 @@ NDIS_STATUS ZlzOpenConfiguration(PNDIS_STRING str, PVOID sys1)
 		ConfigurationHandle,
 		&DeviceStr,
 		NdisParameterString);
-	DbgPrint("0x%x", ndissta);
+	DbgPrint("0x%x\n", ndissta);
 	if (ndissta != NDIS_STATUS_SUCCESS)
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
 	str->Length = Param->ParameterData.StringData.Length;
 	str->MaximumLength = str->Length;
+	if (str->Buffer == NULL)
+	{
+		DbgPrint("errror: the buffer is empty!\n");
+		return STATUS_UNSUCCESSFUL;
+	}
 	NdisAllocateMemoryWithTag(&str->Buffer, str->Length, 0);
 	NdisMoveMemory(str->Buffer, Param->ParameterData.StringData.Buffer, Param->ParameterData.StringData.Length);
-	DbgPrint("%wZ", str);
+	DbgPrint("%wZ\n", str);
 	return NDIS_STATUS_SUCCESS;
 }

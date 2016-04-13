@@ -23,6 +23,7 @@ NTSTATUS myAddDevice(
 NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 {
 	DbgBreakPoint();
+	driver->DriverUnload = unload;
     DbgPrint("%wZ", str);
 	global.contextnum = 0;
 	global.mininum = 0;

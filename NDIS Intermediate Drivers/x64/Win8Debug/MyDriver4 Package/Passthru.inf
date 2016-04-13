@@ -49,7 +49,7 @@ Signature  = "$Windows NT$"
 Class      = NetService
 ClassGUID  = {4D36E974-E325-11CE-BFC1-08002BE10318}
 Provider   = %Msft%
-DriverVer=04/09/2016,17.44.21.246
+DriverVer=04/13/2016,15.34.18.248
 
 
 [Manufacturer]
@@ -87,7 +87,7 @@ CopyInf         = netsf_m.inf
 DelFiles = Passthru.Files.Sys
 
 [Passthru.ndi.Services]
-AddService = Passthru,, Passthru.AddService
+AddService = zlzpass,, Passthru.AddService
 
 [Passthru.AddService]
 DisplayName    = %PassthruService_Desc%
@@ -143,8 +143,8 @@ HKR, Ndi, HelpText, , %Passthru_HELP%
 ;    In this case this is ms_passthrump (refer to netsf_m.inf)
 ;
 HKR, Ndi,            FilterClass,         , failover
-HKR, Ndi,            FilterDeviceInfId,   , ms_passthrump
-HKR, Ndi,            Service,             , Passthru
+HKR, Ndi,            FilterDeviceInfId,   , ms_zlzpassMP
+HKR, Ndi,            Service,             , zlzpass
 HKR, Ndi\Interfaces, UpperRange,          , noupper
 HKR, Ndi\Interfaces, LowerRange,          , nolower
 HKR, Ndi\Interfaces, FilterMediaTypes,    , "ethernet, tokenring, fddi, wan"
@@ -159,8 +159,8 @@ HKR, Parameters, Param1, 0, 4
 Msft = "Microsoft"
 DiskDescription = "Microsoft Passthru Driver Disk"
 
-Passthru_Desc = "Passthru Driver"
-Passthru_HELP = "Passthru Driver"
+Passthru_Desc = "Zlz NDIS passthw driver"
+Passthru_HELP = "Zlz NDIS passthw driver"
 PassthruService_Desc = "Passthru Service"
 
 
