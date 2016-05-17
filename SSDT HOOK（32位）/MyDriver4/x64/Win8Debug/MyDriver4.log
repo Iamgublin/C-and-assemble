@@ -1,0 +1,15 @@
+﻿生成启动时间为 2016/5/10 9:42:29。
+     1>项目“I:\VS2013工程文件\MyDriver4\MyDriver4\MyDriver4.vcxproj”在节点 2 上(Build 个目标)。
+     1>Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"I:\VS2013工程文件\MyDriver4\x64\Win8Debug\MyDriver4.sys" /VERSION:"6.3" /INCREMENTAL:NO /NOLOGO /WX /SECTION:"INIT,d" I:\WDK\lib\win8\KM\x64\BufferOverflowFastFailK.lib I:\WDK\lib\win8\KM\x64\ntoskrnl.lib I:\WDK\lib\win8\KM\x64\hal.lib I:\WDK\lib\win8\KM\x64\wmilib.lib /NODEFAULTLIB /MANIFEST:NO /DEBUG /PDB:"I:\VS2013工程文件\MyDriver4\x64\Win8Debug\MyDriver4.pdb" /SUBSYSTEM:NATIVE,"6.02" /Driver /OPT:REF /OPT:ICF /ENTRY:"GsDriverEntry" /RELEASE /IMPLIB:"I:\VS2013工程文件\MyDriver4\x64\Win8Debug\MyDriver4.lib" /MERGE:"_TEXT=.text;_PAGE=PAGE" /MACHINE:X64 /PROFILE /kernel /IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221,4108,4088,4218,4218,4235 /osversion:6.3 /pdbcompress /debugtype:pdata "x64\Win8Debug\源.obj"
+         MyDriver4.vcxproj -> I:\VS2013工程文件\MyDriver4\x64\Win8Debug\MyDriver4.sys
+       DriverTestSign:
+         I:\WDK\bin\x86\signtool.exe sign /ph /sha1 "4ED069F228DC651F6F5F1F932A54980D6913FF46" 
+         Done Adding Additional Store
+         Successfully signed: I:\VS2013\MyDriver4\x64\Win8Debug\MyDriver4.sys
+         
+     1>已完成生成项目“I:\VS2013工程文件\MyDriver4\MyDriver4\MyDriver4.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:00.69
