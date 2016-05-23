@@ -1,3 +1,4 @@
+#define IOCTL_GETIPPACKET (ULONG)CTL_CODE(FILE_DEVICE_UNKNOWN,0x911,METHOD_BUFFERED,FILE_WRITE_DATA|FILE_READ_DATA)  
 typedef struct _ETHeader //以太网数据帧头部结构
 {
 	UCHAR dhost[6]; //目的MAC地址
@@ -30,6 +31,7 @@ typedef struct _adapercontext
 	BOOLEAN isnotgetdescriptor;
 	NDIS_HANDLE relateminiporthandle;
 	UINT seletemediumundex;
+	int powerstatus;
 }adapercontext, *padapercontext;
 typedef struct _miniportcontext
 {
@@ -45,10 +47,12 @@ typedef struct _GLOBAL
 	NDIS_HANDLE driverhandle;
 	NDIS_HANDLE protocolhandle;
 	padapercontext adaptercontext[20];   //最多支持20个设备
-	NDIS_HANDLE bindinghandle[20];
 	int contextnum;
+	NDIS_HANDLE bindinghandle[20];
 	pminiportcontext miniportcontext[20];
 	int mininum;
+	PDEVICE_OBJECT controlobj;
+	NDIS_HANDLE controlhand;
 }GLOBAL, *PGLOBAL;
 GLOBAL global;
 PGLOBAL pglobal = &global;
@@ -88,3 +92,20 @@ typedef struct _IpPacket
 	ULONG ipDestination; //目标IP地址
 }IpPacket, *pIpPacket;
 #pragma pack(pop)
+typedef struct ippackinfo
+{
+	int timestamp;
+	int Protocol;
+	int type;
+	BOOLEAN issend;
+	UCHAR sourcemac[6];
+	UCHAR destmac[6];
+	ULONG ipSource; //源IP地址
+	ULONG ipDestination; //目标IP地址
+}ippackinfo, *pippackinfo;
+typedef struct _packetinfopool
+{
+	ippackinfo packet[5000];
+	int count;
+}packetinfopool,*ppactetinfopool;
+packetinfopool globalinfopool;

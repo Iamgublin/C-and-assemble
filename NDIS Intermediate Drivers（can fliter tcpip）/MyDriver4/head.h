@@ -15,14 +15,16 @@
 #define     NdisMediumFddi   2  // Fddi
 #define     NdisMediumWan    3  // NDISWAN
 #define     Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))
+VOID checkcount();
 NDIS_STATUS ZlzAnalysePacket(PNDIS_PACKET Packet,enum PacketType type);
-VOID ZlzAnalysisIpPacket(UCHAR *buf,int length);
+VOID ZlzAnalysisIpPacket(UCHAR *buf, pippackinfo info);
 VOID
 NdisProtRequestComplete(
 IN NDIS_HANDLE                  ProtocolBindingContext,
 IN PNDIS_REQUEST                pNdisRequest,
 IN NDIS_STATUS                  Status);
 NDIS_STATUS ZlzOpenConfiguration(PNDIS_STRING str, PVOID sys1);
+
 NDIS_STATUS
 MPInitialize(
 OUT PNDIS_STATUS OpenErrorStatus,
@@ -85,6 +87,10 @@ OUT PULONG BytesNeeded)
 	DbgPrint("oid number:0x%x\n", Oid);
 	NDIS_STATUS ndissta;
 	pminiportcontext context = MiniportAdapterContext;
+	if (context->relateadaptercontext->powerstatus)
+	{
+		return NDIS_STATUS_FAILURE;
+	}
 	KeWaitForSingleObject(&seteve, Executive, KernelMode, FALSE, NULL);
 	context->setinformationrequest.RequestType = NdisRequestSetInformation;
 	context->setinformationrequest.DATA.SET_INFORMATION.Oid = Oid;
@@ -112,6 +118,10 @@ OUT PULONG      BytesNeeded)
 {
 	NDIS_STATUS ndissta;
 	pminiportcontext context = MiniportAdapterContext;
+	if (context->relateadaptercontext->powerstatus)
+	{
+		return NDIS_STATUS_FAILURE;
+	}
 	KeWaitForSingleObject(&queryeve, Executive, KernelMode, FALSE, NULL);
 	context->queryinformationrequest.RequestType = NdisRequestQueryInformation;
 	context->queryinformationrequest.DATA.QUERY_INFORMATION.Oid = Oid;
@@ -142,6 +152,7 @@ _In_  UINT                    Flags
 	pminiportcontext context = MiniportAdapterContext;
 	UINT mediasize;
 	PVOID mediainfo;
+	ZlzAnalysePacket(Packet, ZLZ_PACKET_SEND);
 	pps = NdisIMGetCurrentPacketStack(Packet, &reuse);
 	if (reuse)
 	{
@@ -232,6 +243,7 @@ IN UINT                       BytesToTransfer
 	if (ndissta != NDIS_STATUS_PENDING)
 	{
 		//分析数据包
+		ZlzAnalysePacket(Packet, ZLZ_PACKET_RECEIVE);
 	}
 
 	return ndissta;
@@ -304,6 +316,10 @@ IN NDIS_STATUS                  Status
 )
 {
 	padapercontext context = ProtocolBindingContext;
+	if (context->powerstatus)
+	{
+		return;
+	}
 	switch (pNdisRequest->RequestType)
 	{
 	case NdisRequestSetInformation:
@@ -437,6 +453,7 @@ IN PVOID                        SystemSpecific2
 		UINT seletemediumundex = 0;
 		padapercontext context;
 		NdisAllocateMemoryWithTag(&context, sizeof(adapercontext), 0);
+		context->powerstatus = 0;
 		InitializeListHead(&context->packrecvlist);
 		KeInitializeSpinLock(&context->lock);
 		NdisInitializeEvent(&context->ndiseve);
@@ -517,6 +534,7 @@ IN NDIS_HANDLE                  UnbindContext
 	NDIS_STATUS sta;
 	padapercontext context = (padapercontext)ProtocolBindingContext;
 	num = context->contextno;
+	context->powerstatus = 1;
 	NdisCloseAdapter(&sta, global.bindinghandle[num]);
 	if (sta == NDIS_STATUS_PENDING)
 	{
@@ -620,8 +638,8 @@ NDIS_STATUS ZlzOpenConfiguration(PNDIS_STRING str, PVOID sys1)
 }
 NDIS_STATUS ZlzAnalysePacket(PNDIS_PACKET Packet, enum PacketType type)
 {
-	PNDIS_STATUS ndissta;
-	ndissta;
+	checkcount();
+	ippackinfo info;
 	PUCHAR buffer;
 	NdisAllocateMemoryWithTag(&buffer, 2048, 0);
 	NdisZeroMemory(buffer, 2048);
@@ -648,6 +666,14 @@ NDIS_STATUS ZlzAnalysePacket(PNDIS_PACKET Packet, enum PacketType type)
 			break;
 		}
 	}
+	if (type == ZLZ_PACKET_RECEIVE)
+	{
+		info.issend = FALSE;
+	}
+	else
+	{
+		info.issend = TRUE;
+	}
 	ETHeader *eth = (ETHeader*)buffer;
 	switch (Tranverse16(eth->type))
 	{
@@ -664,21 +690,40 @@ NDIS_STATUS ZlzAnalysePacket(PNDIS_PACKET Packet, enum PacketType type)
 		DbgPrint("Packet type:Unknown\n");
 			break;
 	}
+	info.type = Tranverse16(eth->type);
 	DbgPrint("source mac:%x-%x-%x-%x-%x-%x\n", eth->shost[0], eth->shost[1], eth->shost[2],
 		eth->shost[3], eth->shost[4], eth->shost[5]);
 	DbgPrint("dest mac:%x-%x-%x-%x-%x-%x\n", eth->dhost[0], eth->dhost[1], eth->dhost[2],
 		eth->dhost[3], eth->dhost[4], eth->dhost[5]);
+	info.sourcemac[0] = eth->shost[0];
+	info.sourcemac[1] = eth->shost[1];
+	info.sourcemac[2] = eth->shost[2];
+	info.sourcemac[3] = eth->shost[3];
+	info.sourcemac[4] = eth->shost[4];
+	info.sourcemac[5] = eth->shost[5];
+	info.destmac[0] = eth->dhost[0];
+	info.destmac[1] = eth->dhost[1];
+	info.destmac[2] = eth->dhost[2];
+	info.destmac[3] = eth->dhost[3];
+	info.destmac[4] = eth->dhost[4];
+	info.destmac[5] = eth->dhost[5];
 	if (Tranverse16(eth->type)==0x0800)
 	{
-		ZlzAnalysisIpPacket(buffer, 2048);
+		ZlzAnalysisIpPacket(buffer, &info);
+	}
+	else
+	{
+
 	}
 	DbgPrint("\n---------------------------------------------\n");
 	DbgPrint("\t\t\tPacket Analysis End\n");
 	DbgPrint("---------------------------------------------\n\n");
 	NdisFreeMemory(buffer, 2048, 0);
+	globalinfopool.packet[globalinfopool.count] = info;
+	globalinfopool.count++;
 	return STATUS_SUCCESS;
 }
-VOID ZlzAnalysisIpPacket(UCHAR *buf, int length)
+VOID ZlzAnalysisIpPacket(UCHAR *buf, pippackinfo info)
 {
 	IpPacket *ippack = (pIpPacket)(buf + sizeof(ETHeader));
 	switch (ippack->ipProtocol)
@@ -699,9 +744,19 @@ VOID ZlzAnalysisIpPacket(UCHAR *buf, int length)
 		DbgPrint("Protocol Type:Unknown\n");
 		break;
 	}
+	info->Protocol = ippack->ipProtocol;
 	UCHAR *sourceip = (UCHAR *)&ippack->ipSource;
 	UCHAR *destip = (UCHAR *)&ippack->ipDestination;
+	info->ipSource = *sourceip;
+	info->ipDestination = *destip;
 	DbgPrint("source ip:%d.%d.%d.%d\n", sourceip[0], sourceip[1], sourceip[2], sourceip[3]);
 	DbgPrint("dest ip:%d.%d.%d.%d\n", destip[0], destip[1], destip[2], destip[3]);
 	DbgPrint("TTL:%d\n", ippack->ipTTL);
+}
+VOID checkcount()
+{
+	if (globalinfopool.count == 5000)
+	{
+		globalinfopool.count = 0;
+	}
 }

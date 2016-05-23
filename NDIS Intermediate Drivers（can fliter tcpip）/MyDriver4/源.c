@@ -1,7 +1,16 @@
 #include "head.h"
+#define DEVICE_NAME L"\\Device\\ZLZNDIS Intermediate Drivers"
+#define SYM_NAME L"\\??\\ZLZNDIS Intermediate Drivers"
 typedef NTSTATUS (*systemadddeviceFUNC)(IN PDRIVER_OBJECT  DriverObject,
 	IN PDEVICE_OBJECT  PhysicalDeviceObject);
+typedef VOID(*systemunloadFUNC)(IN PDRIVER_OBJECT  DriverObject);
 systemadddeviceFUNC sysadddevfunc;
+systemunloadFUNC sysunloadfunc;
+NTSTATUS ZlzCreateDevice(PDRIVER_OBJECT driver, NDIS_HANDLE wraphandle);
+NTSTATUS ZlzIoControl(PDEVICE_OBJECT dev, PIRP irp);
+NTSTATUS ZlzDeviceCreate(PDEVICE_OBJECT dev, PIRP irp);
+NTSTATUS ZlzDeviceClose(PDEVICE_OBJECT dev, PIRP irp);
+NTSTATUS ZlzDeviceCleanUp(PDEVICE_OBJECT dev, PIRP irp);
 NTSTATUS unload(PDRIVER_OBJECT driver)
 {
 	DbgBreakPoint();
@@ -18,6 +27,14 @@ NTSTATUS unload(PDRIVER_OBJECT driver)
 	{
 		NdisDeregisterProtocol(&ndissta, global.protocolhandle);
 	}
+	if (global.controlobj)
+	{
+		UNICODE_STRING symname;
+		RtlInitUnicodeString(&symname, SYM_NAME);
+		IoDeleteSymbolicLink(&symname);
+		IoDeleteDevice(global.controlobj);
+	}
+	sysunloadfunc(driver);
 	return STATUS_SUCCESS;
 }
 NTSTATUS myAddDevice(
@@ -26,13 +43,11 @@ NTSTATUS myAddDevice(
 NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 {
 	DbgBreakPoint();
-	driver->DriverUnload = unload;
-    DbgPrint("%wZ", str);
+	NTSTATUS sta;
 	global.contextnum = 0;
 	global.mininum = 0;
-	driver->DriverUnload = unload;
-	sysadddevfunc = driver->DriverExtension->AddDevice;
-	driver->DriverExtension->AddDevice = myAddDevice;
+	globalinfopool.count = 0;
+	global.controlobj = NULL;
 	NDIS_STATUS ndissta;
 	NDIS_HANDLE wraphandle=NULL;
 	NDIS_MINIPORT_CHARACTERISTICS minicha;
@@ -61,6 +76,12 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
+	sysunloadfunc = driver->DriverUnload;
+	sysadddevfunc = driver->DriverExtension->AddDevice;
+
+	driver->DriverExtension->AddDevice = myAddDevice;
+	driver->DriverUnload = unload;
+
 	pc.MajorNdisVersion = 5;
 	pc.MinorNdisVersion = 0;
 	pc.Name = ns;
@@ -86,6 +107,12 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 		return STATUS_UNSUCCESSFUL;
 	}
 	NdisIMAssociateMiniport(global.driverhandle, global.protocolhandle);
+
+	sta = ZlzCreateDevice(driver,wraphandle);
+	if (!NT_SUCCESS(sta))
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
     return STATUS_SUCCESS;
 }
 NTSTATUS myAddDevice(
@@ -93,6 +120,65 @@ NTSTATUS myAddDevice(
 	IN PDEVICE_OBJECT  PhysicalDeviceObject)
 {
 	DbgBreakPoint();
-	DbgPrint("1\n");
+	WCHAR classname[100];
+	ULONG longret;
+	IoGetDeviceProperty(PhysicalDeviceObject, DevicePropertyClassName, 100, classname, &longret);
+	DbgPrint("class name:%ws\n", classname);
 	return sysadddevfunc(DriverObject, PhysicalDeviceObject);
+}
+NTSTATUS ZlzCreateDevice(PDRIVER_OBJECT driver,NDIS_HANDLE wraphandle)
+{
+	DbgBreakPoint();
+	NDIS_STATUS sta;
+	UNICODE_STRING devname;
+	UNICODE_STRING symname;
+	PDRIVER_DISPATCH dispatchfunc[IRP_MJ_MAXIMUM_FUNCTION + 1];
+	RtlInitUnicodeString(&devname, DEVICE_NAME);
+	RtlInitUnicodeString(&symname, SYM_NAME);
+	dispatchfunc[IRP_MJ_CREATE] = ZlzDeviceCreate;
+	dispatchfunc[IRP_MJ_DEVICE_CONTROL] = ZlzIoControl;
+	dispatchfunc[IRP_MJ_CLOSE] = ZlzDeviceClose;
+	dispatchfunc[IRP_MJ_CLEANUP] = ZlzDeviceCleanUp;
+	sta=NdisMRegisterDevice(wraphandle, &devname, &symname, dispatchfunc, &global.controlobj, &global.controlhand);
+	global.controlobj->Flags |= DO_BUFFERED_IO;
+	global.controlobj->Flags &= ~DO_DEVICE_INITIALIZING;
+	if (sta!=NDIS_STATUS_SUCCESS)
+	{
+		return sta;
+	}
+	sta = IoCreateSymbolicLink(&symname, &devname);
+	return STATUS_SUCCESS;
+}
+NTSTATUS ZlzIoControl(PDEVICE_OBJECT dev, PIRP irp)
+{
+		DbgBreakPoint();
+		PIO_STACK_LOCATION sa = IoGetCurrentIrpStackLocation(irp);
+		switch (sa->Parameters.DeviceIoControl.IoControlCode)
+		{
+		case IOCTL_GETIPPACKET:
+			irp->IoStatus.Information = globalinfopool.count;
+			irp->IoStatus.Status = STATUS_SUCCESS;
+			irp->AssociatedIrp.SystemBuffer = ExAllocatePool(NonPagedPool, sizeof(globalinfopool.packet) * 5000);
+			memcpy(irp->AssociatedIrp.SystemBuffer, globalinfopool.packet, sizeof(globalinfopool.packet) * 5000);
+			IoCompleteRequest(irp, IO_NO_INCREMENT);
+			ExFreePool(irp->AssociatedIrp.SystemBuffer);
+			return STATUS_SUCCESS;
+		default:
+			return STATUS_SUCCESS;
+			break;
+		}
+}
+NTSTATUS ZlzDeviceCreate(PDEVICE_OBJECT dev, PIRP irp)
+{
+		DbgBreakPoint();
+		DbgPrint("Creae Success!\n");
+		return STATUS_SUCCESS;
+}
+NTSTATUS ZlzDeviceClose(PDEVICE_OBJECT dev, PIRP irp)
+{
+	return STATUS_SUCCESS;
+}
+NTSTATUS ZlzDeviceCleanUp(PDEVICE_OBJECT dev, PIRP irp)
+{
+	return STATUS_SUCCESS;
 }
