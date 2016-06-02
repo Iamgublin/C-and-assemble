@@ -49,7 +49,7 @@ Signature  = "$Windows NT$"
 Class      = NetService
 ClassGUID  = {4D36E974-E325-11CE-BFC1-08002BE10318}
 Provider   = %Msft%
-DriverVer=05/22/2016,15.24.44.198
+DriverVer=06/01/2016,14.8.36.783
 
 
 [Manufacturer]

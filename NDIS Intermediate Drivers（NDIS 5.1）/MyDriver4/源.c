@@ -3,15 +3,13 @@
 #define SYM_NAME L"\\??\\ZLZNDIS Intermediate Drivers"
 typedef NTSTATUS (*systemadddeviceFUNC)(IN PDRIVER_OBJECT  DriverObject,
 	IN PDEVICE_OBJECT  PhysicalDeviceObject);
-typedef VOID(*systemunloadFUNC)(IN PDRIVER_OBJECT  DriverObject);
 systemadddeviceFUNC sysadddevfunc;
-systemunloadFUNC sysunloadfunc;
 NTSTATUS ZlzCreateDevice(PDRIVER_OBJECT driver, NDIS_HANDLE wraphandle);
 NTSTATUS ZlzIoControl(PDEVICE_OBJECT dev, PIRP irp);
 NTSTATUS ZlzDeviceCreate(PDEVICE_OBJECT dev, PIRP irp);
 NTSTATUS ZlzDeviceClose(PDEVICE_OBJECT dev, PIRP irp);
 NTSTATUS ZlzDeviceCleanUp(PDEVICE_OBJECT dev, PIRP irp);
-NTSTATUS unload(PDRIVER_OBJECT driver)
+VOID unload(PDRIVER_OBJECT driver)
 {
 	DbgBreakPoint();
 	NDIS_STATUS ndissta;
@@ -34,8 +32,6 @@ NTSTATUS unload(PDRIVER_OBJECT driver)
 		IoDeleteSymbolicLink(&symname);
 		IoDeleteDevice(global.controlobj);
 	}
-	sysunloadfunc(driver);
-	return STATUS_SUCCESS;
 }
 NTSTATUS myAddDevice(
 	IN PDRIVER_OBJECT  DriverObject,
@@ -76,11 +72,9 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
-	sysunloadfunc = driver->DriverUnload;
 	sysadddevfunc = driver->DriverExtension->AddDevice;
 
 	driver->DriverExtension->AddDevice = myAddDevice;
-	driver->DriverUnload = unload;
 
 	pc.MajorNdisVersion = 5;
 	pc.MinorNdisVersion = 0;
@@ -113,6 +107,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
+
+	NdisMRegisterUnloadHandler(wraphandle, unload);
     return STATUS_SUCCESS;
 }
 NTSTATUS myAddDevice(
@@ -156,12 +152,13 @@ NTSTATUS ZlzIoControl(PDEVICE_OBJECT dev, PIRP irp)
 		switch (sa->Parameters.DeviceIoControl.IoControlCode)
 		{
 		case IOCTL_GETIPPACKET:
-			irp->IoStatus.Information = globalinfopool.count;
+			irp->IoStatus.Information = sizeof(ippackinfo) * 100;
 			irp->IoStatus.Status = STATUS_SUCCESS;
-			irp->AssociatedIrp.SystemBuffer = ExAllocatePool(NonPagedPool, sizeof(globalinfopool.packet) * 5000);
-			memcpy(irp->AssociatedIrp.SystemBuffer, globalinfopool.packet, sizeof(globalinfopool.packet) * 5000);
+			/*irp->AssociatedIrp.SystemBuffer = ExAllocatePoolWithTag(NonPagedPool, sizeof(ippackinfo) * 100, 0);*/
+			PVOID buffer = irp->AssociatedIrp.SystemBuffer;
+			buffer;
+			RtlCopyMemory(irp->AssociatedIrp.SystemBuffer, globalinfopool.packet, sizeof(ippackinfo) * 100);
 			IoCompleteRequest(irp, IO_NO_INCREMENT);
-			ExFreePool(irp->AssociatedIrp.SystemBuffer);
 			return STATUS_SUCCESS;
 		default:
 			return STATUS_SUCCESS;

@@ -719,6 +719,7 @@ NDIS_STATUS ZlzAnalysePacket(PNDIS_PACKET Packet, enum PacketType type)
 	DbgPrint("\t\t\tPacket Analysis End\n");
 	DbgPrint("---------------------------------------------\n\n");
 	NdisFreeMemory(buffer, 2048, 0);
+	info.timestamp = KeQuerySystemTime(&info.timestamp);
 	globalinfopool.packet[globalinfopool.count] = info;
 	globalinfopool.count++;
 	return STATUS_SUCCESS;
@@ -747,15 +748,15 @@ VOID ZlzAnalysisIpPacket(UCHAR *buf, pippackinfo info)
 	info->Protocol = ippack->ipProtocol;
 	UCHAR *sourceip = (UCHAR *)&ippack->ipSource;
 	UCHAR *destip = (UCHAR *)&ippack->ipDestination;
-	info->ipSource = *sourceip;
-	info->ipDestination = *destip;
+	info->ipSource = ippack->ipSource;
+	info->ipDestination = ippack->ipDestination;
 	DbgPrint("source ip:%d.%d.%d.%d\n", sourceip[0], sourceip[1], sourceip[2], sourceip[3]);
 	DbgPrint("dest ip:%d.%d.%d.%d\n", destip[0], destip[1], destip[2], destip[3]);
 	DbgPrint("TTL:%d\n", ippack->ipTTL);
 }
 VOID checkcount()
 {
-	if (globalinfopool.count == 5000)
+	if (globalinfopool.count == 100)
 	{
 		globalinfopool.count = 0;
 	}
