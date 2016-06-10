@@ -94,7 +94,7 @@ typedef struct _IpPacket
 #pragma pack(pop)
 typedef struct ippackinfo
 {
-	int timestamp;
+	long long timestamp;
 	int Protocol;
 	int type;
 	BOOLEAN issend;
@@ -105,7 +105,7 @@ typedef struct ippackinfo
 }ippackinfo, *pippackinfo;
 typedef struct _packetinfopool
 {
-	ippackinfo packet[5000];
+	ippackinfo packet[100];
 	int count;
 }packetinfopool,*ppactetinfopool;
 packetinfopool globalinfopool;

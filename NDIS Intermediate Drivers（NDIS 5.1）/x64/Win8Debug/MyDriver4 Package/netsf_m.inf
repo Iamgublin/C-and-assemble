@@ -24,7 +24,7 @@ signature  = "$Windows NT$"
 Class      = Net
 ClassGUID  = {4d36e972-e325-11ce-bfc1-08002be10318}
 Provider   = %Msft%
-DriverVer=05/22/2016,15.24.44.132
+DriverVer=06/01/2016,14.8.36.712
 
 [ControlFlags]
 ExcludeFromSelect = ms_zlzpassMP
