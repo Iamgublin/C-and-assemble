@@ -1,0 +1,32 @@
+﻿生成启动时间为 2016/7/1 22:09:04。
+     1>项目“I:\github project\zlz1\tuhou project源代码\60復\RyuJin.vcxproj”在节点 2 上(Build 个目标)。
+     1>Link:
+         I:\Microsoft Visual stdio 2013\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"I:\github project\zlz1\tuhou project源代码\60復\Debug\RyuJin.exe" /INCREMENTAL /NOLOGO /LIBPATH:../include kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"I:\github project\zlz1\tuhou project源代码\60復\Debug\RyuJin.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE:NO /IMPLIB:"I:\github project\zlz1\tuhou project源代码\60復\Debug\RyuJin.lib" /MACHINE:X86 /SAFESEH /SAFESEH:NO Debug\3Dbackground.obj
+         Debug\boss_shot.obj
+         Debug\boss_shotH.obj
+         Debug\calc.obj
+         Debug\char.obj
+         Debug\check_time.obj
+         Debug\cshot.obj
+         Debug\dn.obj
+         Debug\effect.obj
+         Debug\enemy.obj
+         Debug\enemy_act_pattern.obj
+         Debug\fps.obj
+         Debug\graph.obj
+         Debug\graph_back.obj
+         Debug\ini.obj
+         Debug\key.obj
+         Debug\load.obj
+         Debug\main.obj
+         Debug\music.obj
+         Debug\out.obj
+         Debug\out_lazer.obj
+         Debug\shot.obj
+         Debug\shotH.obj
+         RyuJin.vcxproj -> I:\github project\zlz1\tuhou project源代码\60復\Debug\RyuJin.exe
+     1>已完成生成项目“I:\github project\zlz1\tuhou project源代码\60復\RyuJin.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.24
