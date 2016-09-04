@@ -1,9 +1,39 @@
 #include<ntifs.h>
 #include<ntddk.h>
 #include<tdikrnl.h>
+#pragma warning(disable:4054)
+#pragma warning(disable:4055)
 #define TCP L"\\Device\\Tcp"
 #define UDP L"\\Device\\Udp"
 #define IP L"\\Device\\RawIp"
+NTSTATUS my_ClientEventReceive(
+	_In_  PVOID              TdiEventContext,
+	_In_  CONNECTION_CONTEXT ConnectionContext,
+	_In_  ULONG              ReceiveFlags,
+	_In_  ULONG              BytesIndicated,
+	_In_  ULONG              BytesAvailable,
+	_Out_ ULONG              *BytesTaken,
+	_In_  PVOID              Tsdu,
+	_Out_ PIRP               *IoRequestPacket
+	);
+typedef NTSTATUS(__stdcall *ClientEventReceive)(
+	_In_  PVOID              TdiEventContext,
+	_In_  CONNECTION_CONTEXT ConnectionContext,
+	_In_  ULONG              ReceiveFlags,
+	_In_  ULONG              BytesIndicated,
+	_In_  ULONG              BytesAvailable,
+	_Out_ ULONG              *BytesTaken,
+	_In_  PVOID              Tsdu,
+	_Out_ PIRP               *IoRequestPacket
+	);
+#pragma pack(push,1)
+typedef struct _temp_context
+{
+	int magic;
+	PVOID old_handler;
+	PVOID old_context;
+}temp_context, *ptemp_context;
+#pragma pack(pop)
 enum DevType
 {
 	DEVTYPE_TCP = 0,
@@ -40,6 +70,13 @@ NTSTATUS dispatch(PDEVICE_OBJECT dev, PIRP irp);
 enum DevType check(PDEVICE_OBJECT dev);
 NTSTATUS createcomplete(PDEVICE_OBJECT dev, PIRP irp, PVOID context);
 NTSTATUS querycom(PDEVICE_OBJECT dev, PIRP irp, PVOID context);
+USHORT tdi_ntohs(USHORT netshort)
+{
+	USHORT result = 0;
+	((char *)&result)[0] = ((char *)&netshort)[1];
+	((char *)&result)[1] = ((char *)&netshort)[0];
+	return result;
+}
 NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 {
 	UNREFERENCED_PARAMETER(driver);
@@ -189,25 +226,28 @@ NTSTATUS dispatch(PDEVICE_OBJECT dev, PIRP irp)
 			TA_ADDRESS *ta;
 			TDI_REQUEST_KERNEL_CONNECT *trk = (TDI_REQUEST_KERNEL_CONNECT *)(&sa->Parameters);
 			ta = ((TRANSPORT_ADDRESS*)(trk->RequestConnectionInformation->RemoteAddress))->Address;
-			TA_IP_ADDRESS *ip = (TA_IP_ADDRESS*)&(ta->Address);
-			in_addr *ia = (in_addr*)&(ip->Address->Address->in_addr);
-			DbgPrint("%d.%d.%d.%d:%d\n",
-				ia->S_un.S_un_b.s_b1,
-				ia->S_un.S_un_b.s_b2,
-				ia->S_un.S_un_b.s_b3,
-				ia->S_un.S_un_b.s_b4,
-				RtlUshortByteSwap(((TDI_ADDRESS_IP*)(ip->Address))->sin_port));
+			PTDI_ADDRESS_IP ip = (PTDI_ADDRESS_IP)&(ta->Address);
+			unsigned long Address = ip->in_addr;
+			DbgPrint("ip address:%d.%d.%d.%d\n",
+				((char *)& Address)[0],
+				((char *)& Address)[1],
+				((char *)& Address)[2],
+				((char *)& Address)[3]);
+			DbgPrint("port = %d\r\n", tdi_ntohs(ip->sin_port));
 		}
 		if (sa->MinorFunction == TDI_SET_EVENT_HANDLER)
 		{
 			DbgPrint("tdi set event handler\n");
 			PTDI_REQUEST_KERNEL_SET_EVENT r = (PTDI_REQUEST_KERNEL_SET_EVENT)&(sa->Parameters);
-			if (r->EventType == TDI_EVENT_CONNECT&&r->EventHandler != NULL)
+			if (r->EventType == TDI_EVENT_RECEIVE&&r->EventHandler != NULL)
 			{
-				/*PVOID my_handler;
-				PVOID oldcontext = r->EventContext;
-				PVOID old_hand = r->EventHandler;
-				r->EventHandler = my_handler;*/
+				DbgBreakPoint();
+				temp_context* context = (ptemp_context)ExAllocatePool(NonPagedPool, sizeof(temp_context));
+				context->old_context = r->EventContext;
+				context->old_handler = r->EventHandler;
+				context->magic = 0x907690;
+				r->EventHandler = (PVOID)my_ClientEventReceive;
+				r->EventContext = context;
 			}
 		}
 		break;
@@ -239,23 +279,18 @@ NTSTATUS createcomplete(PDEVICE_OBJECT dev, PIRP irp, PVOID context)
 	DbgPrint("enter createcomplete\n");
 	PIO_STACK_LOCATION sa = IoGetCurrentIrpStackLocation(irp);
 	PCONTEXTI info = context;
-	DbgPrint("1\n");
 	TDI_ADDRESS_INFO *tai = ExAllocatePool(NonPagedPool, sizeof(TDI_ADDRESS_INFO));
-	DbgPrint("2\n");
 	PMDL mdl = IoAllocateMdl(tai, sizeof(TDI_ADDRESS_INFO), FALSE, FALSE, info->query_irp);
 	MmBuildMdlForNonPagedPool(mdl);
 	info->mdl = mdl;
-	DbgPrint("3\n");
 	IoCopyCurrentIrpStackLocationToNext(irp);
 	TdiBuildQueryInformation(info->query_irp, info->realdev, sa->FileObject, querycom, info, TDI_QUERY_ADDRESS_INFO, mdl);
-	DbgPrint("4\n");
 	if (irp->PendingReturned)
 	{
 		IoMarkIrpPending(irp);
 		DbgPrint("pending\n");
 	}
 	IoCallDriver(info->realdev, info->query_irp);
-	DbgPrint("6\n");
 	IoFreeMdl(info->mdl);
 	ExFreePool(context);
 	return STATUS_SUCCESS;
@@ -265,19 +300,45 @@ NTSTATUS querycom(PDEVICE_OBJECT dev, PIRP irp, PVOID context)
 	UNREFERENCED_PARAMETER(dev);
 	UNREFERENCED_PARAMETER(irp);
 	UNREFERENCED_PARAMETER(context);
-	DbgPrint("5\n");
 	if (irp->MdlAddress)
 	{
 		TDI_ADDRESS_INFO *tai = (TDI_ADDRESS_INFO*)MmGetSystemAddressForMdlSafe(irp->MdlAddress, NormalPagePriority);
 		TA_ADDRESS *addr = tai->Address.Address;
-		TA_IP_ADDRESS *ip = (TA_IP_ADDRESS*)&(addr->Address);
-		in_addr *ia = (in_addr*)&(ip->Address->Address->in_addr);
+		PTDI_ADDRESS_IP ip = (PTDI_ADDRESS_IP)&(addr->Address);
+		unsigned long Address = ip->in_addr;
+		unsigned short port;
+		port = ip->sin_port;
+		unsigned char ports[2];
+		ports[0] = ((char *)& port)[0];
+		ports[1] = ((char *)& port)[1];
 		DbgPrint("%d.%d.%d.%d:%d\n",
-			ia->S_un.S_un_b.s_b1 , 
-			ia->S_un.S_un_b.s_b2,
-			ia->S_un.S_un_b.s_b3,
-			ia->S_un.S_un_b.s_b4,
-			RtlUshortByteSwap(((TDI_ADDRESS_IP*)(addr->Address))->sin_port));
+			((char *)& Address)[0],
+			((char *)& Address)[1],
+			((char *)& Address)[2],
+			((char *)& Address)[3],
+			ports);
 	}
 	return STATUS_MORE_PROCESSING_REQUIRED;
+}
+NTSTATUS my_ClientEventReceive(
+	_In_  PVOID              TdiEventContext,
+	_In_  CONNECTION_CONTEXT ConnectionContext,
+	_In_  ULONG              ReceiveFlags,
+	_In_  ULONG              BytesIndicated,
+	_In_  ULONG              BytesAvailable,
+	_Out_ ULONG              *BytesTaken,
+	_In_  PVOID              Tsdu,                     //收到数据的指针
+	_Out_ PIRP               *IoRequestPacket        //客户端处理回调函数（对收到的数据包进行过滤，转发）
+	)
+{
+	DbgBreakPoint();
+	temp_context* context = (temp_context*)TdiEventContext;
+	ClientEventReceive func = (ClientEventReceive)context->old_handler;
+	PVOID old_context = context->old_context;
+	if (context->magic == 0x907690)
+	{
+		/*ExFreePool(TdiEventContext);*/
+	}
+	return func(old_context, ConnectionContext, ReceiveFlags, BytesIndicated, BytesAvailable, BytesTaken, Tsdu,
+		IoRequestPacket);
 }
