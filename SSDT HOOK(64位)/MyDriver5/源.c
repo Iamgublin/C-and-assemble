@@ -41,7 +41,7 @@ UCHAR shellcode3[13] =
 "\xFF\xE0";                                //11
 typedef ULONG (*CLOSEINTERUPT)();
 typedef VOID (*OPENINTERUPT)(ULONG old_cr0);
-typedef NTSTATUS(__fastcall *OLDCREATEFILE)(
+typedef NTSTATUS(__fastcall *OLDCREATEFILE)(                         //一定要是fastcall，否则会出问题！
 	_Out_    PHANDLE            FileHandle,
 	_In_     ACCESS_MASK        DesiredAccess,
 	_In_     POBJECT_ATTRIBUTES ObjectAttributes,
@@ -54,7 +54,7 @@ typedef NTSTATUS(__fastcall *OLDCREATEFILE)(
 	_In_opt_ PVOID              EaBuffer,
 	_In_     ULONG              EaLength
 	);
-OLDCREATEFILE old_func;
+OLDCREATEFILE  old_func;
 typedef struct ServiceDescriptorEntry {
 	INT64 *ServiceTableBase;
 	INT64 *ServiceCounterTableBase;
@@ -67,7 +67,7 @@ ULONG getaddressoffset(PServiceDescriptorTableEntry_t enteraddress,INT64 address
 PVOID changessdt(PServiceDescriptorTableEntry_t address, int service_id);
 ULONG closeinterupt();
 void startinteript(ULONG old_cr0);
-NTSTATUS myfunc(
+NTSTATUS __fastcall myfunc(
 	_Out_    PHANDLE            FileHandle,
 	_In_     ACCESS_MASK        DesiredAccess,
 	_In_     POBJECT_ATTRIBUTES ObjectAttributes,
@@ -80,9 +80,16 @@ NTSTATUS myfunc(
 	_In_opt_ PVOID              EaBuffer,
 	_In_     ULONG              EaLength
 	);
+VOID resetessdt(PServiceDescriptorTableEntry_t address, int service_id);
+
+PServiceDescriptorTableEntry_t ent;
+
 NTSTATUS unload(PDRIVER_OBJECT driver)
 {
 	UNREFERENCED_PARAMETER(driver);
+	UNICODE_STRING func = RTL_CONSTANT_STRING(L"ZwCreateFile");
+	PVOID funcaddress = MmGetSystemRoutineAddress(&func);
+	resetessdt(ent, findserviceid(funcaddress));
 	return STATUS_SUCCESS;
 }
 NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
@@ -95,7 +102,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	PVOID funcaddress = MmGetSystemRoutineAddress(&func);
 	int service_id = findserviceid(funcaddress);
 	DbgPrint("serviceid:%x\n", service_id);
-	PServiceDescriptorTableEntry_t ent;
 	ULONGLONG address = GetKeServiceDescriptorTable64();
 	DbgPrint("0x%p\n", address);
 	ent = (PServiceDescriptorTableEntry_t)address;
@@ -140,7 +146,7 @@ int findserviceid(PVOID address)
 	{
 		i1 = *temp;
 		i2 = *(temp + 1);
-		if (i1 == 0xb8)
+		if (i1 == 0xb8)  //硬编码
 		{
 			break;
 		}
@@ -152,18 +158,28 @@ PVOID changessdt(PServiceDescriptorTableEntry_t address, int service_id)
 	ULONG old_cr0=0;
 	ULONGLONG add;
 	ULONGLONG ssdtentry = (ULONGLONG)address->ServiceTableBase;
-	ULONG temp = (ULONG)address->ServiceTableBase[service_id];
-	temp = temp >> 4;
-	add = ssdtentry + temp;
-	old_func = (void*)add;
+	PULONG servicetableaddr = (PULONG)address->ServiceTableBase;
+	LONG temp1 = servicetableaddr[service_id];
+	temp1 = temp1 >> 4;
+	add = ssdtentry + temp1;
+	old_func = (OLDCREATEFILE)add;
 	ULONGLONG myfuncaddress = (ULONGLONG)myfunc;
 	DbgPrint("%p\n", myfuncaddress);
 	memcpy(shellcode3 + 2, &myfuncaddress, 8);
 	old_cr0 = closeinterupt();
 	memcpy(KeBugCheckEx, shellcode3, 13);
-	address->ServiceTableBase[service_id] = getaddressoffset(address, (INT64)KeBugCheckEx);
+	servicetableaddr[service_id] = getaddressoffset(address, (INT64)KeBugCheckEx);
 	startinteript(old_cr0);
 	return (PVOID)add;
+}
+VOID resetessdt(PServiceDescriptorTableEntry_t address, int service_id)
+{
+	ULONG old_cr0 = 0;
+	PULONG servicetableaddr = (PULONG)address->ServiceTableBase;
+	old_cr0 = closeinterupt();
+	memcpy(KeBugCheckEx, shellcode3, 13);
+	servicetableaddr[service_id] = (ULONG)((ULONGLONG)old_func - (ULONGLONG)address->ServiceTableBase);
+	startinteript(old_cr0);
 }
 ULONG closeinterupt()
 {
@@ -181,7 +197,7 @@ void startinteript(ULONG old_cr0)
 	func(old_cr0);
 	ExFreePool(func);
 }
-NTSTATUS myfunc(
+NTSTATUS __fastcall myfunc(
 	_Out_    PHANDLE            FileHandle,
 	_In_     ACCESS_MASK        DesiredAccess,
 	_In_     POBJECT_ATTRIBUTES ObjectAttributes,
@@ -195,8 +211,7 @@ NTSTATUS myfunc(
 	_In_     ULONG              EaLength
 	)
 {
-	DbgPrint("enter the ssdt hook\n");
-	return old_func(FileHandle, DesiredAccess, ObjectAttributes, IoStatusBlock, AllocationSize, FileAttributes, ShareAccess,
+	return NtCreateFile(FileHandle, DesiredAccess, ObjectAttributes, IoStatusBlock, AllocationSize, FileAttributes, ShareAccess,
 		CreateDisposition, CreateOptions, EaBuffer, EaLength);
 }
 ULONG getaddressoffset(PServiceDescriptorTableEntry_t enteraddress, INT64 address)
