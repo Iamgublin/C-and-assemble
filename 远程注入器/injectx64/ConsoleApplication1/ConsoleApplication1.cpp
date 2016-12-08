@@ -1,10 +1,8 @@
-// ConsoleApplication7.cpp : 定义控制台应用程序的入口点。
-//
-
 #include "stdafx.h"
 #include<Windows.h>
 #include<TlHelp32.h>
 #include<locale.h>
+#define QWORD LONGLONG
 typedef struct
 {
 	ULONG Size;
@@ -24,17 +22,17 @@ HANDLE MyNtCreateThreadEx(HANDLE hProcess, LPVOID lpRemoteThreadStart, LPVOID lp
 	HANDLE hThread = NULL;
 	HMODULE hModule = GetModuleHandleA("ntdll.dll");
 	FARPROC func = GetProcAddress(hModule, "NtCreateThreadEx");
-	int sta = ((int(__stdcall *)(HANDLE *, signed int, DWORD, HANDLE, LPTHREAD_START_ROUTINE, LPVOID, signed int, DWORD, DWORD, DWORD, int *))func)(
+	int sta = ((int(__stdcall *)(HANDLE *, signed __int64, QWORD, HANDLE, LPTHREAD_START_ROUTINE, LPVOID, signed __int64, QWORD, QWORD, QWORD, __int64*))func)(
 		&hThread,
-		0x1FFFFF,
+		0x1FFFFFi64,
 		NULL,
 		hProcess,
 		(LPTHREAD_START_ROUTINE)lpRemoteThreadStart,
 		lpRemoteCallback,
 		FALSE,
-		0,
-		0,
-		0,
+		0i64,
+		0i64,
+		0i64,
 		NULL);
 	*Status = sta;
 	return hThread;
@@ -43,18 +41,17 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	SIZE_T a;
 	HANDLE took;
-	LUID PD; 
-	DWORD processId=-1;
-	BOOL is32;
+	LUID PD;
+	DWORD processId = -1;
 	int i = 5;
 	setlocale(LC_ALL, "chs");
 	printf("请输入想要注入的进程名:");
 	wscanf_s(TEXT("%s"), buf, 20);
-    HANDLE hand = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	HANDLE hand = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	PROCESSENTRY32W info;
 	info.dwSize = sizeof(PROCESSENTRY32W);
 	Process32First(hand, &info);
-	if (wcscmp(info.szExeFile, buf)==0)
+	if (wcscmp(info.szExeFile, buf) == 0)
 	{
 		processId = info.th32ProcessID;
 	}
@@ -62,7 +59,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		while (Process32Next(hand, &info))
 		{
-			if (wcscmp(info.szExeFile, buf)==0)
+			if (wcscmp(info.szExeFile, buf) == 0)
 			{
 				processId = info.th32ProcessID;
 				break;
@@ -92,42 +89,25 @@ int _tmain(int argc, _TCHAR* argv[])
 	tp.Privileges->Luid = PD;
 	AdjustTokenPrivileges(took, FALSE, &tp, NULL, NULL, NULL);
 	printf("0x%x\n", GetLastError());
-	HANDLE exploer=OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
+	HANDLE exploer = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
 	printf("0x%x\n", GetLastError());
-	IsWow64Process(exploer, &is32);
-	if (is32)
+	int status;
+	PTHREAD_START_ROUTINE pfn = (PTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "LoadLibraryA");
+	void* add = VirtualAllocEx(exploer, NULL, strlen(b), MEM_COMMIT, PAGE_READWRITE);
+	WriteProcessMemory(exploer, add, b, strlen(b), &a);
+	printf("0x%x\n", GetLastError());
+	MyNtCreateThreadEx(exploer, pfn, add, &status);
+	if (status == 0)
 	{
-		PTHREAD_START_ROUTINE pfn = (PTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "LoadLibraryA");
-		void* add = VirtualAllocEx(exploer, NULL, strlen(b), MEM_COMMIT, PAGE_READWRITE);
-		WriteProcessMemory(exploer, add, b, strlen(b), &a);
-		HANDLE thread = CreateRemoteThread(exploer, NULL, 0, pfn, add, 0, NULL);
-		if (GetLastError() == ERROR_SUCCESS)
-		{
-			printf("注入成功!\n");
-		}
-		else
-		{
-			printf("注入失败,您需要以管理员身份运行程序或尝试关闭360\n");
-		}
+		printf("x64 inject success!\n");
 	}
 	else
 	{
-		int status;
-		PTHREAD_START_ROUTINE pfn = (PTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "LoadLibraryA");
-		void* add = VirtualAllocEx(exploer, NULL, strlen(b), MEM_COMMIT, PAGE_READWRITE);
-		WriteProcessMemory(exploer, add, b, strlen(b), &a);
-		printf("0x%x\n", GetLastError());
-		MyNtCreateThreadEx(exploer, pfn, add, &status);
-		if (status==0)
-		{
-			printf("x64 inject success!\n");
-		}
-		else
-		{
-			printf("注入64位失败,不能注入windows进程！\n");
-		}
+		printf("注入64位失败,不能注入windows进程！\n");
 	}
 	Sleep(3000);
 	return 0;
 }
+
+
 
