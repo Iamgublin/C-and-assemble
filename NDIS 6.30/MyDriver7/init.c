@@ -1,11 +1,21 @@
 #include"struct.h"
 #include"filter.h"
-#define FILTER_MAJOR_NDIS_VERSION   NDIS_FILTER_MAJOR_VERSION
-#define FILTER_MINOR_NDIS_VERSION   NDIS_FILTER_MINOR_VERSION
+UNICODE_STRING devname = RTL_CONSTANT_STRING(DEVICE_NAME);
+UNICODE_STRING symname = RTL_CONSTANT_STRING(SYM_NAME);
+
+NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp);
 VOID Unload(PDRIVER_OBJECT driver)
 {
 	DbgBreakPoint();
-	NdisFDeregisterFilterDriver(Global.DrverHandle);
+	if (Global.DriverHandle)
+	{
+		NdisFDeregisterFilterDriver(Global.DriverHandle);
+	}
+	if (Global.FilterDev)
+	{
+		IoDeleteSymbolicLink(&symname);
+		IoDeleteDevice(Global.FilterDev);
+	}
 }
 NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 {
@@ -18,6 +28,10 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	NDIS_STRING UniqueName = RTL_CONSTANT_STRING(NETCFGGUID);
 	NDIS_STRING ServiceName = RTL_CONSTANT_STRING(SERVICENAME);
 	Global.contextnum = 0;
+	Global.DriverHandle = NULL;
+	Global.FilterDev = NULL;
+	driver->DriverUnload = Unload;
+	devcon = driver->MajorFunction[IRP_MJ_DEVICE_CONTROL];
 
 	NdisZeroMemory(&FChars, sizeof(NDIS_FILTER_DRIVER_CHARACTERISTICS));
 	FChars.Header.Type = NDIS_OBJECT_TYPE_FILTER_DRIVER_CHARACTERISTICS;
@@ -53,11 +67,34 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	FChars.SetFilterModuleOptionsHandler = FilterSetModuleOptions;
 	FChars.SetOptionsHandler = FilterSetOptions;
 	FChars.StatusHandler = NULL;
-	sta = NdisFRegisterFilterDriver(driver, NULL, &FChars, &Global.DrverHandle);
+	sta = NdisFRegisterFilterDriver(driver, NULL, &FChars, &Global.DriverHandle);
 	DbgPrint("0x%x\n", sta);
 	if (!NT_SUCCESS(sta))
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
+	IoCreateDevice(driver, 0, &devname, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &Global.FilterDev);
+
+	if (Global.FilterDev)
+	{
+		IoCreateSymbolicLink(&symname, &devname);
+	}
 	return 0;
+}
+NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp)
+{
+	if (dev == Global.FilterDev)
+	{
+		PIO_STACK_LOCATION sa = IoGetCurrentIrpStackLocation(irp);
+		switch (sa->Parameters.DeviceIoControl.IoControlCode)
+		{
+		default:
+			break;
+		}
+		return STATUS_SUCCESS;
+	}
+	else
+	{
+		return devcon(dev, irp);
+	}
 }

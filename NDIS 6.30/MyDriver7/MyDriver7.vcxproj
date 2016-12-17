@@ -152,9 +152,11 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="filter.c" />
     <ClCompile Include="init.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="devio.h" />
     <ClInclude Include="filter.h" />
     <ClInclude Include="struct.h" />
   </ItemGroup>

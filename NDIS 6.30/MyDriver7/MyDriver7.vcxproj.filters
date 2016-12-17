@@ -27,12 +27,18 @@
     <ClCompile Include="init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="filter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="struct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="devio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
