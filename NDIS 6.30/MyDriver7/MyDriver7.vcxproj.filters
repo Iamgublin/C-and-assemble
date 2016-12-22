@@ -41,5 +41,8 @@
     <ClInclude Include="devio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="packetcpy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

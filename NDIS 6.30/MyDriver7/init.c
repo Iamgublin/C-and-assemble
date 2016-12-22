@@ -1,9 +1,11 @@
 #include"struct.h"
 #include"filter.h"
+#include"devio.h"
 UNICODE_STRING devname = RTL_CONSTANT_STRING(DEVICE_NAME);
 UNICODE_STRING symname = RTL_CONSTANT_STRING(SYM_NAME);
 
 NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp);
+extern NTSTATUS ZlzCleanPool(PFILTER_CONTEXT Context);
 VOID Unload(PDRIVER_OBJECT driver)
 {
 	DbgBreakPoint();
@@ -80,21 +82,4 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 		IoCreateSymbolicLink(&symname, &devname);
 	}
 	return 0;
-}
-NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp)
-{
-	if (dev == Global.FilterDev)
-	{
-		PIO_STACK_LOCATION sa = IoGetCurrentIrpStackLocation(irp);
-		switch (sa->Parameters.DeviceIoControl.IoControlCode)
-		{
-		default:
-			break;
-		}
-		return STATUS_SUCCESS;
-	}
-	else
-	{
-		return devcon(dev, irp);
-	}
 }

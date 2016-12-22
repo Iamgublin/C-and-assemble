@@ -12,5 +12,6 @@ extern FILTER_CANCEL_SEND_NET_BUFFER_LISTS FilterCancelSendNetBufferLists;
 extern FILTER_RECEIVE_NET_BUFFER_LISTS FilterReceiveNetBufferLists;
 extern FILTER_RETURN_NET_BUFFER_LISTS FilterReturnNetBufferLists;
 extern FILTER_NET_PNP_EVENT FilterNetPnPEvent;
+extern FILTER_STATUS FilterStatus;
 
 

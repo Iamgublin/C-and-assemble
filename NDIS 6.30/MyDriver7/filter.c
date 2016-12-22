@@ -1,13 +1,14 @@
 #include"filter.h"
-#include "devio.h"
+#include "packetcpy.h"
 _Use_decl_annotations_
 NDIS_STATUS FilterNetPnPEvent(
 	_In_ NDIS_HANDLE                 FilterModuleContext,
 	_In_ PNET_PNP_EVENT_NOTIFICATION NetPnPEvent
 )
 {
-	DbgBreakPoint();
+	/*DbgBreakPoint();*/
 	NDIS_STATUS sta;
+	PFILTER_CONTEXT Context = FilterModuleContext;
 	DbgPrint("NetEvent:0x%x\n", NetPnPEvent->NetPnPEvent.NetEvent);
 	if (NetPnPEvent->NetPnPEvent.NetEvent == NetEventRestart)
 	{
@@ -15,7 +16,7 @@ NDIS_STATUS FilterNetPnPEvent(
 		para;
 		DbgPrint("Ready to runing\n");
 	}
-	sta = NdisFNetPnPEvent(FilterModuleContext, NetPnPEvent);
+	sta = NdisFNetPnPEvent(Context->FilterHandle, NetPnPEvent);
 	return sta;
 }
 
@@ -28,8 +29,9 @@ VOID FilterReturnNetBufferLists(                               //·µ»¹Ð¡¶Ë¿Ú·ÖÅäµ
 {
 	/*DbgBreakPoint();*/
 	PFILTER_CONTEXT context = FilterModuleContext;
-	if (NdisGetPoolFromNetBufferList(NetBufferLists) != context->NetBufferSendPool)    //ÊÇÐ­Òé²ã Ð¡¶Ë¿Ú²ã·ÖÅäµÄ£¬dispatch¸ÃÏûÏ¢
+	if (NdisGetPoolFromNetBufferList(NetBufferLists) != context->NetBufferPool)    //ÊÇÐ­Òé²ã Ð¡¶Ë¿Ú²ã·ÖÅäµÄ£¬dispatch¸ÃÏûÏ¢
 	{
+		NDIS_SET_RETURN_FLAG(ReturnFlags, NDIS_RETURN_FLAGS_DISPATCH_LEVEL);
 		NdisFReturnNetBufferLists(context->FilterHandle, NetBufferLists, ReturnFlags);
 	}
 }
@@ -61,6 +63,10 @@ VOID FilterReceiveNetBufferLists(
 			NdisFReturnNetBufferLists(context->FilterHandle, NetBufferLists, ReturnFlags);
 		}
 		return;
+	}
+	if (context->IsFiltering)
+	{
+		/*ZlzCopyNdlToBufferAndInsert(context, NetBufferLists);*/
 	}
 	NdisFIndicateReceiveNetBufferLists(context->FilterHandle, NetBufferLists, PortNumber, NumberOfNetBufferLists, ReceiveFlags);
 }
@@ -120,7 +126,8 @@ NDIS_STATUS FilterPause(
 	_In_ PNDIS_FILTER_PAUSE_PARAMETERS FilterPauseParameters
 )
 {
-	DbgBreakPoint();
+	/*DbgBreakPoint();*/
+	
 	PFILTER_CONTEXT context = FilterModuleContext;
 	context->IsRunning = FALSE;
 	return STATUS_SUCCESS;
@@ -132,7 +139,7 @@ NDIS_STATUS FilterRestart(
 	_In_ PNDIS_FILTER_RESTART_PARAMETERS FilterRestartParameters
 )
 {
-	DbgBreakPoint();
+	/*DbgBreakPoint();*/
 	PFILTER_CONTEXT context = FilterModuleContext;
 	context->IsRunning = TRUE;
 	return STATUS_SUCCESS;
@@ -143,9 +150,13 @@ VOID FilterDetach(
 	_In_ NDIS_HANDLE FilterModuleContext
 )
 {
-	DbgBreakPoint();
+	/*DbgBreakPoint();*/
+	/*ZlzCleanPool(Global.context[num]);*/
 	PFILTER_CONTEXT context = FilterModuleContext;
-	NdisFreeNetBufferListPool(context->NetBufferSendPool);
+	context->IsFiltering = FALSE;
+	context->IsRunning = FALSE;
+	NdisFreeNetBufferListPool(context->NetBufferPool);
+	ExFreePool(context);
 }
 
 _Use_decl_annotations_
@@ -155,35 +166,44 @@ NDIS_STATUS FilterAttach(
 	_In_ PNDIS_FILTER_ATTACH_PARAMETERS AttachParameters
 )
 {
-	DbgBreakPoint();
+	/*DbgBreakPoint();*/
 	NDIS_STATUS sta;
 	NDIS_FILTER_ATTRIBUTES FilterAttributes;
 	DbgPrint("BaseMiniportName:%wZ\n", AttachParameters->BaseMiniportName);
 	DbgPrint("BaseMiniportInstanceName:%wZ\n", AttachParameters->BaseMiniportInstanceName);
-	PFILTER_CONTEXT context;
-	NdisAllocateMemoryWithTag(&context, sizeof(PFILTER_CONTEXT), 0);
+	PFILTER_CONTEXT context = (PFILTER_CONTEXT)ExAllocatePool(NonPagedPool, sizeof(FILTER_CONTEXT));
+	if (context == NULL)
+	{
+		KeBugCheckEx(NO_EXCEPTION_HANDLING_SUPPORT, 0, 0, 0, 1);
+	}
 	memmove(context->magic, "zlzndis", sizeof(context->magic));
 	NET_BUFFER_LIST_POOL_PARAMETERS para;
 	para.Header.Size = NDIS_SIZEOF_NET_BUFFER_LIST_POOL_PARAMETERS_REVISION_1;
 	para.Header.Type = NDIS_OBJECT_TYPE_DEFAULT;
 	para.Header.Revision = NET_BUFFER_LIST_POOL_PARAMETERS_REVISION_1;
-	para.ProtocolId = 0;
+	para.ProtocolId = NDIS_PROTOCOL_ID_DEFAULT;
 	para.fAllocateNetBuffer = TRUE;
 	para.ContextSize = 0;
 	para.DataSize = 0;
 	para.PoolTag = 0;
-	NDIS_HANDLE PoolHandle = NdisAllocateNetBufferListPool(NULL, &para);
-
+	NDIS_HANDLE PoolHandle = NdisAllocateNetBufferListPool(NdisFilterHandle, &para);
+	if (PoolHandle == NULL)
+	{
+		KeBugCheckEx(NO_EXCEPTION_HANDLING_SUPPORT, 0, 0, 0, 0);
+	}
+	
 	NdisZeroMemory(&FilterAttributes, sizeof(NDIS_FILTER_ATTRIBUTES));
 	FilterAttributes.Header.Revision = NDIS_FILTER_ATTRIBUTES_REVISION_1;
 	FilterAttributes.Header.Size = sizeof(NDIS_FILTER_ATTRIBUTES);
 	FilterAttributes.Header.Type = NDIS_OBJECT_TYPE_FILTER_ATTRIBUTES;
 	FilterAttributes.Flags = 0;
 
-	context->NetBufferSendPool = PoolHandle;
+	KeInitializeSpinLock(&context->NetBufferPoolLock);
+	context->NetBufferPool = PoolHandle;
 	context->FilterHandle = NdisFilterHandle;
 	context->FliterIndex = Global.contextnum;
 	context->CurrentRecvNum = 0;
+	context->IsFiltering = TRUE;               //¿´Çé¿öÐÞ¸Ä
 	sta = NdisFSetAttributes(NdisFilterHandle,
 		context,
 		&FilterAttributes);
@@ -198,16 +218,25 @@ NDIS_STATUS FilterSetOptions(
 	_In_ NDIS_HANDLE DriverContext
 )
 {
-	DbgBreakPoint();
+	/*DbgBreakPoint();*/
 	return STATUS_SUCCESS;
 }
 
-_Use_decl_annotations_               //ÉèÖÃÖ¸¶¨°ó¶¨Éè±¸µÄº¯Êý¹Ò¹³
+_Use_decl_annotations_               //ÉèÖÃÖ¸¶¨°ó¶¨Éè±¸µÄº¯Êý¹Ò¹³(NdisFRestartFilterµ÷ÓÃºóµ÷ÓÃ)
 NDIS_STATUS FilterSetModuleOptions(
 	_In_ NDIS_HANDLE FilterModuleContext
 )
 {
-	DbgBreakPoint();
+	/*DbgBreakPoint();*/
 	return STATUS_SUCCESS;
+}
+_Use_decl_annotations_
+VOID FilterStatus(
+	_In_ NDIS_HANDLE             FilterModuleContext,
+	_In_ PNDIS_STATUS_INDICATION StatusIndication
+)
+{
+	PFILTER_CONTEXT Context = (PFILTER_CONTEXT)FilterModuleContext;
+	NdisFIndicateStatus(Context->FilterHandle, StatusIndication);
 }
 

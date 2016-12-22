@@ -6,6 +6,8 @@
 #include<wdm.h>
 #include<ndis.h>
 
+
+#define RECV_POOL_MAX 300
 #define FILTER_MAJOR_NDIS_VERSION   NDIS_FILTER_MAJOR_VERSION
 #define FILTER_MINOR_NDIS_VERSION   NDIS_FILTER_MINOR_VERSION
 #define NETCFGGUID L"{5cbf81bd-5055-47cd-9055-a76b2b4e3697}"
@@ -17,19 +19,19 @@ PDRIVER_DISPATCH devcon;
 typedef struct _S_PACKET
 {
 	int size;
-	PVOID buffer;
+	PNET_BUFFER_LIST buffer;
 }S_PACKET, *PS_PACKET;
 typedef struct _FILTER_CONTEXT
 {
 	char magic[8];
 	NDIS_HANDLE FilterHandle;
-	NDIS_HANDLE NetBufferSendPool;
+	NDIS_HANDLE NetBufferPool;
 	BOOLEAN IsRunning;
 	BOOLEAN IsFiltering;
 	int FliterIndex;
 	int CurrentRecvNum;
-	PS_PACKET PacketRecvPool[100];
-	KSPIN_LOCK PoolLock;
+	PS_PACKET PacketRecvPool[RECV_POOL_MAX];
+	KSPIN_LOCK NetBufferPoolLock;
 }FILTER_CONTEXT, *PFILTER_CONTEXT;
 typedef struct _GLOBAL
 {
