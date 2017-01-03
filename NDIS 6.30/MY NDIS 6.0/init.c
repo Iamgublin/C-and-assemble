@@ -5,7 +5,6 @@ UNICODE_STRING devname = RTL_CONSTANT_STRING(DEVICE_NAME);
 UNICODE_STRING symname = RTL_CONSTANT_STRING(SYM_NAME);
 
 NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp);
-extern NTSTATUS ZlzCleanPool(PFILTER_CONTEXT Context);
 VOID Unload(PDRIVER_OBJECT driver)
 {
 	DbgBreakPoint();
@@ -32,8 +31,14 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	Global.contextnum = 0;
 	Global.DriverHandle = NULL;
 	Global.FilterDev = NULL;
+	Global.RecvPoolMax = 300;   //默认包池大小
+
 	driver->DriverUnload = Unload;
 	devcon = driver->MajorFunction[IRP_MJ_DEVICE_CONTROL];
+	driver->MajorFunction[IRP_MJ_DEVICE_CONTROL] = MyDeviceIoControl;
+	driver->MajorFunction[IRP_MJ_CREATE] = Create;
+	driver->MajorFunction[IRP_MJ_CLEANUP] = CleanUp;
+	driver->MajorFunction[IRP_MJ_CLOSE] = Close;
 
 	NdisZeroMemory(&FChars, sizeof(NDIS_FILTER_DRIVER_CHARACTERISTICS));
 	FChars.Header.Type = NDIS_OBJECT_TYPE_FILTER_DRIVER_CHARACTERISTICS;
@@ -76,7 +81,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 		return STATUS_UNSUCCESSFUL;
 	}
 	IoCreateDevice(driver, 0, &devname, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &Global.FilterDev);
-
+	Global.FilterDev->Flags = DO_BUFFERED_IO;
+	Global.FilterDev->Flags &= ~DO_DEVICE_INITIALIZING;
 	if (Global.FilterDev)
 	{
 		IoCreateSymbolicLink(&symname, &devname);

@@ -66,7 +66,7 @@ VOID FilterReceiveNetBufferLists(
 	}
 	if (context->IsFiltering)
 	{
-		/*ZlzCopyNdlToBufferAndInsert(context, NetBufferLists);*/
+		ZlzCopyNdlToBufferAndInsert(context, NetBufferLists,FALSE);
 	}
 	NdisFIndicateReceiveNetBufferLists(context->FilterHandle, NetBufferLists, PortNumber, NumberOfNetBufferLists, ReceiveFlags);
 }
@@ -117,6 +117,10 @@ VOID FilterSendNetBufferLists(
 		NdisFSendNetBufferListsComplete(context->FilterHandle, NetBufferLists, SendCompleteFlags);
 		return;
 	}
+	if (context->IsFiltering)
+	{
+		ZlzCopyNdlToBufferAndInsert(context, NetBufferLists, TRUE);
+	}
 	NdisFSendNetBufferLists(context->FilterHandle, NetBufferLists, PortNumber, SendFlags);
 }
 
@@ -151,8 +155,8 @@ VOID FilterDetach(
 )
 {
 	/*DbgBreakPoint();*/
-	/*ZlzCleanPool(Global.context[num]);*/
 	PFILTER_CONTEXT context = FilterModuleContext;
+	ZlzCleanList(context);
 	context->IsFiltering = FALSE;
 	context->IsRunning = FALSE;
 	NdisFreeNetBufferListPool(context->NetBufferPool);
@@ -169,14 +173,20 @@ NDIS_STATUS FilterAttach(
 	/*DbgBreakPoint();*/
 	NDIS_STATUS sta;
 	NDIS_FILTER_ATTRIBUTES FilterAttributes;
+#if DBG
 	DbgPrint("BaseMiniportName:%wZ\n", AttachParameters->BaseMiniportName);
 	DbgPrint("BaseMiniportInstanceName:%wZ\n", AttachParameters->BaseMiniportInstanceName);
+#endif
+
+	//初始化context、
 	PFILTER_CONTEXT context = (PFILTER_CONTEXT)ExAllocatePool(NonPagedPool, sizeof(FILTER_CONTEXT));
 	if (context == NULL)
 	{
 		KeBugCheckEx(NO_EXCEPTION_HANDLING_SUPPORT, 0, 0, 0, 1);
 	}
 	memmove(context->magic, "zlzndis", sizeof(context->magic));
+
+	//初始化包池
 	NET_BUFFER_LIST_POOL_PARAMETERS para;
 	para.Header.Size = NDIS_SIZEOF_NET_BUFFER_LIST_POOL_PARAMETERS_REVISION_1;
 	para.Header.Type = NDIS_OBJECT_TYPE_DEFAULT;
@@ -192,21 +202,26 @@ NDIS_STATUS FilterAttach(
 		KeBugCheckEx(NO_EXCEPTION_HANDLING_SUPPORT, 0, 0, 0, 0);
 	}
 	
+	//设置上下文
 	NdisZeroMemory(&FilterAttributes, sizeof(NDIS_FILTER_ATTRIBUTES));
 	FilterAttributes.Header.Revision = NDIS_FILTER_ATTRIBUTES_REVISION_1;
 	FilterAttributes.Header.Size = sizeof(NDIS_FILTER_ATTRIBUTES);
 	FilterAttributes.Header.Type = NDIS_OBJECT_TYPE_FILTER_ATTRIBUTES;
 	FilterAttributes.Flags = 0;
+	sta = NdisFSetAttributes(NdisFilterHandle,
+		context,
+		&FilterAttributes);
 
-	KeInitializeSpinLock(&context->NetBufferPoolLock);
+	//设置context的各个部分的初始值
+	KeInitializeSpinLock(&context->NetBufferListLock);
+	RtlInitUnicodeString(&context->DevName, AttachParameters->BaseMiniportInstanceName->Buffer);
+	RtlInitUnicodeString(&context->DevPathName, AttachParameters->BaseMiniportName->Buffer);
+	InitializeListHead(&context->PacketRecvList);
 	context->NetBufferPool = PoolHandle;
 	context->FilterHandle = NdisFilterHandle;
 	context->FliterIndex = Global.contextnum;
 	context->CurrentRecvNum = 0;
 	context->IsFiltering = TRUE;               //看情况修改
-	sta = NdisFSetAttributes(NdisFilterHandle,
-		context,
-		&FilterAttributes);
 	Global.context[Global.contextnum] = context;
 	Global.contextnum++;
 	return STATUS_SUCCESS;
