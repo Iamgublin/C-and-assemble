@@ -28,6 +28,7 @@ typedef struct _AdapterInfo
 {
 	WCHAR DevPathName[PATH_MAX];
 	WCHAR DevName[PATH_MAX];
+	UCHAR MacAddress[32];
 }AdapterInfo, *PAdapterInfo;
 typedef struct _IO_Packet
 {
@@ -41,9 +42,15 @@ typedef struct _IO_Packet
 		}ShowAdapter;
 		struct
 		{
-			int Num;
-			UCHAR Buffer[300][2000];
-		}Net_Packet;
+			int Size;
+			UCHAR Buffer[2000];
+			BOOLEAN IsSendPacket;
+			BOOLEAN Isthelast;
+		}Net_Packet_Output;
+		struct 
+		{
+			int ContextNum;
+		}Net_Packet_InPut;
 		unsigned u;
 	}Packet;
 }IO_Packet,*PIO_Packet;
@@ -52,15 +59,21 @@ typedef struct _S_PACKET
 	LIST_ENTRY PacketList;
 	int size;
 	int MdlNumber;
+	int MdlHasCopied;
 	BOOLEAN IsSendPacket;
 	PNET_BUFFER_LIST buffer;
 	PMDL *mdllist;
 }S_PACKET, *PS_PACKET;
+typedef struct _DEVINCE_INFO
+{
+	NDIS_STRING DevPathName;                    //设备路径名
+	NDIS_STRING DevName;                        //设备名字
+	UCHAR MacAddress[32];
+}DEVICE_INFO,*PDEVINCE_INFO;
 typedef struct _FILTER_CONTEXT
 {
 	char magic[8];
-	NDIS_STRING DevPathName;                    //设备路径名
-	NDIS_STRING DevName;                        //设备名字 
+	DEVICE_INFO DevInfo;
 	NDIS_HANDLE FilterHandle;                   //过滤设备区别句柄
 	NDIS_HANDLE NetBufferPool;                  //包池句柄
 	BOOLEAN IsRunning;                          //该过滤器是否处于运行中

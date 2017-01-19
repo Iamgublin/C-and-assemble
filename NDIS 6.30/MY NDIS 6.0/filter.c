@@ -213,9 +213,12 @@ NDIS_STATUS FilterAttach(
 		&FilterAttributes);
 
 	//设置context的各个部分的初始值
+	//设置设备信息
 	KeInitializeSpinLock(&context->NetBufferListLock);
-	RtlInitUnicodeString(&context->DevName, AttachParameters->BaseMiniportInstanceName->Buffer);
-	RtlInitUnicodeString(&context->DevPathName, AttachParameters->BaseMiniportName->Buffer);
+	RtlInitUnicodeString(&context->DevInfo.DevName, AttachParameters->BaseMiniportInstanceName->Buffer);
+	RtlInitUnicodeString(&context->DevInfo.DevPathName, AttachParameters->BaseMiniportName->Buffer);
+	RtlCopyMemory(context->DevInfo.MacAddress, AttachParameters->CurrentMacAddress, sizeof(AttachParameters->CurrentMacAddress));
+	//初始化变量
 	InitializeListHead(&context->PacketRecvList);
 	context->NetBufferPool = PoolHandle;
 	context->FilterHandle = NdisFilterHandle;

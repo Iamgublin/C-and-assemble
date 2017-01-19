@@ -1,34 +1,46 @@
+/********************************************************************************
+*                                                                               *
+* NdisCoreApi.h -- ApiSet Contract for ZlzNdis Kernel-Mode Driver               *
+*                                                                               *
+* Copyright (c) Microsoft Corporation. All rights reserved.                     *
+*                                                                               *
+********************************************************************************/
+#ifdef _MSC_VER
+#pragma once
+#endif // _MSC_VER
+
+#ifndef _APICORENDIS_
+#define _APICORENDIS_
 #include<Windows.h>
+#include"define.h"
 #ifdef NDISCOREAPI_EXPORTS
 #define NDISCOREAPI_API __declspec(dllexport)
 #else
 #define NDISCOREAPI_API __declspec(dllimport)
 #endif
-#define PATH_MAX 255
-typedef struct _AdapterInfo
-{
-	WCHAR DevPathName[PATH_MAX];
-	WCHAR DevName[PATH_MAX];
-}AdapterInfo, *PAdapterInfo;
-typedef struct _IO_Packet
-{
-	int Type;
-	union
-	{
-		struct
-		{
-			int Num;
-			AdapterInfo AdapterInfo[20];
-		}ShowAdapter;
-		struct
-		{
-			int Num;
-			UCHAR Buffer[300][2000];
-		}Net_Packet;
-		unsigned u;
-	}Packet;
-}IO_Packet, *PIO_Packet;
-// 此类是从 NdisCoreApi.dll 导出的
-NDISCOREAPI_API int Net_ShowAdapter(HANDLE FilterHandle, PIO_Packet Packet);
-NDISCOREAPI_API HANDLE Net_OpenFilter(void);
-NDISCOREAPI_API int Net_GetRawPacket(HANDLE FilterHandle, PIO_Packet Packet);
+
+
+NDISCOREAPI_API 
+int 
+WINAPI 
+Net_ShowAdapter(
+	_In_ HANDLE FilterHandle,
+	_Out_ PIO_Packet Packet
+);
+
+NDISCOREAPI_API 
+HANDLE 
+WINAPI 
+Net_OpenFilter(
+	void
+);
+
+NDISCOREAPI_API 
+int 
+WINAPI 
+Net_GetRawPacket(
+	_In_ HANDLE FilterHandle,
+	_Out_ PIO_Packet Packet,
+	_In_ int AdapterIndex
+);
+#endif //_APICORENDIS_

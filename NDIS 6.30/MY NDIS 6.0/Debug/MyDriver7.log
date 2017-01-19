@@ -1,0 +1,9 @@
+﻿  Building 'MY NDIS 6.0' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
+  Stamping Debug\MyDriver7.inf [Version] section with DriverVer=12/14/2016,9.9.28.925
+  init.c
+init.obj : error LNK2019: 无法解析的外部符号 _NdisAllocateMemoryWithTag@12，该符号在函数 _FilterAttach@12 中被引用
+init.obj : error LNK2019: 无法解析的外部符号 _NdisAllocateNetBufferListPool@8，该符号在函数 _FilterAttach@12 中被引用
+init.obj : error LNK2019: 无法解析的外部符号 _NdisFRegisterFilterDriver@16，该符号在函数 _DriverEntry@8 中被引用
+init.obj : error LNK2019: 无法解析的外部符号 _NdisFDeregisterFilterDriver@4，该符号在函数 _Unload@4 中被引用
+init.obj : error LNK2019: 无法解析的外部符号 _NdisFSetAttributes@12，该符号在函数 _FilterAttach@12 中被引用
+D:\VS2013工程文件\MyDriver7\Debug\MYNDIS6.0.sys : fatal error LNK1120: 5 个无法解析的外部命令

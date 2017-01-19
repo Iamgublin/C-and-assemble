@@ -128,6 +128,22 @@ NTSTATUS ZlzCleanList(PFILTER_CONTEXT Context)
 	Context->CurrentRecvNum = 0;
 	return STATUS_SUCCESS;
 }
+NTSTATUS ZlzRemoveListHead(PFILTER_CONTEXT Context)
+{
+	PS_PACKET Packet = (PS_PACKET)Context->PacketRecvList.Flink;
+	RemoveHeadList(&Context->PacketRecvList);
+	if (Packet->buffer != NULL)
+	{
+		NdisFreeCloneNetBufferList(Packet->buffer, 0);
+		if (Packet->mdllist != NULL)
+		{
+			ExFreePool(Packet->mdllist);
+		}
+		ExFreePool(Packet);
+	}
+	Context->CurrentRecvNum--;
+	return STATUS_SUCCESS;
+}
 NTSTATUS ZlzInsertIntoList(PS_PACKET Packet, PFILTER_CONTEXT Context)
 {
 	KIRQL irql;
@@ -153,6 +169,7 @@ NTSTATUS ZlzCopyNdlToBufferAndInsert(PFILTER_CONTEXT Context, PNET_BUFFER_LIST N
 	Packet->MdlNumber = MdlNum;
 	Packet->buffer = CloneNbl;
 	Packet->size = 0;
+	Packet->MdlHasCopied = 0;
 	Packet->IsSendPacket = IsSendPacket;
 	ZlzInsertIntoList(Packet, Context);
 	return STATUS_SUCCESS;

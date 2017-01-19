@@ -1,0 +1,24 @@
+﻿  Building 'MY NDIS 6.0' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
+  Stamping x64\Release\MyDriver7.inf [Version] section with DriverVer=01/14/2017,16.37.23.178
+  filter.c
+  init.c
+  正在生成代码...
+  MyDriver7.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Release\zlzndislwf.sys
+  MyDriver7.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Release\zlzndislwf.pdb (Full PDB)
+  Done Adding Additional Store
+  Successfully signed: D:\VS2013\MyDriver7\x64\Release\zlzndislwf.sys
+  
+  .........................
+  Signability test complete.
+  
+  Errors:
+  None
+  
+  Warnings:
+  None
+  
+  Catalog generation complete.
+  D:\VS2013工程文件\MyDriver7\x64\Release\MY NDIS 6.0\netlwf.cat
+  Done Adding Additional Store
+  Successfully signed: D:\VS2013\MyDriver7\x64\Release\MY NDIS 6.0\netlwf.cat
+  
