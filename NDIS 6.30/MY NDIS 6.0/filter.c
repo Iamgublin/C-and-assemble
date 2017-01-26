@@ -82,6 +82,9 @@ VOID FilterCancelSendNetBufferLists(
 	NdisFCancelSendNetBufferLists(context->FilterHandle, CancelId);
 }
 
+//If an overlying driver initiated the send request, the filter driver should call the NdisFSendNetBufferListsComplete function to complete the send request.
+//If the filter driver originated the send request, FilterSendNetBufferListsComplete can either release the NET_BUFFER_LIST structures and associated data or prepare them for reuse in a subsequent call to NdisFSendNetBufferLists.
+//Note  A filter driver should keep track of send requests that it initiates and make sure that it does not call NdisFSendNetBufferListsComplete when NDIS calls FilterSendNetBufferListsComplete for such requests.
 _Use_decl_annotations_
 VOID FilterSendNetBufferListsComplete(
 	_In_ NDIS_HANDLE      FilterModuleContext,
@@ -90,10 +93,12 @@ VOID FilterSendNetBufferListsComplete(
 )
 {
 	/*DbgBreakPoint();*/
+	//如果是Filter发送的包，不应该调用NdisFSendNetBufferListsComplete，直接释放资源
 	PFILTER_CONTEXT context = FilterModuleContext;
 	NdisFSendNetBufferListsComplete(context->FilterHandle, NetBufferLists, SendCompleteFlags);
 }
 
+//自定义发送包是 NET_BUFFER_LIST->sourcehandle必须为context->FilterHandle
 _Use_decl_annotations_
 VOID FilterSendNetBufferLists(
 	_In_ NDIS_HANDLE      FilterModuleContext,
@@ -230,7 +235,7 @@ NDIS_STATUS FilterAttach(
 	return STATUS_SUCCESS;
 }
 
-_Use_decl_annotations_
+_Use_decl_annotations_                  //NdisSetOptionalHandlers
 NDIS_STATUS FilterSetOptions(
 	_In_ NDIS_HANDLE NdisDriverHandle,
 	_In_ NDIS_HANDLE DriverContext

@@ -43,7 +43,7 @@ typedef struct _IO_Packet
 		struct
 		{
 			int Size;
-			UCHAR Buffer[2000];
+			UCHAR Buffer[2000];         //MTU<=1500 
 			BOOLEAN IsSendPacket;
 			BOOLEAN Isthelast;
 		}Net_Packet_Output;
@@ -68,7 +68,7 @@ typedef struct _DEVINCE_INFO
 {
 	NDIS_STRING DevPathName;                    //设备路径名
 	NDIS_STRING DevName;                        //设备名字
-	UCHAR MacAddress[32];
+	UCHAR MacAddress[32];                       //Mac地址
 }DEVICE_INFO,*PDEVINCE_INFO;
 typedef struct _FILTER_CONTEXT
 {
@@ -96,6 +96,6 @@ typedef struct _MAC
 {
 	UCHAR dst[6];
 	UCHAR sou[6];
-	UCHAR type[2];
+	USHORT type;
 }MAC,*PMAC;
 GLOBAL Global;

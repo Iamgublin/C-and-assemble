@@ -76,7 +76,7 @@ VOID analysis(PS_PACKET Packet)
 	DbgPrint("start*********************************\n");
 	DbgPrint("dest mac:%02x-%02x-%02x-%02x-%02x-%02x\n", macpacket.dst[0], macpacket.dst[1], macpacket.dst[2], macpacket.dst[3], macpacket.dst[4], macpacket.dst[5]);
 	DbgPrint("source mac:%02x-%02x-%02x-%02x-%02x-%02x\n", macpacket.sou[0], macpacket.sou[1], macpacket.sou[2], macpacket.sou[3], macpacket.sou[4], macpacket.sou[5]);
-	DbgPrint("type:%02x%02x\n", macpacket.type[0], macpacket.type[1]);
+	DbgPrint("type:%04x\n", macpacket.type);
 	DbgPrint("%s\n", Packet->IsSendPacket ? "Send" : "Receive");
 	DbgPrint("end*********************************\n");
 }

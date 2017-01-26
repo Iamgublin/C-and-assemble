@@ -95,7 +95,6 @@ NTSTATUS CleanUp(PDEVICE_OBJECT dev, PIRP irp)
 }
 NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp)
 {
-	DbgBreakPoint();
 	if (dev == Global.FilterDev)
 	{
 		PIO_Packet Packet = (PIO_Packet)ExAllocatePool(NonPagedPool, sizeof(IO_Packet));
