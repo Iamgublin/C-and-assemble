@@ -1,6 +1,7 @@
 #pragma once
 #include"struct.h"
 extern NTSTATUS ZlzRemoveListHead(PFILTER_CONTEXT Context);
+extern VOID analysis(PS_PACKET Packet);
 VOID ZlzInitShowAdapterPacket(PIO_Packet IoPacket)
 {
 	IoPacket->Packet.ShowAdapter.Num = Global.contextnum;
@@ -54,25 +55,32 @@ NTSTATUS CopyNetBuffer(PIO_Packet Packet, int i)
 	if (Global.context[i]->CurrentRecvNum != 0)
 	{
 		KIRQL irql;
+		int TotalSize = 0;
+		int MdlHasCopied = 0;
 		KeAcquireSpinLock(&Global.context[i]->NetBufferListLock, &irql);
 		PS_PACKET PacketUsed = (PS_PACKET)Global.context[i]->PacketRecvList.Flink;
-		PMDL MdlUsed = PacketUsed->mdllist[PacketUsed->MdlHasCopied];
-		PVOID Buf = MmGetSystemAddressForMdlSafe(MdlUsed, IoPriorityNormal);
-		int size = MmGetMdlByteCount(MdlUsed);
-		Packet->Packet.Net_Packet_Output.Size = size;
-		Packet->Packet.Net_Packet_Output.IsSendPacket = PacketUsed->IsSendPacket;
 		RtlZeroMemory(Packet->Packet.Net_Packet_Output.Buffer, sizeof(Packet->Packet.Net_Packet_Output.Buffer));
-		RtlCopyMemory(Packet->Packet.Net_Packet_Output.Buffer, Buf, size);
-		PacketUsed->MdlHasCopied++;
-		if (PacketUsed->MdlHasCopied == PacketUsed->MdlNumber)
+		while (MdlHasCopied != PacketUsed->MdlNumber)
 		{
-			ZlzRemoveListHead(Global.context[i]);
-			Packet->Packet.Net_Packet_Output.Isthelast = TRUE;
+			PMDL MdlUsed = PacketUsed->mdllist[MdlHasCopied];
+			PVOID Buf = MmGetSystemAddressForMdlSafe(MdlUsed, IoPriorityNormal);
+			if (Buf == NULL)
+			{
+				return STATUS_UNSUCCESSFUL;
+			}
+			int size = MmGetMdlByteCount(MdlUsed);
+			if (TotalSize + size > IO_BUF)
+			{
+				DbgPrint("Buf is too small!\n");
+				break;
+			}
+			RtlCopyMemory(&Packet->Packet.Net_Packet_Output.Buffer[TotalSize], Buf, size);
+			MdlHasCopied++;
+			TotalSize += size;
 		}
-		else
-		{
-			Packet->Packet.Net_Packet_Output.Isthelast = FALSE;
-		}
+		Packet->Packet.Net_Packet_Output.IsSendPacket = PacketUsed->IsSendPacket;
+		Packet->Packet.Net_Packet_Output.Size = TotalSize;
+		ZlzRemoveListHead(Global.context[i]);
 		KeReleaseSpinLock(&Global.context[i]->NetBufferListLock, irql);
 	}
 	else
@@ -130,7 +138,7 @@ NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp)
 			break;
 		}
 		ExFreePool(Packet);
-		return STATUS_SUCCESS;
+		return irp->IoStatus.Status;
 	}
 	else
 	{

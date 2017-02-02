@@ -1,5 +1,21 @@
 #pragma once
 #include<Windows.h>
+
+//用到的宏
+#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))
+#define SET_INFO_TYPE(A,B) (A->Type=B)
+
+//用于判断包类型
+#define PACKET_IP   0x0800
+#define PACKET_IPv6 0X86DD
+#define PACKET_ARP  0X0806
+#define PACKET_RARP 0X0835
+#define PACKET_TCP  0X6
+#define PACKET_IGMP 0X02
+#define PACKET_ICMP 0x01
+#define PACKET_UDP  0X11
+
+//所有包的数据结构
 typedef struct _MAC
 {
 	UCHAR dst[6];

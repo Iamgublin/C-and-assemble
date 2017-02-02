@@ -1,12 +1,12 @@
 // ConsoleTest.cpp : 定义控制台应用程序的入口点。
 //
-
 #include "stdafx.h"
 #include"..\NdisCoreApi\NdisCoreApi.h"
 #include"..\RawPacketAnalysis\RawPacketAnalysis.h"
 #pragma comment(lib,"..\\ReleaseX64\\RawPacketAnalysis.lib")
 #pragma comment(lib,"..\\ReleaseX64\\NdisCoreApi.lib")
 #include<locale.h>
+char pro[11][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6"};
 int main()
 {
 	setlocale(LC_ALL, "chs");
@@ -27,10 +27,15 @@ int main()
 	int a = 2;
 	while (1)
 	{
-		Net_GetRawPacket(hF, Output, a);
-		if (GetLastError() == ERROR_SUCCESS)
+		Sleep(100);
+		if (Net_GetRawPacket(hF, Output, a))
 		{
 			AnalysePacket(Output, &Info);
+			printf("TYPE:%s\n", pro[Info.Type]);
+			if (Info.Type == INFO_TCP)
+			{
+				printf("Number:%d\n", Tranverse16(Info.protocol1.Tcp.destinationPort));
+			}
 		}
 	}
 	/*printf("size:%d\n", Output->Packet.Net_Packet_Output.Size);

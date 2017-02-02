@@ -6,6 +6,7 @@
 #include<wdm.h>
 #include<ndis.h>
 
+#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))
 
 /*#define RECV_POOL_MAX 300*/
 #define PACKET_DATA_MAX 1518
@@ -16,6 +17,7 @@
 #define DEVICE_NAME L"\\Device\\Zlz Ndis6.30 Filter Kernel-Mode Device"
 #define SYM_NAME L"\\??\\Zlz Ndis6.30 Filter SymbolLink"
 #define PATH_MAX 255
+#define IO_BUF 2000
 
 #define IOCTL_SHOWADAPTER (ULONG)CTL_CODE(FILE_DEVICE_UNKNOWN,0x911,METHOD_BUFFERED,FILE_WRITE_DATA|FILE_READ_DATA) 
 #define IOCTL_GETRAWDATA (ULONG)CTL_CODE(FILE_DEVICE_UNKNOWN,0x912,METHOD_BUFFERED,FILE_WRITE_DATA|FILE_READ_DATA) 
@@ -43,9 +45,8 @@ typedef struct _IO_Packet
 		struct
 		{
 			int Size;
-			UCHAR Buffer[2000];         //MTU<=1500 
+			UCHAR Buffer[IO_BUF];         //MTU<=1500 
 			BOOLEAN IsSendPacket;
-			BOOLEAN Isthelast;
 		}Net_Packet_Output;
 		struct 
 		{
@@ -59,7 +60,6 @@ typedef struct _S_PACKET
 	LIST_ENTRY PacketList;
 	int size;
 	int MdlNumber;
-	int MdlHasCopied;
 	BOOLEAN IsSendPacket;
 	PNET_BUFFER_LIST buffer;
 	PMDL *mdllist;

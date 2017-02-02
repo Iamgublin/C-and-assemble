@@ -1,8 +1,41 @@
-﻿  Building 'MY NDIS 6.0' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
-  Stamping x64\Debug\MyDriver7.inf [Version] section with DriverVer=01/20/2017,10.31.16.755
-  filter.c
-  MyDriver7.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.sys
-  MyDriver7.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.pdb (Full PDB)
-  Done Adding Additional Store
-  Successfully signed: D:\VS2013\MyDriver7\x64\Debug\zlzndislwf.sys
-  
+﻿生成启动时间为 2017/1/31 17:26:38。
+     1>项目“D:\VS2013工程文件\MyDriver7\MY NDIS 6.0\MyDriver7.vcxproj”在节点 2 上(Build 个目标)。
+     1>DriverBuildNotifications:
+         Building 'MY NDIS 6.0' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
+         Using KMDF 1.11.
+       InitializeBuildStatus:
+         正在创建“x64\Debug\MY NDIS 6.0.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+       StampInf:
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\stampinf.exe -d "*" -a "amd64" -v "*" -k "1.11" -f x64\Debug\MyDriver7.inf 
+         Copying "D:\VS2013工程文件\MyDriver7\MY NDIS 6.0\MyDriver7.inf" to "x64\Debug\MyDriver7.inf" for stamping
+         Stamping x64\Debug\MyDriver7.inf [Version] section with DriverVer=01/31/2017,17.26.38.961
+         正在将文件从“x64\Debug\MyDriver7.inf”复制到“D:\VS2013工程文件\MyDriver7\x64\Debug\MyDriver7.inf”。
+       ClCompile:
+         D:\Microsoft Visual stdio 2015\VC\bin\x86_amd64\CL.exe /c /Ix64\Debug\ /Zi /nologo /W4 /WX /Od /Oi /Oy- /D _WIN64 /D _AMD64_ /D AMD64 /D DEPRECATE_DDK_FUNCTIONS=1 /D MSC_NOOPT /D _WIN32_WINNT=0x0602 /D WINVER=0x0602 /D WINNT=1 /D NTDDI_VERSION=0x06020000 /D DBG=1 /GF /Gm- /Zp8 /GS /Gy /fp:precise /Zc:wchar_t- /Zc:forScope /Zc:inline /GR- /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gz /wd4748 /wd4603 /wd4627 /wd4986 /wd4987 /wd4996 /FI"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\shared\warning.h" /errorReport:prompt /kernel -cbstring -d2epilogunwind /d1import_no_registry /d2AllowCompatibleILVersions /d2Zi+ filter.c init.c
+         filter.c
+         init.c
+         正在生成代码...
+       Link:
+         D:\Microsoft Visual stdio 2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.sys" /VERSION:"10.0" /INCREMENTAL:NO /NOLOGO /WX /SECTION:"INIT,d" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\\cfg_support_v1.lib" ndis.lib "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\BufferOverflowFastFailK.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\ntoskrnl.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\hal.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\wmilib.lib" /NODEFAULTLIB /MANIFEST:NO /DEBUG /PDB:"D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.pdb" /SUBSYSTEM:NATIVE,"6.02" /Driver /OPT:REF /OPT:ICF /ENTRY:"GsDriverEntry" /RELEASE /IMPLIB:"D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.lib" /MERGE:"_TEXT=.text;_PAGE=PAGE" /MACHINE:X64 /PROFILE /kernel /IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221,4108,4088,4218,4218,4235 /osversion:10.0 /pdbcompress /debugtype:pdata x64\Debug\filter.obj
+         x64\Debug\init.obj
+         MyDriver7.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.sys
+         MyDriver7.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.pdb (Full PDB)
+     1>项目“D:\VS2013工程文件\MyDriver7\MY NDIS 6.0\MyDriver7.vcxproj”(1)正在节点 3 上生成“D:\VS2013工程文件\MyDriver7\MY NDIS 6.0\MyDriver7.vcxproj”(1:2) (TestSign 个目标)。
+     1>TestSign:
+         The driver will be test-signed. Driver signing options can be changed from the project properties.
+         Sign Inputs: D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.sys
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\signtool.exe sign /ph /sha1 "BAD61C454AD2F0881488730C5E7B9CBF2C136A1A" 
+         Done Adding Additional Store
+         Successfully signed: D:\VS2013\MyDriver7\x64\Debug\zlzndislwf.sys
+         
+         Certificate used for signing: issued to = WDKTestCert Arch Vile,131230423186855723 and thumbprint = BAD61C454AD2F0881488730C5E7B9CBF2C136A1A
+         Exported Certificate: D:\VS2013工程文件\MyDriver7\x64\Debug\zlzndislwf.cer
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\MY NDIS 6.0\MyDriver7.vcxproj”(TestSign 个目标)的操作。
+     1>FinalizeBuildStatus:
+         正在删除文件“x64\Debug\MY NDIS 6.0.tlog\unsuccessfulbuild”。
+         正在对“x64\Debug\MY NDIS 6.0.tlog\MY NDIS 6.0.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\MY NDIS 6.0\MyDriver7.vcxproj”(Build 个目标)的操作。
+
+已成功生成。
+
+已用时间 00:00:01.85

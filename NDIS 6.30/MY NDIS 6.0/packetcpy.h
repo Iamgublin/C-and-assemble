@@ -74,9 +74,10 @@ VOID analysis(PS_PACKET Packet)
 	MAC macpacket;
 	RtlCopyMemory(&macpacket, address, sizeof(MAC));
 	DbgPrint("start*********************************\n");
+	DbgPrint("Packet num:%d\n", Packet->MdlNumber);
 	DbgPrint("dest mac:%02x-%02x-%02x-%02x-%02x-%02x\n", macpacket.dst[0], macpacket.dst[1], macpacket.dst[2], macpacket.dst[3], macpacket.dst[4], macpacket.dst[5]);
 	DbgPrint("source mac:%02x-%02x-%02x-%02x-%02x-%02x\n", macpacket.sou[0], macpacket.sou[1], macpacket.sou[2], macpacket.sou[3], macpacket.sou[4], macpacket.sou[5]);
-	DbgPrint("type:%04x\n", macpacket.type);
+	DbgPrint("type:%04x\n", Tranverse16(macpacket.type));
 	DbgPrint("%s\n", Packet->IsSendPacket ? "Send" : "Receive");
 	DbgPrint("end*********************************\n");
 }
@@ -169,7 +170,6 @@ NTSTATUS ZlzCopyNdlToBufferAndInsert(PFILTER_CONTEXT Context, PNET_BUFFER_LIST N
 	Packet->MdlNumber = MdlNum;
 	Packet->buffer = CloneNbl;
 	Packet->size = 0;
-	Packet->MdlHasCopied = 0;
 	Packet->IsSendPacket = IsSendPacket;
 	ZlzInsertIntoList(Packet, Context);
 	return STATUS_SUCCESS;
