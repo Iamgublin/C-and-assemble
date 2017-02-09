@@ -62,7 +62,8 @@ NTSTATUS CopyNetBuffer(PIO_Packet Packet, int i)
 		RtlZeroMemory(Packet->Packet.Net_Packet_Output.Buffer, sizeof(Packet->Packet.Net_Packet_Output.Buffer));
 		while (MdlHasCopied != PacketUsed->MdlNumber)
 		{
-			PMDL MdlUsed = PacketUsed->mdllist[MdlHasCopied];
+			PMDL MdlUsed = NULL;
+			MdlUsed = PacketUsed->mdllist[MdlHasCopied];
 			PVOID Buf = MmGetSystemAddressForMdlSafe(MdlUsed, IoPriorityNormal);
 			if (Buf == NULL)
 			{
@@ -78,6 +79,19 @@ NTSTATUS CopyNetBuffer(PIO_Packet Packet, int i)
 			MdlHasCopied++;
 			TotalSize += size;
 		}
+		/*ULONG DataOff = PacketUsed->buffer->FirstNetBuffer->DataOffset;
+
+		if (DataOff != 0)           //可能NB会有Backfill Space（填充区段）,把该区段丢弃
+		{
+			if (DataOff == PacketUsed->buffer->FirstNetBuffer->CurrentMdlOffset)
+			{
+				RtlMoveMemory(Packet->Packet.Net_Packet_Output.Buffer, Packet->Packet.Net_Packet_Output.Buffer + DataOff, TotalSize);   //内存重叠,千万不能用RtlCopyMemory
+			}
+			else
+			{
+				RtlMoveMemory(Packet->Packet.Net_Packet_Output.Buffer, Packet->Packet.Net_Packet_Output.Buffer + PacketUsed->buffer->FirstNetBuffer->CurrentMdlOffset, TotalSize);   //内存重叠,千万不能用RtlCopyMemory
+			}
+		}*/  //NdisAllocateCloneNetBufferList调用后新包会去除填充区段
 		Packet->Packet.Net_Packet_Output.IsSendPacket = PacketUsed->IsSendPacket;
 		Packet->Packet.Net_Packet_Output.Size = TotalSize;
 		ZlzRemoveListHead(Global.context[i]);

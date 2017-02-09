@@ -1,0 +1,64 @@
+﻿生成启动时间为 2017/2/9 15:15:13。
+     1>项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”在节点 2 上(Build 个目标)。
+     1>InitializeBuildStatus:
+         正在对“.\Build\Debug\DuiLib.tlog\unsuccessfulbuild”执行 Touch 任务。
+       ClCompile:
+         所有输出均为最新。
+         所有输出均为最新。
+         所有输出均为最新。
+         所有输出均为最新。
+       MakeDirsForLink:
+         正在创建目录“D:\VS2013工程文件\MyDriver7\lib\”。
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1189,5): warning MSB8012: TargetPath(D:\VS2013工程文件\MyDriver7\DuiLib\.\Build\Debug\DuiLib.dll) does not match the Linker's OutputFile property value (D:\VS2013工程文件\MyDriver7\DebugX64\DuiLib_d.dll). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1191,5): warning MSB8012: TargetName(DuiLib) does not match the Linker's OutputFile property value (DuiLib_d). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1193,5): warning MSB8030: The linker switch "Minimum Required Version" requires "SubSystem" to be set.  Without "SubSystem", the "Minimum Required Version" would not be passed to linker and could prevent to the output binary from running on older Operating Systems.
+       Link:
+         所有输出均为最新。
+         D:\Microsoft Visual stdio 2015\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"../DebugX64/DuiLib_d.dll" /INCREMENTAL:NO /NOLOGO /LIBPATH:.\lib2 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST:NO /DEBUG /PDB:".\Build\Debug\DuiLib.pdb" /TLBID:1 /BASE:"0x11000000" /DYNAMICBASE /NXCOMPAT /IMPLIB:"../lib/DuiLib_d.lib" /MACHINE:X86 /SAFESEH /DLL .\Build\Debug\UITreeView.obj
+         .\Build\Debug\StdAfx.obj
+         .\Build\Debug\UIlib.obj
+         .\Build\Debug\WinImplBase.obj
+         .\Build\Debug\stb_image.obj
+         .\Build\Debug\UIDelegate.obj
+         .\Build\Debug\Utils.obj
+         .\Build\Debug\WndShadow.obj
+         .\Build\Debug\XUnzip.obj
+         .\Build\Debug\UIBase.obj
+         .\Build\Debug\UIContainer.obj
+         .\Build\Debug\UIControl.obj
+         .\Build\Debug\UIDlgBuilder.obj
+         .\Build\Debug\UIManager.obj
+         .\Build\Debug\UIMarkup.obj
+         .\Build\Debug\UIRender.obj
+         .\Build\Debug\UIChildLayout.obj
+         .\Build\Debug\UIHorizontalLayout.obj
+         .\Build\Debug\UITabLayout.obj
+         .\Build\Debug\UITileLayout.obj
+         .\Build\Debug\UIVerticalLayout.obj
+         .\Build\Debug\UIActiveX.obj
+         .\Build\Debug\UIButton.obj
+         .\Build\Debug\UICheckBox.obj
+         .\Build\Debug\UICombo.obj
+         .\Build\Debug\UIDateTime.obj
+         .\Build\Debug\UIEdit.obj
+         .\Build\Debug\UIGifAnim.obj
+         .\Build\Debug\UILabel.obj
+         .\Build\Debug\UIList.obj
+         .\Build\Debug\UIOption.obj
+         .\Build\Debug\UIProgress.obj
+         .\Build\Debug\UIRichEdit.obj
+         .\Build\Debug\UIScrollBar.obj
+         .\Build\Debug\UISlider.obj
+         .\Build\Debug\UIText.obj
+         .\Build\Debug\UIWebBrowser.obj
+           正在创建库 ../lib/DuiLib_d.lib 和对象 ../lib/DuiLib_d.exp
+         DuiLib.vcxproj -> D:\VS2013工程文件\MyDriver7\DuiLib\.\Build\Debug\DuiLib.dll
+         DuiLib.vcxproj -> .\Build\Debug\DuiLib.pdb (Full PDB)
+       FinalizeBuildStatus:
+         正在删除文件“.\Build\Debug\DuiLib.tlog\unsuccessfulbuild”。
+         正在对“.\Build\Debug\DuiLib.tlog\DuiLib.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”(Build 个目标)的操作。
+
+已成功生成。
+
+已用时间 00:00:01.23

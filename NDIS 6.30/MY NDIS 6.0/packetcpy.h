@@ -41,30 +41,26 @@ int ZlzCalcBufSizeOrCopy(PS_PACKET Packet, PNET_BUFFER_LIST Nbl, int num, int Md
 	{
 		Packet->mdllist = ExAllocatePool(NonPagedPool, sizeof(PMDL)*MdlNum);
 	}
+	nb = NET_BUFFER_LIST_FIRST_NB(nbltemp);
 	do
 	{
-		nb = NET_BUFFER_LIST_FIRST_NB(nbltemp);
-		do
+		if (nb != NULL)
 		{
-			if (nb != NULL)
+			for (PMDL mdl = NET_BUFFER_FIRST_MDL(nb); mdl != NULL; mdl = mdl->Next)
 			{
-				for (PMDL mdl = NET_BUFFER_FIRST_MDL(nb); mdl != NULL; mdl = mdl->Next)
+				if (num == 0)
 				{
-					if (num == 0)
-					{
-						TempNum++;
-					}
-					else
-					{
-						Packet->mdllist[TempNum] = mdl;
-						TempNum++;
-					}
+					TempNum++;
+				}
+				else
+				{
+					Packet->mdllist[TempNum] = mdl;
+					TempNum++;
 				}
 			}
-			nb = NET_BUFFER_NEXT_NB(nb);
-		} while (nb != NULL);
-		nbltemp = NET_BUFFER_LIST_NEXT_NBL(nbltemp);
-	} while (nbltemp != NULL);
+		}
+		nb = NET_BUFFER_NEXT_NB(nb);
+	} while (nb != NULL);
 	return TempNum;
 }
 VOID analysis(PS_PACKET Packet)
@@ -161,16 +157,37 @@ NTSTATUS ZlzInsertIntoList(PS_PACKET Packet, PFILTER_CONTEXT Context)
 #endif // DEBUG
 	return STATUS_SUCCESS;
 }
-NTSTATUS ZlzCopyNdlToBufferAndInsert(PFILTER_CONTEXT Context, PNET_BUFFER_LIST Nbl,BOOLEAN IsSendPacket)
+NTSTATUS ZlzCopyNdlToBufferAndInsert(PFILTER_CONTEXT Context, PNET_BUFFER_LIST Nbl,BOOLEAN IsSendPacket) //解NDL链表，分别插入
 {
-	PNET_BUFFER_LIST CloneNbl=NdisAllocateCloneNetBufferList(Nbl, Context->NetBufferPool, NULL, 0); //FLAG=0时初始化并拷贝所有MDL
-	PS_PACKET Packet=(PS_PACKET)ExAllocatePool(NonPagedPool, sizeof(S_PACKET));
-	int MdlNum = ZlzCalcBufSizeOrCopy(Packet, CloneNbl, 0, 0);
-	ZlzCalcBufSizeOrCopy(Packet, CloneNbl, 1, MdlNum);
-	Packet->MdlNumber = MdlNum;
-	Packet->buffer = CloneNbl;
-	Packet->size = 0;
-	Packet->IsSendPacket = IsSendPacket;
-	ZlzInsertIntoList(Packet, Context);
+	PNET_BUFFER_LIST nbltemp = Nbl;
+	do
+	{
+		PNET_BUFFER_LIST CloneNbl = NdisAllocateCloneNetBufferList(nbltemp, Context->NetBufferPool, NULL, 0); //FLAG=0时初始化并拷贝所有MDL，注意clone包不会把链表上的所有NBL都克隆，只会克隆一个，且clone包的Next会置为NULL
+		PS_PACKET Packet = (PS_PACKET)ExAllocatePool(NonPagedPool, sizeof(S_PACKET));
+		int MdlNum = ZlzCalcBufSizeOrCopy(Packet, CloneNbl, 0, 0);
+		ZlzCalcBufSizeOrCopy(Packet, CloneNbl, 1, MdlNum);
+		Packet->MdlNumber = MdlNum;
+		Packet->buffer = CloneNbl;
+		Packet->size = 0;
+		Packet->IsSendPacket = IsSendPacket;
+		ZlzInsertIntoList(Packet, Context);
+		nbltemp = NET_BUFFER_LIST_NEXT_NBL(nbltemp);
+	} while (nbltemp != NULL);
+	return STATUS_SUCCESS;
+}
+NTSTATUS ZlzGetNetworkAdapterInformation(PFILTER_CONTEXT Context)
+{
+	WCHAR* TempPath = NULL;
+	NDIS_STRING DevPathName = Context->DevInfo.DevPathName;
+	NDIS_STRING RegPath = RTL_CONSTANT_STRING(REG_NETWORKTCPIPCONFIG_PATH);
+	TempPath = ExAllocatePoolWithTag(NonPagedPool, DevPathName.Length + RegPath.Length + sizeof(WCHAR), 'asd');
+	if (TempPath == NULL)
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
+	RtlStringCbCatW(TempPath, DevPathName.Length + RegPath.Length + sizeof(WCHAR), RegPath.Buffer);
+	RtlStringCbCatW(TempPath, DevPathName.Length + RegPath.Length + sizeof(WCHAR), DevPathName.Buffer);
+	DbgPrint("%wZ\n", TempPath);
+	ExFreePoolWithTag(TempPath, 'asd');
 	return STATUS_SUCCESS;
 }

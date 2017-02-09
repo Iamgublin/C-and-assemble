@@ -32,7 +32,7 @@ typedef struct _IO_Packet
 		}Net_Packet_Output;
 		struct
 		{
-			int ContextNum;
+			int Reserved;
 		}Net_Packet_InPut;
 		unsigned u;
 	}Packet;

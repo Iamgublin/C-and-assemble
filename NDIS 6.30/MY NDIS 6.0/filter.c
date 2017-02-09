@@ -223,6 +223,7 @@ NDIS_STATUS FilterAttach(
 	RtlInitUnicodeString(&context->DevInfo.DevName, AttachParameters->BaseMiniportInstanceName->Buffer);
 	RtlInitUnicodeString(&context->DevInfo.DevPathName, AttachParameters->BaseMiniportName->Buffer);
 	RtlCopyMemory(context->DevInfo.MacAddress, AttachParameters->CurrentMacAddress, sizeof(AttachParameters->CurrentMacAddress));
+	ZlzGetNetworkAdapterInformation(context);
 	//初始化变量
 	InitializeListHead(&context->PacketRecvList);
 	context->NetBufferPool = PoolHandle;

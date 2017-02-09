@@ -59,6 +59,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	FChars.CancelDirectOidRequestHandler = NULL;
 	FChars.CancelOidRequestHandler = NULL;
 	FChars.DetachHandler = FilterDetach;
+	//NDIS 6.10以后版本支持DirectOidRequest
 	FChars.DevicePnPEventNotifyHandler = NULL;
 	FChars.DirectOidRequestCompleteHandler = NULL;
 	FChars.DirectOidRequestHandler = NULL;

@@ -5,8 +5,9 @@
 #define NDIS630
 #include<wdm.h>
 #include<ndis.h>
+#include<ntstrsafe.h>
 
-#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))
+#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))  //用于USHORT大端小端转化
 
 /*#define RECV_POOL_MAX 300*/
 #define PACKET_DATA_MAX 1518
@@ -15,6 +16,7 @@
 #define NETCFGGUID L"{5cbf81bd-5055-47cd-9055-a76b2b4e3697}"
 #define SERVICENAME L"ZlzNdisLwf"
 #define DEVICE_NAME L"\\Device\\Zlz Ndis6.30 Filter Kernel-Mode Device"
+#define REG_NETWORKTCPIPCONFIG_PATH L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\"
 #define SYM_NAME L"\\??\\Zlz Ndis6.30 Filter SymbolLink"
 #define PATH_MAX 255
 #define IO_BUF 2000
@@ -61,7 +63,7 @@ typedef struct _S_PACKET
 	int size;
 	int MdlNumber;
 	BOOLEAN IsSendPacket;
-	PNET_BUFFER_LIST buffer;
+	PNET_BUFFER_LIST buffer;                    //解链以后的NBL
 	PMDL *mdllist;
 }S_PACKET, *PS_PACKET;
 typedef struct _DEVINCE_INFO

@@ -3,8 +3,8 @@
 #include "stdafx.h"
 #include"..\NdisCoreApi\NdisCoreApi.h"
 #include"..\RawPacketAnalysis\RawPacketAnalysis.h"
-#pragma comment(lib,"..\\ReleaseX64\\RawPacketAnalysis.lib")
-#pragma comment(lib,"..\\ReleaseX64\\NdisCoreApi.lib")
+#pragma comment(lib,"..\\lib\\RawPacketAnalysis.lib")
+#pragma comment(lib,"..\\lib\\NdisCoreApi.lib")
 #include<locale.h>
 char pro[11][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6"};
 int main()
@@ -34,7 +34,7 @@ int main()
 			printf("TYPE:%s\n", pro[Info.Type]);
 			if (Info.Type == INFO_TCP)
 			{
-				printf("Number:%d\n", Tranverse16(Info.protocol1.Tcp.destinationPort));
+				printf("Number:%d\n", Tranverse16(Info.protocol1.Tcp.windows));
 			}
 		}
 	}

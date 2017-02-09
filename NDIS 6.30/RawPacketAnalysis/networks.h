@@ -2,7 +2,7 @@
 #include<Windows.h>
 
 //用到的宏
-#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))
+#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))    //用于USHORT大端小端转化
 #define SET_INFO_TYPE(A,B) (A->Type=B)
 
 //用于判断包类型
@@ -35,18 +35,26 @@ typedef struct _IPPacket
 	ULONG ipSource; //源IP地址
 	ULONG ipDestination; //目标IP地址
 }IPPacket, *pIPPacket;
+#pragma pack(push,1)
 typedef struct _TCPPacket //20个字节
 {
 	USHORT sourcePort; //16位源端口号
 	USHORT destinationPort;//16位目的端口号
 	ULONG sequenceNumber; //32位序列号
 	ULONG acknowledgeNumber;//32位确认号
-	UCHAR dataoffset; //4位首部长度/4位保留字
-	UCHAR flags; //6位标志位
+	USHORT dataoffset : 4; //4位首部长度
+	USHORT reserved : 6; //6位保留字
+	USHORT urg : 1;
+	USHORT ack : 1;
+	USHORT psh : 1;
+	USHORT rst : 1;
+	USHORT syn : 1;
+	USHORT fin : 1; //6位标志位
 	USHORT windows; //16位窗口大小
 	USHORT checksum; //16位校验和
 	USHORT urgentPointer; //16位紧急数据偏移量
 }TCPPacket, *PTCPPacket;
+#pragma pack(pop)
 typedef struct _UDPPacket
 {
 	USHORT sourcePort; //源端口号
@@ -83,3 +91,12 @@ typedef struct _ARPPacket //28字节的ARP头
 	UCHAR dmac[6]; //目的MAC地址
 	UCHAR daddr[4]; //目的IP地址
 }ARPPacket, *PARPPacket;
+typedef struct _DNSPacket 
+{
+	USHORT id; //标识，通过它客户端可以将DNS的请求与应答相匹配；
+	USHORT flags; //标志：(查询)0x0100 (应答)0x8180 这些数字都是主机序
+	USHORT questions; //问题数目
+	USHORT answers; //资源记录数目
+	USHORT author; //授权资源记录数目
+	USHORT addition; //额外资源记录数目
+}DNSPacket,*PDNSPacket;

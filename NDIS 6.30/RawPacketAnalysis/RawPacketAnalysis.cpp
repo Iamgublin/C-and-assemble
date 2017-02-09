@@ -22,8 +22,8 @@ void AnalyseIcmp(PPacketInfo Info, int IpHeaderLen)
 }
 void AnalyseArp(PPacketInfo Info)
 {
-	/*memcpy(&Info->protocol.Arp, Info->RawPacket + sizeof(MAC), sizeof(ARPPacket));
-	printf("**************ARP**********\n");
+	memcpy(&Info->protocol.Arp, Info->RawPacket + sizeof(MAC), sizeof(ARPPacket));
+	/*printf("**************ARP**********\n");
 	if (Tranverse16(Info->protocol.Arp.opcode) == ARP_REQUEST)
 	{
 		printf("who has ip %03d.%03d.%03d.%03d? tell %03d.%03d.%03d.%03d\n",Info->protocol.Arp.daddr[0],

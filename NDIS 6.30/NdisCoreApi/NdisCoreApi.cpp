@@ -14,7 +14,7 @@ NDISCOREAPI_API int  WINAPI Net_ShowAdapter(HANDLE FilterHandle,PIO_Packet Packe
 NDISCOREAPI_API int WINAPI Net_GetRawPacket(HANDLE FilterHandle, PIO_Packet Packet,int AdapterIndex)
 {
 	IO_Packet PacketInput = { 0 };
-	PacketInput.Packet.Net_Packet_InPut.ContextNum = AdapterIndex;
+	PacketInput.Packet.Net_Packet_InPut.Reserved = AdapterIndex;
 	DWORD ByteRet = 0;
 	return DeviceIoControl(FilterHandle, IOCTL_GETRAWDATA, &PacketInput, sizeof(IO_Packet), Packet, sizeof(IO_Packet), &ByteRet, NULL);
 }
