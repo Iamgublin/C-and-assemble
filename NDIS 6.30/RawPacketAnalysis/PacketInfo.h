@@ -14,26 +14,38 @@
 #define INFO_NAT     8
 #define INFO_DHCP    9
 #define INFO_IPv6    10
+#define INFO_QICQ    11
 
 //ARP->opcode
-#define ARP_REQUEST 1
-#define ARP_REPLY 2
+#define ARP_REQUEST  1
+#define ARP_REPLY    2
+
+//DHCP->messageType
+#define DHCP_REQUEST 1
+#define DHCP_REPLY   2  
+
 typedef struct _PacketInfo
 {
-	int Type;
+	int Type;     //数据包类型 （INFO_XXX）
+	int Size;     //数据包大小
 	BOOLEAN IsSendPacket;
-	MAC Mac;
+	MAC Mac;      //数据链路层
 	union 
 	{
 		IPPacket Ip;
 		ARPPacket Arp;
-	}protocol;
+	}protocol;    //网络层
 	union 
 	{
 		TCPPacket Tcp;
 		UDPPacket Udp;
 		ICMPPacket Icmp;
 		IGMPPacket Igmp;
-	}protocol1;
+	}protocol1;  //传输层
+	union 
+	{
+		QICQPacket Qicq;
+		DHCPPacket Dhcp;
+	}protocol2;
 	UCHAR RawPacket[2000];     //原始的包数据（MTU<=1500）
 }PacketInfo,*PPacketInfo;

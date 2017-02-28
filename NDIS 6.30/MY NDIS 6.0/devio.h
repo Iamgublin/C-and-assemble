@@ -1,13 +1,26 @@
 #pragma once
+/********************************************************************************
+*                                                                               *
+* devio.h --  Handle zlzndislwf Driver I/O With R3                              *
+*                                                                               *
+* Copyright (c) Microsoft Corporation. All rights reserved.                     *
+*                                                                               *
+********************************************************************************/
 #include"struct.h"
+
+
 extern NTSTATUS ZlzRemoveListHead(PFILTER_CONTEXT Context);
 extern VOID analysis(PS_PACKET Packet);
+extern NTSTATUS ZlzCleanList(PFILTER_CONTEXT Context);
+
+
 VOID ZlzInitShowAdapterPacket(PIO_Packet IoPacket)
 {
 	IoPacket->Packet.ShowAdapter.Num = Global.contextnum;
 	IoPacket->Type = PACKET_TYPE_ADAPTERINFO;
 	for (int i = 0; i < Global.contextnum; i++)
 	{
+		IoPacket->Packet.ShowAdapter.AdapterInfo[i].isFiltering = Global.context[i]->IsFiltering;
 		RtlCopyMemory(IoPacket->Packet.ShowAdapter.AdapterInfo[i].DevName, Global.context[i]->DevInfo.DevName.Buffer, Global.context[i]->DevInfo.DevName.Length);
 		RtlCopyMemory(IoPacket->Packet.ShowAdapter.AdapterInfo[i].DevPathName, Global.context[i]->DevInfo.DevPathName.Buffer, Global.context[i]->DevInfo.DevPathName.Length);
 		RtlCopyMemory(IoPacket->Packet.ShowAdapter.AdapterInfo[i].MacAddress, Global.context[i]->DevInfo.MacAddress, 32);
@@ -49,6 +62,10 @@ NTSTATUS CopyNetBuffer(PIO_Packet Packet, int i)
 {
 	Packet->Type = PACKET_TYPE_NETPACKET;
 	if (Global.context[i] == NULL)
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
+	if (Global.context[i]->IsRunning == FALSE)
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
@@ -103,6 +120,88 @@ NTSTATUS CopyNetBuffer(PIO_Packet Packet, int i)
 	}
 	return STATUS_SUCCESS;
 }
+NTSTATUS ZlzStartFilter(int StartNum)
+{
+	if (Global.contextnum == 0)
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
+	if(StartNum==START_ALL)
+	{ 
+		for (int i = 0; i < Global.contextnum; i++)
+		{
+			if (Global.context[i]->IsFiltering == TRUE)
+			{
+				continue;
+			}
+			else
+			{
+				KIRQL irql;
+				KeAcquireSpinLock(&Global.context[i]->NetBufferListLock, &irql);
+				ZlzCleanList(Global.context[i]);
+				KeReleaseSpinLock(&Global.context[i]->NetBufferListLock, irql);
+				Global.context[i]->IsFiltering = TRUE;
+			}
+		}
+	}
+	else 
+	{
+		if (StartNum > Global.contextnum || StartNum < 0)
+		{
+			return STATUS_UNSUCCESSFUL;
+		}
+		if (Global.context[StartNum]->IsFiltering == TRUE)
+		{
+			return STATUS_SUCCESS;
+		}
+		else
+		{
+			KIRQL irql;
+			KeAcquireSpinLock(&Global.context[StartNum]->NetBufferListLock, &irql);
+			ZlzCleanList(Global.context[StartNum]);
+			KeReleaseSpinLock(&Global.context[StartNum]->NetBufferListLock, irql);
+			Global.context[StartNum]->IsFiltering = TRUE;
+		}
+	}
+	return STATUS_SUCCESS;
+}
+NTSTATUS ZlzStopFilter(int StopNum)
+{
+	if (Global.contextnum == 0)
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
+	if (StopNum == STOP_ALL)
+	{
+		for (int i = 0; i < Global.contextnum; i++)
+		{
+			if (Global.context[i]->IsFiltering == FALSE)
+			{
+				continue;
+			}
+			else
+			{
+				Global.context[i]->IsFiltering = FALSE;
+			}
+		}
+	}
+	else 
+	{
+		if (StopNum > Global.contextnum || StopNum < 0)
+		{
+			return STATUS_UNSUCCESSFUL;
+		}
+		if (Global.context[StopNum]->IsFiltering == FALSE)
+		{
+			return STATUS_SUCCESS;
+		}
+		else
+		{
+			Global.context[StopNum]->IsFiltering = FALSE;
+		}
+	}
+	return STATUS_SUCCESS;
+}
 NTSTATUS Create(PDEVICE_OBJECT dev, PIRP irp)
 {
 	return STATUS_SUCCESS;
@@ -145,6 +244,26 @@ NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp)
 				int ContextNum = PacketInput->Packet.Net_Packet_InPut.ContextNum;
 				irp->IoStatus.Status = CopyNetBuffer(Packet, ContextNum);
 				RtlCopyMemory(buffer, Packet, sizeof(IO_Packet));
+			}
+			IoCompleteRequest(irp, IO_NO_INCREMENT);
+			break;
+		case IOCTL_STARTFILTER:
+			irp->IoStatus.Information = 0;
+			if (sa->Parameters.DeviceIoControl.InputBufferLength)
+			{
+				PIO_Packet PacketInput = irp->AssociatedIrp.SystemBuffer;
+				int StartNum = PacketInput->Packet.Net_StartStop_Filter.Index;
+				irp->IoStatus.Status = ZlzStartFilter(StartNum);
+			}
+			IoCompleteRequest(irp, IO_NO_INCREMENT);
+			break;
+		case IOCTL_STOPFILTER:
+			irp->IoStatus.Information = 0;
+			if (sa->Parameters.DeviceIoControl.InputBufferLength)
+			{
+				PIO_Packet PacketInput = irp->AssociatedIrp.SystemBuffer;
+				int StopNum = PacketInput->Packet.Net_StartStop_Filter.Index;
+				irp->IoStatus.Status = ZlzStopFilter(StopNum);
 			}
 			IoCompleteRequest(irp, IO_NO_INCREMENT);
 			break;

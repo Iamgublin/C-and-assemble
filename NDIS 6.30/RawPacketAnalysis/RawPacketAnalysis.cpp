@@ -8,6 +8,14 @@ VOID analysis(MAC macpacket)
 	printf("type:%04x\n", Tranverse16(macpacket.type));
 	printf("end*********************************\n");
 }
+void AnalyseDhcp(PPacketInfo Info, int IpHeaderLen)
+{
+	memcpy(&Info->protocol2.Dhcp, Info->RawPacket + sizeof(MAC) + IpHeaderLen + sizeof(UDPPacket), sizeof(DHCPPacket));
+}
+void AnalyseQicq(PPacketInfo Info, int IpHeaderLen)
+{
+	memcpy(&Info->protocol2.Qicq, Info->RawPacket + sizeof(MAC) + IpHeaderLen + sizeof(UDPPacket), sizeof(QICQPacket));
+}
 void AnalyseIgmp(PPacketInfo Info, int IpHeaderLen)
 {
 	memcpy(&Info->protocol1.Igmp, Info->RawPacket + sizeof(MAC) + IpHeaderLen, sizeof(IGMPPacket));
@@ -15,6 +23,16 @@ void AnalyseIgmp(PPacketInfo Info, int IpHeaderLen)
 void AnalyseUdp(PPacketInfo Info, int IpHeaderLen)
 {
 	memcpy(&Info->protocol1.Udp, Info->RawPacket + sizeof(MAC) + IpHeaderLen, sizeof(UDPPacket));
+	if (Info->protocol1.Udp.sourcePort == 4009 || Info->protocol1.Udp.sourcePort == 8000)
+	{
+		SET_INFO_TYPE(Info, INFO_QICQ);
+		AnalyseQicq(Info, IpHeaderLen);
+	}
+	else if (Info->protocol1.Udp.sourcePort==67||Info->protocol1.Udp.sourcePort==68)
+	{
+		SET_INFO_TYPE(Info, INFO_DHCP);
+		AnalyseDhcp(Info, IpHeaderLen);
+	}
 }
 void AnalyseIcmp(PPacketInfo Info, int IpHeaderLen)
 {
@@ -45,7 +63,6 @@ void AnalyseTcp(PPacketInfo Info,int IpHeaderLen)
 void AnalyseIp(PPacketInfo Info)
 {
 	memcpy(&Info->protocol.Ip, Info->RawPacket + sizeof(MAC), sizeof(IPPacket));
-	/*printf("Protocol:0x%x\n", Info->protocol.Ip.ipProtocol);*/
 	int IpHeaderLen = (Info->protocol.Ip.iphVerLen & 0x0f)*4;
 	switch (Info->protocol.Ip.ipProtocol)
 	{
@@ -76,10 +93,10 @@ RAWPACKETANALYSIS_API int AnalysePacket(PIO_Packet Packet,PPacketInfo Info)
 	{
 		return 0;
 	}
-	memcpy(Info->RawPacket, Packet->Packet.Net_Packet_Output.Buffer, sizeof(Info->RawPacket));
+	Info->Size = Packet->Packet.Net_Packet_Output.Size;
 	Info->IsSendPacket = Packet->Packet.Net_Packet_Output.IsSendPacket;
+	memcpy(Info->RawPacket, Packet->Packet.Net_Packet_Output.Buffer, sizeof(Info->RawPacket));
 	memcpy(&Info->Mac, Info->RawPacket, sizeof(Info->Mac));
-	/*analysis(Info->Mac);*/
 	switch (Tranverse16(Info->Mac.type))
 	{
 	case PACKET_IP:
@@ -94,7 +111,7 @@ RAWPACKETANALYSIS_API int AnalysePacket(PIO_Packet Packet,PPacketInfo Info)
 		break;
 	default:
 		SET_INFO_TYPE(Info, INFO_UNKNOWN);
-		analysis(Info->Mac);
+		/*analysis(Info->Mac);*/
 		break;
 	}
     return 1;

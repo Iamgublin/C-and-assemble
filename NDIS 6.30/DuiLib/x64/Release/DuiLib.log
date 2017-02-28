@@ -1,9 +1,60 @@
-﻿生成启动时间为 2017/2/9 15:55:47。
-     1>项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”在节点 2 上(Clean 个目标)。
-     1>_PrepareForClean:
-         正在删除文件“x64\Release\DuiLib.tlog\DuiLib.lastbuildstate”。
-     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”(Clean 个目标)的操作。
+﻿生成启动时间为 2017/2/18 11:02:17。
+     1>项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”在节点 2 上(Build 个目标)。
+     1>InitializeBuildStatus:
+         正在对“x64\Release\DuiLib.tlog\unsuccessfulbuild”执行 Touch 任务。
+       ClCompile:
+         所有输出均为最新。
+         所有输出均为最新。
+         所有输出均为最新。
+         所有输出均为最新。
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1189,5): warning MSB8012: TargetPath(D:\VS2013工程文件\MyDriver7\x64\Release\DuiLib.dll) does not match the Linker's OutputFile property value (D:\VS2013工程文件\MyDriver7\ReleaseX64\DuiLib.dll). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1193,5): warning MSB8030: The linker switch "Minimum Required Version" requires "SubSystem" to be set.  Without "SubSystem", the "Minimum Required Version" would not be passed to linker and could prevent to the output binary from running on older Operating Systems.
+       Link:
+         D:\Microsoft Visual stdio 2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"../ReleaseX64/DuiLib.dll" /INCREMENTAL:NO /NOLOGO /LIBPATH:.\lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST:NO /DEBUG /PDB:"D:\VS2013工程文件\MyDriver7\x64\Release\DuiLib.pdb" /TLBID:1 /BASE:"0x11000000" /DYNAMICBASE /NXCOMPAT /IMPLIB:"../lib/DuiLib.lib" /MACHINE:X64 /DLL x64\Release\UITreeView.obj
+         x64\Release\StdAfx.obj
+         x64\Release\UIlib.obj
+         x64\Release\WinImplBase.obj
+         x64\Release\stb_image.obj
+         x64\Release\UIDelegate.obj
+         x64\Release\Utils.obj
+         x64\Release\WndShadow.obj
+         x64\Release\XUnzip.obj
+         x64\Release\UIBase.obj
+         x64\Release\UIContainer.obj
+         x64\Release\UIControl.obj
+         x64\Release\UIDlgBuilder.obj
+         x64\Release\UIManager.obj
+         x64\Release\UIMarkup.obj
+         x64\Release\UIRender.obj
+         x64\Release\UIChildLayout.obj
+         x64\Release\UIHorizontalLayout.obj
+         x64\Release\UITabLayout.obj
+         x64\Release\UITileLayout.obj
+         x64\Release\UIVerticalLayout.obj
+         x64\Release\UIActiveX.obj
+         x64\Release\UIButton.obj
+         x64\Release\UICheckBox.obj
+         x64\Release\UICombo.obj
+         x64\Release\UIDateTime.obj
+         x64\Release\UIEdit.obj
+         x64\Release\UIGifAnim.obj
+         x64\Release\UILabel.obj
+         x64\Release\UIList.obj
+         x64\Release\UIOption.obj
+         x64\Release\UIProgress.obj
+         x64\Release\UIRichEdit.obj
+         x64\Release\UIScrollBar.obj
+         x64\Release\UISlider.obj
+         x64\Release\UIText.obj
+         x64\Release\UIWebBrowser.obj
+           正在创建库 ../lib/DuiLib.lib 和对象 ../lib/DuiLib.exp
+         DuiLib.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Release\DuiLib.dll
+         DuiLib.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Release\DuiLib.pdb (Full PDB)
+       FinalizeBuildStatus:
+         正在删除文件“x64\Release\DuiLib.tlog\unsuccessfulbuild”。
+         正在对“x64\Release\DuiLib.tlog\DuiLib.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”(Build 个目标)的操作。
 
 已成功生成。
 
-已用时间 00:00:00.04
+已用时间 00:00:05.90

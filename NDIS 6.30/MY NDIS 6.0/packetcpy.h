@@ -1,4 +1,11 @@
 #pragma once
+/********************************************************************************
+*                                                                               *
+* packetcpy.h --  RawPacket Manager                                             *
+*                                                                               *
+* Copyright (c) Microsoft Corporation. All rights reserved.                     *
+*                                                                               *
+********************************************************************************/
 #include"struct.h"
 /*int ZlzCalcBufSizeOrCopy(PVOID DestBuf, PNET_BUFFER_LIST Nbl, int num)   //调用两次该函数，第一次获取大小，分配内存，第二次拷贝。
 {

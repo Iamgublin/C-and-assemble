@@ -1,9 +1,26 @@
-﻿生成启动时间为 2017/2/9 15:55:47。
-     1>项目“D:\VS2013工程文件\MyDriver7\NdisCoreApi\NdisCoreApi.vcxproj”在节点 2 上(Clean 个目标)。
-     1>_PrepareForClean:
-         正在删除文件“x64\Release\NdisCoreApi.tlog\NdisCoreApi.lastbuildstate”。
-     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\NdisCoreApi\NdisCoreApi.vcxproj”(Clean 个目标)的操作。
+﻿生成启动时间为 2017/2/26 20:26:51。
+     1>项目“D:\VS2013工程文件\MyDriver7\NdisCoreApi\NdisCoreApi.vcxproj”在节点 2 上(Build 个目标)。
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+     1>InitializeBuildStatus:
+         正在创建“x64\Release\NdisCoreApi.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+       ClCompile:
+         D:\Microsoft Visual stdio 2015\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /GL /D NDEBUG /D _WINDOWS /D _USRDLL /D NDISCOREAPI_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Release\\" /Fd"x64\Release\vc140.pdb" /Gd /TP /errorReport:prompt NdisCoreApi.cpp
+         NdisCoreApi.cpp
+       Link:
+         D:\Microsoft Visual stdio 2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\VS2013工程文件\MyDriver7\x64\Release\..\..\ReleaseX64\NdisCoreApi.dll" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\VS2013工程文件\MyDriver7\x64\Release\..\..\ReleaseX64\NdisCoreApi.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG:incremental /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"..\lib\NdisCoreApi.lib" /MACHINE:X64 /DLL x64\Release\NdisCoreApi.obj
+           正在创建库 ..\lib\NdisCoreApi.lib 和对象 ..\lib\NdisCoreApi.exp
+         正在生成代码
+         0 of 5 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+           0 functions were new in current compilation
+           0 functions had inline decision re-evaluated but remain unchanged
+         已完成代码的生成
+         NdisCoreApi.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Release\..\..\ReleaseX64\NdisCoreApi.dll
+         NdisCoreApi.vcxproj -> D:\VS2013工程文件\MyDriver7\x64\Release\..\..\ReleaseX64\NdisCoreApi.pdb (Full PDB)
+       FinalizeBuildStatus:
+         正在删除文件“x64\Release\NdisCoreApi.tlog\unsuccessfulbuild”。
+         正在对“x64\Release\NdisCoreApi.tlog\NdisCoreApi.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\NdisCoreApi\NdisCoreApi.vcxproj”(Build 个目标)的操作。
 
 已成功生成。
 
-已用时间 00:00:00.02
+已用时间 00:00:09.06

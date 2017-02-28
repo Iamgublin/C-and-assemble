@@ -32,8 +32,8 @@ typedef struct _IPPacket
 	UCHAR ipTTL; //生存时间，就是TTL
 	UCHAR ipProtocol; //协议，可能是TCP、UDP、ICMP等
 	USHORT ipChecksum; //校验和
-	ULONG ipSource; //源IP地址
-	ULONG ipDestination; //目标IP地址
+	UCHAR ipSource[4]; //源IP地址
+	UCHAR ipDestination[4]; //目标IP地址
 }IPPacket, *pIPPacket;
 #pragma pack(push,1)
 typedef struct _TCPPacket //20个字节
@@ -100,3 +100,33 @@ typedef struct _DNSPacket
 	USHORT author; //授权资源记录数目
 	USHORT addition; //额外资源记录数目
 }DNSPacket,*PDNSPacket;
+typedef struct _QICQPacket
+{
+	UCHAR flag;       //0x02
+	USHORT version;  //版本
+	USHORT command;  //0x2心跳包 seqence数加一  0x27:GetFriendOnline 0x1D:RequestKey 0x17:收消息   0x13:GetStatus 0x58:DwonloadFriend 0x81:GetStatusOfFriend 0x5c:GetLevel
+	USHORT seqence;  //序号
+	int qqNumber;    //qq号
+	UCHAR data;      //加密的data（大小不定）
+}QICQPacket,*PQICQPacket;
+typedef struct _DHCPPacket
+{
+	UCHAR messageType;                  //1 Request 2 Reply
+	UCHAR harewareType;                 //1为Ethernet
+	UCHAR hardwareAddressLength;        //Ethernet时为mac地址长度（6）
+	UCHAR hops;                         //经过的路由数（没有为0）
+	int translateId;                    //随机ID
+	USHORT seconds;
+	struct 
+	{
+		USHORT boardcastFlag : 1;       //是否用广播方式传送
+		USHORT Reserved : 15;
+	}flags;
+	UCHAR clientIpAddress[4];           //自己的地址
+	UCHAR serverIpAddress[4];           //服务器地址
+	UCHAR networkGatewayIpAddress[4];   //网关地址
+	UCHAR clientHardwareAddress[16];    //硬件地址
+	UCHAR serverName[64];
+	UCHAR fileName[128];
+	UCHAR options;                      //其余的可选字段（大小不定）
+}DHCPPacket,*PDHCPPacket;

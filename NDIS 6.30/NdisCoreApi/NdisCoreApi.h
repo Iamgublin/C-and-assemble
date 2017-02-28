@@ -43,4 +43,20 @@ Net_GetRawPacket(
 	_Out_ PIO_Packet Packet,
 	_In_ int AdapterIndex
 );
+
+NDISCOREAPI_API
+int
+WINAPI
+Net_StartFilter(
+	_In_ HANDLE FilterHandle,
+	_In_opt_ int *StartFileterIndex
+);
+
+NDISCOREAPI_API
+int
+WINAPI
+Net_StopFilter(
+	_In_ HANDLE FilterHandle,
+	_In_opt_ int *StopFileterIndex
+);
 #endif //_APICORENDIS_

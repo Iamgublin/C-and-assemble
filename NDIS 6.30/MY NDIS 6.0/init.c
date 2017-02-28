@@ -28,6 +28,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	NDIS_STRING FriendlyName = RTL_CONSTANT_STRING(L"Zlz NDIS KernelMode Driver");
 	NDIS_STRING UniqueName = RTL_CONSTANT_STRING(NETCFGGUID);
 	NDIS_STRING ServiceName = RTL_CONSTANT_STRING(SERVICENAME);
+
+	NdisZeroMemory(&Global, sizeof(GLOBAL));
 	Global.contextnum = 0;
 	Global.DriverHandle = NULL;
 	Global.FilterDev = NULL;

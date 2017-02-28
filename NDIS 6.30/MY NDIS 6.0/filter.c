@@ -165,20 +165,22 @@ VOID FilterDetach(
 	context->IsFiltering = FALSE;
 	context->IsRunning = FALSE;
 	NdisFreeNetBufferListPool(context->NetBufferPool);
+	Global.context[context->FliterIndex] = NULL;
 	ExFreePool(context);
+	Global.contextnum--;
 }
 
 _Use_decl_annotations_
 NDIS_STATUS FilterAttach(
 	_In_ NDIS_HANDLE                    NdisFilterHandle,
 	_In_ NDIS_HANDLE                    FilterDriverContext,
-	_In_ PNDIS_FILTER_ATTACH_PARAMETERS AttachParameters
+	_In_ PNDIS_FILTER_ATTACH_PARAMETERS AttachParameters                   //驱动初始化和有网卡接入时均会调用
 )
 {
 	/*DbgBreakPoint();*/
 	NDIS_STATUS sta;
 	NDIS_FILTER_ATTRIBUTES FilterAttributes;
-#if DBG
+#ifndef DBG
 	DbgPrint("BaseMiniportName:%wZ\n", AttachParameters->BaseMiniportName);
 	DbgPrint("BaseMiniportInstanceName:%wZ\n", AttachParameters->BaseMiniportInstanceName);
 #endif
@@ -228,10 +230,21 @@ NDIS_STATUS FilterAttach(
 	InitializeListHead(&context->PacketRecvList);
 	context->NetBufferPool = PoolHandle;
 	context->FilterHandle = NdisFilterHandle;
-	context->FliterIndex = Global.contextnum;
 	context->CurrentRecvNum = 0;
-	context->IsFiltering = TRUE;               //看情况修改
-	Global.context[Global.contextnum] = context;
+	context->IsFiltering = FALSE;               //看情况修改
+	for (int contextinsert = 0; contextinsert < 20; contextinsert++)
+	{
+		if (Global.context[contextinsert] == NULL)
+		{
+			Global.context[contextinsert] = context;     //寻找空位置插入
+			context->FliterIndex = contextinsert;
+			break;
+		}
+		if (contextinsert == 19)
+		{
+			return STATUS_UNSUCCESSFUL;     //超过20个限制
+		}
+	}
 	Global.contextnum++;
 	return STATUS_SUCCESS;
 }
