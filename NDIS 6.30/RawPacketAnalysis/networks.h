@@ -1,10 +1,6 @@
 #pragma once
 #include<Windows.h>
 
-//用到的宏
-#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))    //用于USHORT大端小端转化
-#define SET_INFO_TYPE(A,B) (A->Type=B)
-
 //用于判断包类型
 #define PACKET_IP   0x0800
 #define PACKET_IPv6 0X86DD
@@ -42,14 +38,7 @@ typedef struct _TCPPacket //20个字节
 	USHORT destinationPort;//16位目的端口号
 	ULONG sequenceNumber; //32位序列号
 	ULONG acknowledgeNumber;//32位确认号
-	USHORT dataoffset : 4; //4位首部长度
-	USHORT reserved : 6; //6位保留字
-	USHORT urg : 1;
-	USHORT ack : 1;
-	USHORT psh : 1;
-	USHORT rst : 1;
-	USHORT syn : 1;
-	USHORT fin : 1; //6位标志位
+	USHORT flagsOffset;//偏移和标志
 	USHORT windows; //16位窗口大小
 	USHORT checksum; //16位校验和
 	USHORT urgentPointer; //16位紧急数据偏移量

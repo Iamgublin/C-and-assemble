@@ -41,9 +41,14 @@ int main()
 		Sleep(100);
 		if (Net_GetRawPacket(hF, Output, a))
 		{
+			Info = { 0 };
 			AnalysePacket(Output, &Info);
 			if (Info.Type == INFO_IPv6 || Info.Type == INFO_UNKNOWN)
 			{
+				if (Info.Type == INFO_UNKNOWN)
+				{
+					printf("Unknown protocol:%x\n", Info.Mac.type);
+				}
 				continue;
 			}
 			if (Info.Type == INFO_ARP)
@@ -71,8 +76,8 @@ int main()
 				printf("%03d.%03d.%03d.%03d\t%03d.%03d.%03d.%03d\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3], daddr[0], daddr[1], daddr[2], daddr[3], Info.Size, pro[Info.Type]);
 				if (Info.Type == INFO_TCP)
 				{
-					printf("window:%d port:%d->%d ack:%d syn:%d fin:%d %d\n", Tranverse16(Info.protocol1.Tcp.windows), Tranverse16(Info.protocol1.Tcp.sourcePort), Tranverse16(Info.protocol1.Tcp.destinationPort), Info.protocol1.Tcp.ack,
-						Info.protocol1.Tcp.syn, Info.protocol1.Tcp.fin,Info.protocol1.Tcp.urgentPointer);
+					printf("window:%d port:%d->%d ack:%d syn:%d fin:%d dataoffset:%d\n", Tranverse16(Info.protocol1.Tcp.windows), Tranverse16(Info.protocol1.Tcp.sourcePort), Tranverse16(Info.protocol1.Tcp.destinationPort), TCP_TEST_ACK(Info.protocol1.Tcp.flagsOffset),
+					TCP_TEST_SYN(Info.protocol1.Tcp.flagsOffset), TCP_TEST_FIN(Info.protocol1.Tcp.flagsOffset),(TCP_GETDATAOFFSET(Info.protocol1.Tcp.flagsOffset))*4);
 				}
 				else
 				{

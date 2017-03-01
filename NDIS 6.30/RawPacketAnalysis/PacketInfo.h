@@ -1,6 +1,9 @@
 #pragma once
 #include<Windows.h>
 #include"networks.h"
+//用到的宏
+#define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))    //用于USHORT大端小端转化
+#define SET_INFO_TYPE(A,B) (A->Type=B)
 
 //PacketInfo->type
 #define INFO_UNKNOWN 0
@@ -23,6 +26,15 @@
 //DHCP->messageType
 #define DHCP_REQUEST 1
 #define DHCP_REPLY   2  
+
+//TCP->flagsOffset  X为flagsOffset
+#define TCP_TEST_FIN(X)       Tranverse16(X) & 0x1
+#define TCP_TEST_SYN(X)       Tranverse16(X) >> 1 & 0x1
+#define TCP_TEST_RST(X)		  Tranverse16(X) >> 2 & 0x1
+#define TCP_TEST_PSH(X)		  Tranverse16(X) >> 3 & 0x1
+#define TCP_TEST_ACK(X)		  Tranverse16(X) >> 4 & 0x1
+#define TCP_TEST_URG(X)		  Tranverse16(X) >> 5 & 0x1
+#define TCP_GETDATAOFFSET(X)  Tranverse16(X) >> 12
 
 typedef struct _PacketInfo
 {
