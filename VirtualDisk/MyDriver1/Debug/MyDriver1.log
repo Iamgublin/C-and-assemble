@@ -1,0 +1,83 @@
+﻿生成启动时间为 2017/3/4 14:45:06。
+     1>项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”在节点 2 上(Build 个目标)。
+     1>DriverBuildNotifications:
+         Building 'MyDriver1' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
+         Using KMDF 1.15.
+       InitializeBuildStatus:
+         正在对“Debug\MyDriver1.tlog\unsuccessfulbuild”执行 Touch 任务。
+       StampInf:
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\stampinf.exe -d "*" -a "x86" -v "*" -k "1.15"  -x -f Debug\MyDriver1.inf 
+         Copying "D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.inf" to "Debug\MyDriver1.inf" for stamping
+         Stamping Debug\MyDriver1.inf [Version] section with DriverVer=03/04/2017,14.45.6.990
+         正在将文件从“Debug\MyDriver1.inf”复制到“D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.inf”。
+       ClCompile:
+         D:\Microsoft Visual stdio 2015\VC\bin\CL.exe /c /IDebug\ /Zi /nologo /W4 /WX /Od /Oi /Oy- /D _X86_=1 /D i386=1 /D STD_CALL /D DEPRECATE_DDK_FUNCTIONS=1 /D MSC_NOOPT /D _WIN32_WINNT=0x0A00 /D WINVER=0x0A00 /D WINNT=1 /D NTDDI_VERSION=0x0A000002 /D DBG=1 /GF /Gm- /Zp8 /GS /Gy /fp:precise /Zc:wchar_t- /Zc:forScope /Zc:inline /GR- /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gz /wd4748 /wd4603 /wd4627 /wd4986 /wd4987 /wd4996 /FI"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\shared\warning.h" /analyze- /errorReport:prompt /kernel -cbstring /d1import_no_registry /d2AllowCompatibleILVersions /d2Zi+ init.c
+         init.c
+       Link:
+         D:\Microsoft Visual stdio 2015\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.sys" /VERSION:"10.0" /INCREMENTAL:NO /NOLOGO /WX /SECTION:"INIT,d" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x86\\cfg_support_v1.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x86\BufferOverflowFastFailK.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x86\ntoskrnl.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x86\hal.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x86\wmilib.lib" /NODEFAULTLIB /MANIFEST:NO /DEBUG /PDB:"D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.pdb" /SUBSYSTEM:NATIVE,"10.00" /Driver /OPT:REF /OPT:ICF /ENTRY:"GsDriverEntry@8" /RELEASE /IMPLIB:"D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.lib" /MERGE:"_TEXT=.text;_PAGE=PAGE" /MACHINE:X86 /PROFILE /kernel /IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221 /osversion:10.0 /pdbcompress /debugtype:pdata Debug\init.obj
+         MyDriver1.vcxproj -> D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.sys
+         MyDriver1.vcxproj -> D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.pdb (Full PDB)
+     1>项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1)正在节点 2 上生成“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1:2) (TestSign 个目标)。
+     1>TestSign:
+         The driver will be test-signed. Driver signing options can be changed from the project properties.
+         Sign Inputs: D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.sys
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\signtool.exe sign /ph /sha1 "BAD61C454AD2F0881488730C5E7B9CBF2C136A1A" 
+         Done Adding Additional Store
+         Successfully signed: D:\VS2013\MyDriver1\Debug\MyDriver1.sys
+         
+         Certificate used for signing: issued to = WDKTestCert Arch Vile,131230423186855723 and thumbprint = BAD61C454AD2F0881488730C5E7B9CBF2C136A1A
+         Exported Certificate: D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.cer
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(TestSign 个目标)的操作。
+     1>DriverPackageTarget:
+         Packaging up the following projects for the following configurations:
+         
+          Configuration='' Platform=''
+         
+         
+         The following files will be packaged:
+         
+         File to package:      D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.sys.
+         Location in Package:  \MyDriver1.sys.
+         Requested by project: 
+         
+         
+         File to package:      Debug\MyDriver1.inf.
+         Location in Package:  \MyDriver1.inf.
+         Requested by project: 
+         
+         
+         正在创建目录“D:\VS2013工程文件\MyDriver1\Debug\MyDriver1”。
+         正在将文件从“D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.sys”复制到“D:\VS2013工程文件\MyDriver1\Debug\MyDriver1\\MyDriver1.sys”。
+         正在将文件从“Debug\MyDriver1.inf”复制到“D:\VS2013工程文件\MyDriver1\Debug\MyDriver1\\MyDriver1.inf”。
+       Inf2Cat:
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\inf2cat.exe /os:10_x86 /driver:"D:\VS2013工程文件\MyDriver1\Debug\MyDriver1\\" 
+         ........................
+         Signability test complete.
+         
+         Errors:
+         None
+         
+         Warnings:
+         None
+         
+         Catalog generation complete.
+         D:\VS2013工程文件\MyDriver1\Debug\MyDriver1\zlzramdisk.cat
+     1>项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1)正在节点 2 上生成“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1:3) (TestSign 个目标)。
+     1>TestSign:
+         The driver package will be test-signed. Driver signing options can be changed from the project properties.
+         Sign Inputs: D:\VS2013工程文件\MyDriver1\Debug\MyDriver1\zlzramdisk.cat
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\signtool.exe sign /ph /sha1 "BAD61C454AD2F0881488730C5E7B9CBF2C136A1A" 
+         Done Adding Additional Store
+         Successfully signed: D:\VS2013\MyDriver1\Debug\MyDriver1\zlzramdisk.cat
+         
+         Certificate used for signing: issued to = WDKTestCert Arch Vile,131230423186855723 and thumbprint = BAD61C454AD2F0881488730C5E7B9CBF2C136A1A
+         Exported Certificate: D:\VS2013工程文件\MyDriver1\Debug\MyDriver1.cer
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(TestSign 个目标)的操作。
+     1>FinalizeBuildStatus:
+         正在删除文件“Debug\MyDriver1.tlog\unsuccessfulbuild”。
+         正在对“Debug\MyDriver1.tlog\MyDriver1.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(Build 个目标)的操作。
+
+已成功生成。
+
+已用时间 00:00:01.97

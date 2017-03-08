@@ -1,0 +1,84 @@
+﻿生成启动时间为 2017/3/7 19:08:42。
+     1>项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”在节点 2 上(Build 个目标)。
+     1>DriverBuildNotifications:
+         Building 'MyDriver1' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
+         Using KMDF 1.15.
+       InitializeBuildStatus:
+         正在对“x64\Debug\MyDriver1.tlog\unsuccessfulbuild”执行 Touch 任务。
+       StampInf:
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\stampinf.exe -d "*" -a "amd64" -v "*" -k "1.15"  -x -f x64\Debug\setup.inf 
+         Copying "D:\VS2013工程文件\MyDriver1\MyDriver1\setup.inx" to "x64\Debug\setup.inf" for stamping
+         Stamping x64\Debug\setup.inf [Version] section with DriverVer=03/07/2017,19.8.42.922
+         正在将文件从“x64\Debug\setup.inf”复制到“D:\VS2013工程文件\MyDriver1\x64\Debug\setup.inf”。
+     1>MSBUILD : warning 2083: Section [diskaddreg] not referenced or used.
+       ClCompile:
+         所有输出均为最新。
+       Link:
+         D:\Microsoft Visual stdio 2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.sys" /VERSION:"10.0" /INCREMENTAL:NO /NOLOGO /WX /SECTION:"INIT,d" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\\cfg_support_v1.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\BufferOverflowFastFailK.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\ntoskrnl.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\hal.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\km\x64\wmilib.lib" /NODEFAULTLIB /MANIFEST:NO /DEBUG /PDB:"D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.pdb" /SUBSYSTEM:NATIVE,"10.00" /Driver /OPT:REF /OPT:ICF /ENTRY:"GsDriverEntry" /RELEASE /IMPLIB:"D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.lib" /MERGE:"_TEXT=.text;_PAGE=PAGE" /MACHINE:X64 /PROFILE /kernel /IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221,4108,4088,4218,4218,4235 /osversion:10.0 /pdbcompress /debugtype:pdata x64\Debug\init.obj
+         MyDriver1.vcxproj -> D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.sys
+         MyDriver1.vcxproj -> D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.pdb (Full PDB)
+     1>项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1)正在节点 2 上生成“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1:2) (TestSign 个目标)。
+     1>TestSign:
+         The driver will be test-signed. Driver signing options can be changed from the project properties.
+         Sign Inputs: D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.sys
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\signtool.exe sign /ph /sha1 "BAD61C454AD2F0881488730C5E7B9CBF2C136A1A" 
+         Done Adding Additional Store
+         Successfully signed: D:\VS2013\MyDriver1\x64\Debug\Ramdisk.sys
+         
+         Certificate used for signing: issued to = WDKTestCert Arch Vile,131230423186855723 and thumbprint = BAD61C454AD2F0881488730C5E7B9CBF2C136A1A
+         Exported Certificate: D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.cer
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(TestSign 个目标)的操作。
+     1>DriverPackageTarget:
+         Packaging up the following projects for the following configurations:
+         
+          Configuration='' Platform=''
+         
+         
+         The following files will be packaged:
+         
+         File to package:      D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.sys.
+         Location in Package:  \Ramdisk.sys.
+         Requested by project: 
+         
+         
+         File to package:      x64\Debug\setup.inf.
+         Location in Package:  \setup.inf.
+         Requested by project: 
+         
+         
+         正在将文件从“D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.sys”复制到“D:\VS2013工程文件\MyDriver1\x64\Debug\MyDriver1\\Ramdisk.sys”。
+         正在将文件从“x64\Debug\setup.inf”复制到“D:\VS2013工程文件\MyDriver1\x64\Debug\MyDriver1\\setup.inf”。
+       Inf2Cat:
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\inf2cat.exe /os:10_x64 /driver:"D:\VS2013工程文件\MyDriver1\x64\Debug\MyDriver1\\" 
+         ...........................
+         Signability test complete.
+         
+         Errors:
+         None
+         
+         Warnings:
+         None
+         
+         Catalog generation complete.
+         D:\VS2013工程文件\MyDriver1\x64\Debug\MyDriver1\ramdisksamples.cat
+     1>项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1)正在节点 2 上生成“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(1:3) (TestSign 个目标)。
+     1>TestSign:
+         The driver package will be test-signed. Driver signing options can be changed from the project properties.
+         Sign Inputs: D:\VS2013工程文件\MyDriver1\x64\Debug\MyDriver1\ramdisksamples.cat;D:\VS2013工程文件\MyDriver1\x64\Debug\MyDriver1\zlzramdisk.cat
+         C:\Program Files (x86)\Windows Kits\10\bin\x86\signtool.exe sign /ph /sha1 "BAD61C454AD2F0881488730C5E7B9CBF2C136A1A" 
+         Done Adding Additional Store
+         Successfully signed: D:\VS2013\MyDriver1\x64\Debug\MyDriver1\ramdisksamples.cat
+         
+         Successfully signed: D:\VS2013\MyDriver1\x64\Debug\MyDriver1\zlzramdisk.cat
+         
+         Certificate used for signing: issued to = WDKTestCert Arch Vile,131230423186855723 and thumbprint = BAD61C454AD2F0881488730C5E7B9CBF2C136A1A
+         Exported Certificate: D:\VS2013工程文件\MyDriver1\x64\Debug\Ramdisk.cer
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(TestSign 个目标)的操作。
+     1>FinalizeBuildStatus:
+         正在删除文件“x64\Debug\MyDriver1.tlog\unsuccessfulbuild”。
+         正在对“x64\Debug\MyDriver1.tlog\MyDriver1.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“D:\VS2013工程文件\MyDriver1\MyDriver1\MyDriver1.vcxproj”(Build 个目标)的操作。
+
+已成功生成。
+
+已用时间 00:00:01.10

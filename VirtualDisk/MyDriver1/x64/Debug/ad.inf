@@ -1,0 +1,40 @@
+[Version]
+Signature="$Windows NT$"
+Class=aa
+ClassGUID={78A1C341-4539-11d3-B88D-00C04FAD5171}
+Provider=%Msft%
+DriverVer=03/07/2017,18.52.43.884
+
+
+[SourceDisksNames]
+1=%InstDisk%,"",,
+
+[SourceDisksFiles]
+zlzramdisk.sys=1
+
+[DestinationDirs]
+DefaultDestDir=11               ; LDID_SYS
+;
+; For Windows NT, all drivers go into %windir%\system32\drivers.  Since
+; there isn't a DIRID (LDID) that represents this path on both NT and Win95,
+; we specify the relative path off of %windir%.
+;
+CommonClassParent.CopyFiles.NT = 10, system32\drivers
+
+
+[Manufacturer]
+[SignatureAttributes]
+usbccgp.sys=SignatureAttributes.DRM
+
+
+[Composite.Dev.NT.Services]
+AddService = aaa, 0x00000002, CommonClassParent.AddService
+
+[CommonClassParent.AddService]
+DisplayName    = %GenericParent.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\usbccgp.sys
+LoadOrderGroup = Base
+AddReg         = BootSpecific
