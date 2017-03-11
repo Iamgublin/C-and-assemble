@@ -1,35 +1,6 @@
 #include"struct.h"
 #include"DevCon.h"
 #include"IO.h"
-NTSTATUS Create(PDEVICE_OBJECT dev, PIRP irp)
-{
-	return STATUS_SUCCESS;
-}
-NTSTATUS Close(PDEVICE_OBJECT dev, PIRP irp)
-{
-	return STATUS_SUCCESS;
-}
-VOID DevUnload(PDRIVER_OBJECT driver)
-{
-	UNREFERENCED_PARAMETER(driver);
-	PDEVICE_OBJECT dev = driver->DeviceObject;
-	while (dev)
-	{
-		IoDeleteDevice(dev);
-		dev = dev->NextDevice;
-	}
-}
-NTSTATUS
-AddDev(
-	_In_ struct _DRIVER_OBJECT *DriverObject,
-	_In_ struct _DEVICE_OBJECT *PhysicalDeviceObject
-)
-{
-	UNREFERENCED_PARAMETER(DriverObject);
-	UNREFERENCED_PARAMETER(PhysicalDeviceObject);
-	DbgBreakPoint();
-	return STATUS_SUCCESS;
-}
 NTSTATUS InitAndFormatSpace(PDEVICE_OBJECT dev)
 {
 	PBOOT_SECTOR bootSector;
@@ -39,21 +10,21 @@ NTSTATUS InitAndFormatSpace(PDEVICE_OBJECT dev)
 	USHORT       fatEntries;
 	PDIR_ENTRY   rootDir;
 	PUCHAR       firstFatSector;
-	UNICODE_STRING Dl= RTL_CONSTANT_STRING(DEFAULT_DRIVE_LETTER);
+	UNICODE_STRING Dl = RTL_CONSTANT_STRING(DEFAULT_DRIVE_LETTER);
 	PDEVICE_EXTENSION Ext = dev->DeviceExtension;
 
 	Ext->DiskRegInfo.DiskSize = DEFAULT_DISK_SIZE;
 	RtlCopyUnicodeString(&Ext->DiskRegInfo.DriveLetter, &Dl);
 	Ext->DiskRegInfo.RootDirEntries = DEFAULT_ROOT_DIR_ENTRIES;
 	Ext->DiskRegInfo.SectorsPerCluster = SECTORS_PER_CLUSTER;
-	
+
 	//初始化DiskGeometry
 	Ext->DiskGeometry.BytesPerSector = BYTE_PER_SECTOR;
 	Ext->DiskGeometry.SectorsPerTrack = SECTORS_PER_TRACK;
 	Ext->DiskGeometry.TracksPerCylinder = TRACK_PER_CYLINDER;
 	Ext->DiskGeometry.Cylinders.QuadPart = Ext->DiskRegInfo.DiskSize / BYTE_PER_SECTOR / SECTORS_PER_TRACK / TRACK_PER_CYLINDER;
 	Ext->DiskGeometry.MediaType = RAMDISK_MEDIA_TYPE;
-		 
+
 	Ext->DiskImage = ExAllocatePoolWithTag(PagedPool, DEFAULT_DISK_SIZE, 'zL');
 
 	if (Ext->DiskImage == NULL)
@@ -72,7 +43,7 @@ NTSTATUS InitAndFormatSpace(PDEVICE_OBJECT dev)
 
 	//初始化第一个扇区的关键数据
 	bootSector = (PBOOT_SECTOR)Ext->DiskImage;
-	
+
 	//初始化引导代码
 	bootSector->bsJump[0] = 0xeb;
 	bootSector->bsJump[1] = 0x3c;
@@ -213,9 +184,49 @@ NTSTATUS ZlzInitDiskName(PDEVICE_OBJECT dev)
 
 	RtlAppendUnicodeStringToString(&Ext->SymbolicLink,
 		&DriveLetter);
-	sta = IoCreateSymbolicLink(&Ext->SymbolicLink,&deviceName);
+	sta = IoCreateSymbolicLink(&Ext->SymbolicLink, &deviceName);
 	DbgPrint("sta:0x%x\n", sta);
 	RtlCopyMemory(((PDEVICE_EXTENSION)dev->DeviceExtension)->DriveLetterBuffer, DriveLetter.Buffer, DriveLetter.Length);
+	return STATUS_SUCCESS;
+}
+NTSTATUS Create(PDEVICE_OBJECT dev, PIRP irp)
+{
+	return STATUS_SUCCESS;
+}
+NTSTATUS Close(PDEVICE_OBJECT dev, PIRP irp)
+{
+	return STATUS_SUCCESS;
+}
+VOID DevUnload(PDRIVER_OBJECT driver)
+{
+	UNREFERENCED_PARAMETER(driver);
+	DbgBreakPoint();
+	PDEVICE_OBJECT dev = driver->DeviceObject;
+	while (dev)
+	{
+		PDEVICE_EXTENSION Ext = dev->DeviceExtension;
+		if (Ext->DiskImage)
+		{
+			ExFreePool(Ext->DiskImage);
+		}
+		IoDeleteDevice(dev);
+		dev = dev->NextDevice;
+	}
+}
+NTSTATUS
+AddDev(
+	_In_ struct _DRIVER_OBJECT *DriverObject,
+	_In_ struct _DEVICE_OBJECT *PhysicalDeviceObject
+)
+{
+	UNREFERENCED_PARAMETER(DriverObject);
+	UNREFERENCED_PARAMETER(PhysicalDeviceObject);
+	DbgBreakPoint();
+	if (DriverObject->DeviceObject)
+	{
+		ZlzInitDiskName(DriverObject->DeviceObject);
+		InitAndFormatSpace(DriverObject->DeviceObject);
+	}
 	return STATUS_SUCCESS;
 }
 NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
@@ -239,7 +250,5 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	dev->Flags = DO_DIRECT_IO;
 	dev->Flags &= ~DO_DEVICE_INITIALIZING;
 	driver->DriverUnload = DevUnload;
-	ZlzInitDiskName(dev);
-	InitAndFormatSpace(dev);
 	return STATUS_SUCCESS;
 }

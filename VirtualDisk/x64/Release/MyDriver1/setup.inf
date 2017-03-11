@@ -3,7 +3,7 @@ Signature="$WINDOWS NT$"
 Class=Sample
 ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171}
 Provider=%ProviderString%
-DriverVer=03/07/2017,19.6.29.524
+DriverVer=03/11/2017,11.31.12.971
 CatalogFile=RamdiskSamples.cat
 
 [DestinationDirs]
@@ -44,20 +44,20 @@ StartType     = %SERVICE_DEMAND_START%
 ErrorControl  = %SERVICE_ERROR_NORMAL%
 DisplayName   = %DiskServiceDesc%
 ServiceBinary = %12%\Ramdisk.sys
-AddReg        = DiskAddReg
+;AddReg        = DiskAddReg                   ;删除注册表参数列表
 
-[DiskAddReg]
-HKR, "Parameters", "BreakOnEntry",      %REG_DWORD%, 0x00000000
-HKR, "Parameters", "DiskSize",          %REG_DWORD%, 0x00100000
-HKR, "Parameters", "DriveLetter",       %REG_SZ%,    "R:"
-HKR, "Parameters", "RootDirEntries",    %REG_DWORD%, 0x00000200
-HKR, "Parameters", "SectorsPerCluster", %REG_DWORD%, 0x00000002
+;[DiskAddReg]
+;HKR, "Parameters", "BreakOnEntry",      %REG_DWORD%, 0x00000000
+;HKR, "Parameters", "DiskSize",          %REG_DWORD%, 0x00100000
+;HKR, "Parameters", "DriveLetter",       %REG_SZ%,    "R:"
+;HKR, "Parameters", "RootDirEntries",    %REG_DWORD%, 0x00000200
+;HKR, "Parameters", "SectorsPerCluster", %REG_DWORD%, 0x00000002
 
 [Strings]
 ProviderString     = "TODO-Set-Provider"
 ManufacturerString = "TODO-Set-Manufacturer"
 ClassName          = "Sample Device"
-DiskDevDesc        = "WDF Sample RAM disk Driver"
+DiskDevDesc        = "VritualDisk Sample"
 DiskServiceDesc    = "Ramdisk Driver"
 InstDisk           = "Ramdisk Install Disk"
 ;*******************************************
