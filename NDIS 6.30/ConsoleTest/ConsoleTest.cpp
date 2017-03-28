@@ -6,7 +6,7 @@
 #pragma comment(lib,"..\\lib\\RawPacketAnalysis.lib")
 #pragma comment(lib,"..\\lib\\NdisCoreApi.lib")
 #include<locale.h>
-char pro[11][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6"};
+char pro[13][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6","QICQ","NTP"};
 void SetConsole()
 {
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -35,7 +35,7 @@ int main()
 		PUCHAR Mac = Output->Packet.ShowAdapter.AdapterInfo[i].MacAddress;
 		printf("Mac Address:%02x-%02x-%02x-%02x-%02x-%02x\n", Mac[0], Mac[1], Mac[2], Mac[3], Mac[4], Mac[5]);
 	}
-	int a = 2;
+	int a = 0;
 	while (1)
 	{
 		Sleep(100);
@@ -76,8 +76,27 @@ int main()
 				printf("%03d.%03d.%03d.%03d\t%03d.%03d.%03d.%03d\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3], daddr[0], daddr[1], daddr[2], daddr[3], Info.Size, pro[Info.Type]);
 				if (Info.Type == INFO_TCP)
 				{
-					printf("window:%d port:%d->%d ack:%d syn:%d fin:%d dataoffset:%d\n", Tranverse16(Info.protocol1.Tcp.windows), Tranverse16(Info.protocol1.Tcp.sourcePort), Tranverse16(Info.protocol1.Tcp.destinationPort), TCP_TEST_ACK(Info.protocol1.Tcp.flagsOffset),
+					printf("window:%5d port:%d->%d ack:%d syn:%d fin:%d dataoffset:%d\n", Tranverse16(Info.protocol1.Tcp.windows), Tranverse16(Info.protocol1.Tcp.sourcePort), Tranverse16(Info.protocol1.Tcp.destinationPort), TCP_TEST_ACK(Info.protocol1.Tcp.flagsOffset),
 					TCP_TEST_SYN(Info.protocol1.Tcp.flagsOffset), TCP_TEST_FIN(Info.protocol1.Tcp.flagsOffset),(TCP_GETDATAOFFSET(Info.protocol1.Tcp.flagsOffset))*4);
+				}
+				else if (Info.Type == INFO_ICMP)
+				{
+					printf("type:%02d code:%02d checksum:%d\n", Info.protocol1.Icmp.icmp_type, Info.protocol1.Icmp.icmp_code, Info.protocol1.Icmp.icmp_checksum);
+				}
+				else if (Info.Type == INFO_HTTP)
+				{
+					/*char http[60] = { 0 };
+					int len = sizeof(MAC) + (Info.protocol.Ip.iphVerLen & 0x0f) * 4 + (TCP_GETDATAOFFSET(Info.protocol1.Tcp.flagsOffset) * 4)+1;
+					memcpy(http, Info.RawPacket + len, sizeof(http)-1);
+					for (int i = 0; i < 60; i++)
+					{
+						printf("%c", http[i]);
+					}*/
+					printf("\n");
+				}
+				else if (Info.Type == INFO_UDP)
+				{
+					printf("port:%d->%d\n", Tranverse16(Info.protocol1.Udp.sourcePort), Tranverse16(Info.protocol1.Udp.destinationPort));
 				}
 				else
 				{

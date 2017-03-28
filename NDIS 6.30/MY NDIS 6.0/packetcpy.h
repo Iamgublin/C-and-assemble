@@ -6,7 +6,7 @@
 * Copyright (c) Microsoft Corporation. All rights reserved.                     *
 *                                                                               *
 ********************************************************************************/
-#include"struct.h"
+#include "Struct.h"
 /*int ZlzCalcBufSizeOrCopy(PVOID DestBuf, PNET_BUFFER_LIST Nbl, int num)   //调用两次该函数，第一次获取大小，分配内存，第二次拷贝。
 {
 	PNET_BUFFER_LIST nbltemp = Nbl;
@@ -46,7 +46,7 @@ int ZlzCalcBufSizeOrCopy(PS_PACKET Packet, PNET_BUFFER_LIST Nbl, int num, int Md
 	int TempNum = 0;
 	if (num)
 	{
-		Packet->mdllist = ExAllocatePool(NonPagedPool, sizeof(PMDL)*MdlNum);
+		Packet->mdllist = (PMDL*)ExAllocatePool(NonPagedPool, sizeof(PMDL)*MdlNum);
 	}
 	nb = NET_BUFFER_LIST_FIRST_NB(nbltemp);
 	do

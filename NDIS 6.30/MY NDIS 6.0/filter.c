@@ -1,5 +1,5 @@
-#include"filter.h"
-#include "packetcpy.h"
+#include"Filter.h"
+#include "Packetcpy.h"
 _Use_decl_annotations_
 NDIS_STATUS FilterNetPnPEvent(
 	_In_ NDIS_HANDLE                 FilterModuleContext,
@@ -95,6 +95,19 @@ VOID FilterSendNetBufferListsComplete(
 	/*DbgBreakPoint();*/
 	//如果是Filter发送的包，不应该调用NdisFSendNetBufferListsComplete，直接释放资源
 	PFILTER_CONTEXT context = FilterModuleContext;
+	if (NET_BUFFER_LIST_CONTEXT_DATA_SIZE(NetBufferLists) != 0)
+	{
+		NET_BUFFER_LIST_CONTEXT NetContext = *((PNET_BUFFER_LIST_CONTEXT)NET_BUFFER_LIST_CONTEXT_DATA_START(NetBufferLists));
+		PMY_NET_Buffer_Context MyCon = (PMY_NET_Buffer_Context)&NetContext.ContextData;
+		if (strcmp(MyCon->Magic, "zlz") == 0)
+		{
+			NdisFreeMdl(MyCon->Mdl);
+			NdisFreeMemoryWithTag(MyCon->VirAddress, 'u');
+			NdisFreeNetBufferList(NetBufferLists);
+			return;
+		}
+
+	}
 	NdisFSendNetBufferListsComplete(context->FilterHandle, NetBufferLists, SendCompleteFlags);
 }
 

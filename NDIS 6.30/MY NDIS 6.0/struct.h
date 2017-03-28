@@ -6,6 +6,7 @@
 #include<wdm.h>
 #include<ndis.h>
 #include<ntstrsafe.h>
+#include"Networks_Kernel.h"
 
 #define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))  //用于USHORT大端小端转化
 
@@ -27,6 +28,7 @@
 #define IOCTL_GETRAWDATA (ULONG)CTL_CODE(FILE_DEVICE_UNKNOWN,0x912,METHOD_BUFFERED,FILE_WRITE_DATA|FILE_READ_DATA) 
 #define IOCTL_STARTFILTER (ULONG)CTL_CODE(FILE_DEVICE_UNKNOWN,0x913,METHOD_BUFFERED,FILE_WRITE_DATA|FILE_READ_DATA)
 #define IOCTL_STOPFILTER (ULONG)CTL_CODE(FILE_DEVICE_UNKNOWN,0x914,METHOD_BUFFERED,FILE_WRITE_DATA|FILE_READ_DATA)
+#define IOCTL_SENDPACKET (ULONG)CTL_CODE(FILE_DEVICE_UNKNOWN,0x915,METHOD_BUFFERED,FILE_WRITE_DATA|FILE_READ_DATA)
 
 #define PACKET_TYPE_ADAPTERINFO 1
 #define PACKET_TYPE_NETPACKET 2
@@ -39,7 +41,7 @@ typedef struct _AdapterInfo
 	WCHAR DevName[PATH_MAX];
 	UCHAR MacAddress[32];
 }AdapterInfo, *PAdapterInfo;
-typedef struct _IO_Packet
+typedef struct _IO_Packet                  //r0 r3 I/O用
 {
 	int Type;
 	union 
@@ -103,10 +105,43 @@ typedef struct _GLOBAL
 	UNICODE_STRING symname;            //链接符号名
 	int RecvPoolMax;                   //包池最大大小
 }GLOBAL, *PGLOBAL;
-typedef struct _MAC
-{
-	UCHAR dst[6];
-	UCHAR sou[6];
-	USHORT type;
-}MAC,*PMAC;
 GLOBAL Global;
+
+#pragma pack(push,1)
+typedef struct _RawPacket
+{
+	union
+	{
+		struct
+		{
+			MAC Mac;      //数据链路层
+			union
+			{
+				IPPacket Ip;
+				ARPPacket Arp;
+			}protocol;    //网络层
+			union
+			{
+				TCPPacket Tcp;
+				UDPPacket Udp;
+				ICMPPacket Icmp;
+				IGMPPacket Igmp;
+			}protocol1;  //传输层
+			union
+			{
+				QICQPacket Qicq;
+				DHCPPacket Dhcp;
+			}protocol2;
+		}Osi;
+		UCHAR RawPacket[2000];     //原始的包数据（MTU<=1500）
+	};
+	int AdapterIndex;
+}RawPacket, *PRawPacket;
+#pragma pack(pop)
+
+typedef struct _MY_NET_Buffer_Context
+{
+	char Magic[5];
+	PVOID VirAddress;
+	PMDL Mdl;
+}MY_NET_Buffer_Context, *PMY_NET_Buffer_Context;

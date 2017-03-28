@@ -1,5 +1,5 @@
 #include "RawPacketAnalysis.h"
-#include"networks.h"
+#include "Networks_User.h"
 VOID analysis(MAC macpacket)
 {
 	printf("start*********************************\n");
@@ -23,15 +23,19 @@ void AnalyseIgmp(PPacketInfo Info, int IpHeaderLen)
 void AnalyseUdp(PPacketInfo Info, int IpHeaderLen)
 {
 	memcpy(&Info->protocol1.Udp, Info->RawPacket + sizeof(MAC) + IpHeaderLen, sizeof(UDPPacket));
-	if (Info->protocol1.Udp.sourcePort == 4009 || Info->protocol1.Udp.sourcePort == 8000)
+	if (Tranverse16(Info->protocol1.Udp.sourcePort == 4009) || Tranverse16(Info->protocol1.Udp.sourcePort == 8000))
 	{
 		SET_INFO_TYPE(Info, INFO_QICQ);
 		AnalyseQicq(Info, IpHeaderLen);
 	}
-	else if (Info->protocol1.Udp.sourcePort==67||Info->protocol1.Udp.sourcePort==68)
+	else if (Tranverse16(Info->protocol1.Udp.sourcePort==67)|| Tranverse16(Info->protocol1.Udp.sourcePort==68))
 	{
 		SET_INFO_TYPE(Info, INFO_DHCP);
 		AnalyseDhcp(Info, IpHeaderLen);
+	}
+	else if (Tranverse16(Info->protocol1.Udp.sourcePort) == 123 || Tranverse16(Info->protocol1.Udp.destinationPort) == 123)
+	{
+		SET_INFO_TYPE(Info, INFO_NTP);
 	}
 }
 void AnalyseIcmp(PPacketInfo Info, int IpHeaderLen)
@@ -59,11 +63,15 @@ void AnalyseArp(PPacketInfo Info)
 void AnalyseTcp(PPacketInfo Info,int IpHeaderLen)
 {
 	memcpy(&Info->protocol1.Tcp, Info->RawPacket + sizeof(MAC) + IpHeaderLen, sizeof(TCPPacket));
+	if ((Tranverse16(Info->protocol1.Tcp.sourcePort) == 80) | (Tranverse16(Info->protocol1.Tcp.destinationPort) == 80))
+	{
+		SET_INFO_TYPE(Info, INFO_HTTP);
+	}
 }
 void AnalyseIp(PPacketInfo Info)
 {
 	memcpy(&Info->protocol.Ip, Info->RawPacket + sizeof(MAC), sizeof(IPPacket));
-	int IpHeaderLen = (Info->protocol.Ip.iphVerLen & 0x0f)*4;
+	int IpHeaderLen = (Info->protocol.Ip.iphVerLen & 0x0f)*4;    //1=4¸ö×Ö½Ú
 	switch (Info->protocol.Ip.ipProtocol)
 	{
 	case PACKET_TCP:

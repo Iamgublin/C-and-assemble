@@ -1,5 +1,5 @@
 #pragma once
-#include"struct.h"
+#include"Struct.h"
 extern FILTER_SET_OPTIONS FilterSetOptions;
 extern FILTER_SET_MODULE_OPTIONS FilterSetModuleOptions;
 extern FILTER_ATTACH FilterAttach;

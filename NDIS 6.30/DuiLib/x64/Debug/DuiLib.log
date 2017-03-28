@@ -1,9 +1,113 @@
-﻿生成启动时间为 2017/2/9 15:56:34。
-     1>项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”在节点 2 上(Clean 个目标)。
-     1>_PrepareForClean:
-         正在删除文件“x64\Debug\DuiLib.tlog\DuiLib.lastbuildstate”。
-     1>已完成生成项目“D:\VS2013工程文件\MyDriver7\DuiLib\DuiLib.vcxproj”(Clean 个目标)的操作。
-
-已成功生成。
-
-已用时间 00:00:00.04
+﻿  StdAfx.cpp
+e:\vs2013工程文件\ndis 6.30\duilib\Core/UIManager.h(45): warning C4091: “typedef ”: 没有声明变量时忽略“DuiLib::EVENTTYPE_UI”的左侧
+  UITreeView.cpp
+  UIlib.cpp
+  WinImplBase.cpp
+  UIDelegate.cpp
+  Utils.cpp
+  WndShadow.cpp
+  UIBase.cpp
+Core\UIBase.cpp(295): warning C4244: “=”: 从“WPARAM”转换到“UINT”，可能丢失数据
+Core\UIBase.cpp(307): warning C4244: “参数”: 从“WPARAM”转换到“int”，可能丢失数据
+  UIContainer.cpp
+  UIControl.cpp
+Core\UIControl.cpp(832): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UIDlgBuilder.cpp
+  UIManager.cpp
+Core\UIManager.cpp(1045): warning C4838: 从“DWORD”转换到“LONG”需要收缩转换
+  UIMarkup.cpp
+Core\UIMarkup.cpp(209): warning C4244: “=”: 从“__int64”转换到“ULONG”，可能丢失数据
+Core\UIMarkup.cpp(214): warning C4244: “=”: 从“__int64”转换到“ULONG”，可能丢失数据
+Core\UIMarkup.cpp(489): warning C4244: “初始化”: 从“__int64”转换到“ULONG”，可能丢失数据
+Core\UIMarkup.cpp(490): warning C4244: “=”: 从“__int64”转换到“ULONG”，可能丢失数据
+Core\UIMarkup.cpp(506): warning C4244: “=”: 从“__int64”转换到“ULONG”，可能丢失数据
+Core\UIMarkup.cpp(514): warning C4244: “=”: 从“__int64”转换到“ULONG”，可能丢失数据
+  UIRender.cpp
+Core\UIRender.cpp(1188): warning C4838: 从“int”转换到“COLOR16”需要收缩转换
+Core\UIRender.cpp(1377): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1377): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1444): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1444): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1478): warning C4312: “类型转换”: 从“DWORD”转换到更大的“LPVOID”
+Core\UIRender.cpp(1492): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1492): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1513): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1513): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1523): warning C4312: “类型转换”: 从“DWORD”转换到更大的“LPVOID”
+Core\UIRender.cpp(1578): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1578): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1611): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1611): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1679): warning C4311: “类型转换”: 从“LPVOID”到“UINT”的指针截断
+Core\UIRender.cpp(1679): warning C4302: “类型转换”: 从“LPVOID”到“UINT”截断
+Core\UIRender.cpp(1725): warning C4312: “类型转换”: 从“int”转换到更大的“LPVOID”
+Core\UIRender.cpp(1744): warning C4312: “类型转换”: 从“UINT”转换到更大的“LPVOID”
+Core\UIRender.cpp(1778): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1778): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1815): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1815): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1823): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1823): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1847): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1847): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1867): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(1867): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(1880): warning C4311: “类型转换”: 从“LPVOID”到“UINT”的指针截断
+Core\UIRender.cpp(1880): warning C4302: “类型转换”: 从“LPVOID”到“UINT”截断
+Core\UIRender.cpp(1896): warning C4311: “类型转换”: 从“LPVOID”到“UINT”的指针截断
+Core\UIRender.cpp(1896): warning C4302: “类型转换”: 从“LPVOID”到“UINT”截断
+Core\UIRender.cpp(1914): warning C4311: “类型转换”: 从“LPVOID”到“UINT”的指针截断
+Core\UIRender.cpp(1914): warning C4302: “类型转换”: 从“LPVOID”到“UINT”截断
+Core\UIRender.cpp(1997): warning C4311: “类型转换”: 从“LPVOID”到“UINT”的指针截断
+Core\UIRender.cpp(1997): warning C4302: “类型转换”: 从“LPVOID”到“UINT”截断
+Core\UIRender.cpp(2033): warning C4311: “类型转换”: 从“LPVOID”到“int”的指针截断
+Core\UIRender.cpp(2033): warning C4302: “类型转换”: 从“LPVOID”到“int”截断
+Core\UIRender.cpp(2184): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  UIChildLayout.cpp
+  UIHorizontalLayout.cpp
+Layout\UIHorizontalLayout.cpp(313): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UITabLayout.cpp
+  UITileLayout.cpp
+  UIVerticalLayout.cpp
+Layout\UIVerticalLayout.cpp(306): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UIActiveX.cpp
+  UIButton.cpp
+Control\UIButton.cpp(127): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  正在生成代码...
+  正在编译...
+  UICheckBox.cpp
+  UICombo.cpp
+  UIDateTime.cpp
+Control\UIDateTime.cpp(297): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UIEdit.cpp
+Control\UIEdit.cpp(288): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UIGifAnim.cpp
+  UILabel.cpp
+Control\UILabel.cpp(90): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Control\UILabel.cpp(433): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Control\UILabel.cpp(458): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Control\UILabel.cpp(476): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  UIList.cpp
+Control\UIList.cpp(1780): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+Control\UIList.cpp(2416): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UIOption.cpp
+  UIProgress.cpp
+  UIRichEdit.cpp
+Control\UIRichEdit.cpp(353): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+Control\UIRichEdit.cpp(1347): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  UIScrollBar.cpp
+  UISlider.cpp
+Control\UISlider.cpp(212): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UIText.cpp
+Control\UIText.cpp(52): warning C4302: “类型转换”: 从“LPSTR”到“WORD”截断
+  UIWebBrowser.cpp
+  正在生成代码...
+  stb_image.c
+  XUnzip.cpp
+Utils\XUnzip.cpp(3458): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1189,5): warning MSB8012: TargetPath(E:\VS2013工程文件\NDIS 6.30\x64\Debug\DuiLib.dll) does not match the Linker's OutputFile property value (E:\VS2013工程文件\NDIS 6.30\DebugX64\DuiLib_d.dll). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1191,5): warning MSB8012: TargetName(DuiLib) does not match the Linker's OutputFile property value (DuiLib_d). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1193,5): warning MSB8030: The linker switch "Minimum Required Version" requires "SubSystem" to be set.  Without "SubSystem", the "Minimum Required Version" would not be passed to linker and could prevent to the output binary from running on older Operating Systems.
+    正在创建库 ../lib/DuiLib_d.lib 和对象 ../lib/DuiLib_d.exp
+  DuiLib.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Debug\DuiLib.dll
+  DuiLib.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Debug\DuiLib.pdb (Full PDB)

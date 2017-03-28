@@ -27,10 +27,10 @@
     <ClInclude Include="RawPacketAnalysis.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="networks.h">
+    <ClInclude Include="PacketInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="PacketInfo.h">
+    <ClInclude Include="Networks_User.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

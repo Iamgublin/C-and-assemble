@@ -158,14 +158,15 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="filter.c" />
-    <ClCompile Include="init.c" />
+    <ClCompile Include="Filter.c" />
+    <ClCompile Include="Init.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="devio.h" />
-    <ClInclude Include="packetcpy.h" />
-    <ClInclude Include="filter.h" />
-    <ClInclude Include="struct.h" />
+    <ClInclude Include="Devio.h" />
+    <ClInclude Include="Networks_Kernel.h" />
+    <ClInclude Include="Packetcpy.h" />
+    <ClInclude Include="Filter.h" />
+    <ClInclude Include="Struct.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,24 +24,27 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="init.c">
+    <ClCompile Include="Filter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="filter.c">
+    <ClCompile Include="Init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="struct.h">
+    <ClInclude Include="Networks_Kernel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="filter.h">
+    <ClInclude Include="Devio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="devio.h">
+    <ClInclude Include="Filter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="packetcpy.h">
+    <ClInclude Include="Packetcpy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

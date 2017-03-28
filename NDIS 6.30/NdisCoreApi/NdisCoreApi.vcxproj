@@ -153,7 +153,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="define.h" />
+    <ClInclude Include="Define.h" />
     <ClInclude Include="NdisCoreApi.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

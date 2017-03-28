@@ -24,7 +24,7 @@
     <ClInclude Include="NdisCoreApi.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="define.h">
+    <ClInclude Include="Define.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

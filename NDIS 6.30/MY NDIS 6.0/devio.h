@@ -3,17 +3,54 @@
 *                                                                               *
 * devio.h --  Handle zlzndislwf Driver I/O With R3                              *
 *                                                                               *
-* Copyright (c) Microsoft Corporation. All rights reserved.                     *
+* Copyright Arch-Vile. All rights reserved.                     *
 *                                                                               *
 ********************************************************************************/
-#include"struct.h"
+#include"Struct.h"
 
 
 extern NTSTATUS ZlzRemoveListHead(PFILTER_CONTEXT Context);
 extern VOID analysis(PS_PACKET Packet);
 extern NTSTATUS ZlzCleanList(PFILTER_CONTEXT Context);
 
+NTSTATUS ZlzSendRawPacket(PRawPacket Packet)
+{
+	int AdapterIndex = Packet->AdapterIndex;
+	NTSTATUS Sta = STATUS_UNSUCCESSFUL;
+	PVOID VirAddress = NULL;
+	if (AdapterIndex > Global.contextnum || AdapterIndex < 0)
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
+	Sta = NdisAllocateMemoryWithTag(&VirAddress, sizeof(RawPacket), 'u');
+	if (!NT_SUCCESS(Sta))
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
+	RtlCopyMemory(VirAddress, Packet->RawPacket, sizeof(Packet->RawPacket));
+	PMDL Mdl = NdisAllocateMdl(Global.context[AdapterIndex]->FilterHandle, VirAddress, sizeof(RawPacket));
+	if (Mdl == NULL)
+	{
+		NdisFreeMemoryWithTag(VirAddress, 'u');
+		return STATUS_UNSUCCESSFUL;
+	}
 
+	PNET_BUFFER_LIST NbL = NdisAllocateNetBufferAndNetBufferList(Global.context[AdapterIndex]->NetBufferPool, sizeof(MY_NET_Buffer_Context), 0, Mdl, 0, sizeof(Packet->RawPacket));
+	if (NbL == NULL)
+	{
+		NdisFreeMdl(Mdl);
+		NdisFreeMemoryWithTag(VirAddress, 'u');
+		return STATUS_UNSUCCESSFUL;
+	}
+	NET_BUFFER_LIST_CONTEXT Context = *((PNET_BUFFER_LIST_CONTEXT)NET_BUFFER_LIST_CONTEXT_DATA_START(NbL));
+	PMY_NET_Buffer_Context NetbufferContext = (PMY_NET_Buffer_Context)&Context.ContextData;
+	RtlZeroMemory(NetbufferContext, sizeof(MY_NET_Buffer_Context));
+	RtlCopyMemory(NetbufferContext->Magic, "zlz", sizeof(NetbufferContext->Magic));
+	NetbufferContext->Mdl = Mdl;
+	NetbufferContext->VirAddress = VirAddress;
+	NdisFSendNetBufferLists(Global.context[AdapterIndex]->FilterHandle, NbL, 0, 0);
+	return STATUS_SUCCESS;
+}
 VOID ZlzInitShowAdapterPacket(PIO_Packet IoPacket)
 {
 	IoPacket->Packet.ShowAdapter.Num = Global.contextnum;
@@ -261,9 +298,17 @@ NTSTATUS MyDeviceIoControl(PDEVICE_OBJECT dev, PIRP irp)
 			irp->IoStatus.Information = 0;
 			if (sa->Parameters.DeviceIoControl.InputBufferLength)
 			{
-				PIO_Packet PacketInput = irp->AssociatedIrp.SystemBuffer;
+				PIO_Packet PacketInput = (PIO_Packet)irp->AssociatedIrp.SystemBuffer;
 				int StopNum = PacketInput->Packet.Net_StartStop_Filter.Index;
 				irp->IoStatus.Status = ZlzStopFilter(StopNum);
+			}
+			IoCompleteRequest(irp, IO_NO_INCREMENT);
+			break;
+		case IOCTL_SENDPACKET:
+			if (sa->Parameters.DeviceIoControl.InputBufferLength)
+			{
+				PRawPacket RawPack = (PRawPacket)irp->AssociatedIrp.SystemBuffer;
+				irp->IoStatus.Status = ZlzSendRawPacket(RawPack);
 			}
 			IoCompleteRequest(irp, IO_NO_INCREMENT);
 			break;

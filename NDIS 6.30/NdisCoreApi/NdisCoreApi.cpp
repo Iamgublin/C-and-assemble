@@ -81,3 +81,17 @@ Net_StopFilter(
 	}
 	return DeviceIoControl(FilterHandle, IOCTL_STOPFILTER, &PacketInput, sizeof(IO_Packet), NULL, NULL, &ByteRet, NULL);
 }
+
+NDISCOREAPI_API
+int
+WINAPI
+Net_SendRawPacket(
+	_In_ HANDLE FilterHandle,
+	_In_ RawPacket *RawPacketToSend,
+	_In_ int AdapterIndex
+)
+{
+	DWORD ByteRet = 0;
+	RawPacketToSend->Reserved = AdapterIndex;
+	return DeviceIoControl(FilterHandle, IOCTL_SENDPACKET, RawPacketToSend, sizeof(RawPacket), NULL, NULL, &ByteRet, NULL);
+}

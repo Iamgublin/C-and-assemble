@@ -1,6 +1,6 @@
 #pragma once
 #include<Windows.h>
-#include"networks.h"
+#include"Networks_User.h"
 //用到的宏
 #define Tranverse16(X)   ((((UINT16)(X) & 0xff00) >> 8) |(((UINT16)(X) & 0x00ff) << 8))    //用于USHORT大端小端转化
 #define SET_INFO_TYPE(A,B) (A->Type=B)
@@ -18,6 +18,7 @@
 #define INFO_DHCP    9
 #define INFO_IPv6    10
 #define INFO_QICQ    11
+#define INFO_NTP     12
 
 //ARP->opcode
 #define ARP_REQUEST  1
