@@ -3,7 +3,7 @@
 *                                                                               *
 * packetcpy.h --  RawPacket Manager                                             *
 *                                                                               *
-* Copyright (c) Microsoft Corporation. All rights reserved.                     *
+* Copyright Arch-Vile. All rights reserved.                     *
 *                                                                               *
 ********************************************************************************/
 #include "Struct.h"

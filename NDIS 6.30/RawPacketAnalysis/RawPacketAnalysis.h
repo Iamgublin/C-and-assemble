@@ -2,7 +2,7 @@
 *                                                                               *
 * RawPacketAnalysis.h --  Raw Packet Analyse                                    *
 *                                                                               *
-* Copyright (c) Microsoft Corporation. All rights reserved.                     *
+* Copyright (c) Arch-Vile. All rights reserved.                     *
 *                                                                               *
 ********************************************************************************/
 #pragma once

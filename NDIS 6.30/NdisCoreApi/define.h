@@ -84,5 +84,6 @@ typedef struct _RawPacket
 		UCHAR RawPacket[2000];     //原始的包数据（MTU<=1500）
 	};
 	int Reserved;
+	int Reserved1;
 }RawPacket, *PRawPacket;
 #pragma pack(pop)

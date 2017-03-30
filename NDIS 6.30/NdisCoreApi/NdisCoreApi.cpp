@@ -88,10 +88,12 @@ WINAPI
 Net_SendRawPacket(
 	_In_ HANDLE FilterHandle,
 	_In_ RawPacket *RawPacketToSend,
+	_In_ int size,
 	_In_ int AdapterIndex
 )
 {
 	DWORD ByteRet = 0;
 	RawPacketToSend->Reserved = AdapterIndex;
+	RawPacketToSend->Reserved1 = size;
 	return DeviceIoControl(FilterHandle, IOCTL_SENDPACKET, RawPacketToSend, sizeof(RawPacket), NULL, NULL, &ByteRet, NULL);
 }

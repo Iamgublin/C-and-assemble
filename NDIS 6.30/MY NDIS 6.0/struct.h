@@ -136,6 +136,7 @@ typedef struct _RawPacket
 		UCHAR RawPacket[2000];     //原始的包数据（MTU<=1500）
 	};
 	int AdapterIndex;
+	int SendSize;
 }RawPacket, *PRawPacket;
 #pragma pack(pop)
 
