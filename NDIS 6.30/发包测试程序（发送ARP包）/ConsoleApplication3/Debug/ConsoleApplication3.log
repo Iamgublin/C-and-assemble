@@ -1,4 +1,0 @@
-﻿  ConsoleApplication3.cpp
-ConsoleApplication3.obj : error LNK2019: 无法解析的外部符号 "__declspec(dllimport) void * __stdcall Net_OpenFilter(void)" (__imp_?Net_OpenFilter@@YGPAXXZ)，该符号在函数 _main 中被引用
-E:\VS2013工程文件\NDIS 6.30\lib\NdisCoreApi.lib : warning LNK4272: 库计算机类型“x64”与目标计算机类型“X86”冲突
-E:\VS2013工程文件\ConsoleApplication3\Debug\ConsoleApplication3.exe : fatal error LNK1120: 1 个无法解析的外部命令

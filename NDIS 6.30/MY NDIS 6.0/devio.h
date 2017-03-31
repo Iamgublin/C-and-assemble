@@ -18,43 +18,36 @@ NTSTATUS ZlzSendRawPacket(PRawPacket Packet)
 	int AdapterIndex = Packet->AdapterIndex;
 	NTSTATUS Sta = STATUS_UNSUCCESSFUL;
 	PVOID VirAddress = NULL;
-	if (Packet->SendSize < 0 || Packet->SendSize>1500)
+	if (AdapterIndex > Global.contextnum || AdapterIndex < 0)
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
-	if (AdapterIndex >= Global.contextnum || AdapterIndex < 0 || Global.context[AdapterIndex]==NULL)
-	{
-		return STATUS_UNSUCCESSFUL;
-	}
-	if (Global.context[AdapterIndex]->IsRunning == FALSE)
-	{
-		return STATUS_UNSUCCESSFUL;
-	}
-	Sta = NdisAllocateMemoryWithTag(&VirAddress, Packet->SendSize, 'u');
+	Sta = NdisAllocateMemoryWithTag(&VirAddress, sizeof(RawPacket), 'u');
 	if (!NT_SUCCESS(Sta))
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
-	RtlCopyMemory(VirAddress, Packet->RawPacket, Packet->SendSize);
-	PMDL Mdl = NdisAllocateMdl(Global.context[AdapterIndex]->FilterHandle, VirAddress, Packet->SendSize);
+	RtlCopyMemory(VirAddress, Packet->RawPacket, sizeof(Packet->RawPacket));
+	PMDL Mdl = NdisAllocateMdl(Global.context[AdapterIndex]->FilterHandle, VirAddress, sizeof(RawPacket));
 	if (Mdl == NULL)
 	{
 		NdisFreeMemoryWithTag(VirAddress, 'u');
 		return STATUS_UNSUCCESSFUL;
 	}
 
-	PNET_BUFFER_LIST NbL = NdisAllocateNetBufferAndNetBufferList(Global.context[AdapterIndex]->NetBufferPool, sizeof(MY_NET_Buffer_Context), 0, Mdl, 0, Packet->SendSize);
+	PNET_BUFFER_LIST NbL = NdisAllocateNetBufferAndNetBufferList(Global.context[AdapterIndex]->NetBufferPool, sizeof(MY_NET_Buffer_Context), 0, Mdl, 0, sizeof(Packet->RawPacket));
 	if (NbL == NULL)
 	{
 		NdisFreeMdl(Mdl);
 		NdisFreeMemoryWithTag(VirAddress, 'u');
 		return STATUS_UNSUCCESSFUL;
 	}
-	PMY_NET_Buffer_Context Context = (PMY_NET_Buffer_Context)NET_BUFFER_LIST_CONTEXT_DATA_START(NbL);
-	RtlZeroMemory(Context, sizeof(MY_NET_Buffer_Context));
-	RtlCopyMemory(Context->Magic, "zlz", sizeof(Context->Magic));
-	Context->Mdl = Mdl;
-	Context->VirAddress = VirAddress;
+	NET_BUFFER_LIST_CONTEXT Context = *((PNET_BUFFER_LIST_CONTEXT)NET_BUFFER_LIST_CONTEXT_DATA_START(NbL));
+	PMY_NET_Buffer_Context NetbufferContext = (PMY_NET_Buffer_Context)&Context.ContextData;
+	RtlZeroMemory(NetbufferContext, sizeof(MY_NET_Buffer_Context));
+	RtlCopyMemory(NetbufferContext->Magic, "zlz", sizeof(NetbufferContext->Magic));
+	NetbufferContext->Mdl = Mdl;
+	NetbufferContext->VirAddress = VirAddress;
 	NdisFSendNetBufferLists(Global.context[AdapterIndex]->FilterHandle, NbL, 0, 0);
 	return STATUS_SUCCESS;
 }

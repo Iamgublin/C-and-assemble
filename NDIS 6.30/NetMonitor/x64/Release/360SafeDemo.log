@@ -1,6 +1,0 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  StdAfx.cpp
-e:\vs2013工程文件\ndis 6.30\duilib\Core/UIManager.h(45): warning C4091: “typedef ”: 没有声明变量时忽略“DuiLib::EVENTTYPE_UI”的左侧
-  360Safe.cpp
-  360SafeDemo.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Release\..\..\ReleaseX64\NetMonitor.exe
-  360SafeDemo.vcxproj -> .\Release/360Safe.pdb (Full PDB)

@@ -23,7 +23,7 @@ int main()
 	printf("%p\n", hF);
 	PIO_Packet Output = (PIO_Packet)malloc(sizeof(IO_Packet));
 	PacketInfo Info = { 0 };
-	Net_StartFilter(hF, NULL);          //NULL表示打开所有过滤器
+	Net_StartFilter(hF, NULL);
 	Net_ShowAdapter(hF, Output);
 	printf("0x%x\n", GetLastError());
 	printf("Adapter Num:%d\n", Output->Packet.ShowAdapter.Num);
@@ -55,14 +55,7 @@ int main()
 			{
 				UCHAR* saddr = Info.protocol.Arp.saddr;
 				UCHAR* daddr = Info.protocol.Arp.daddr;
-				if ((Info.Mac.dst[0] == 0xff) || (Info.Mac.dst[1] == 0xff))
-				{
-					printf("%03d.%03d.%03d.%03d\t%BOARDCAST\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3],Info.Size, pro[Info.Type]);
-				}
-				else
-				{
-					printf("%03d.%03d.%03d.%03d\t%03d.%03d.%03d.%03d\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3], daddr[0], daddr[1], daddr[2], daddr[3], Info.Size, pro[Info.Type]);
-				}
+				printf("%03d.%03d.%03d.%03d\t%03d.%03d.%03d.%03d\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3], daddr[0], daddr[1], daddr[2], daddr[3], Info.Size,pro[Info.Type]);
 				if (Tranverse16(Info.protocol.Arp.opcode) == ARP_REQUEST)
 				{
 					printf("who has ip %03d.%03d.%03d.%03d? tell %03d.%03d.%03d.%03d\n", Info.protocol.Arp.daddr[0],
@@ -112,6 +105,11 @@ int main()
 			}
 		}
 	}
+	/*printf("size:%d\n", Output->Packet.Net_Packet_Output.Size);
+	for (int b = 0; b < 2000; b++)
+	{
+		printf("%02x ", Output->Packet.Net_Packet_Output.Buffer[b]);
+	}*/
 	Sleep(INFINITE);
 	return 0;
 }

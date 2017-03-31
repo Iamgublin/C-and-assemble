@@ -2,7 +2,7 @@
 *                                                                               *
 * NdisCoreApi.h -- ApiSet Contract for ZlzNdis Kernel-Mode Driver               *
 *                                                                               *
-* Copyright (c) Arch-Vile. All rights reserved.                     *
+* Copyright (c) Microsoft Corporation. All rights reserved.                     *
 *                                                                               *
 ********************************************************************************/
 #ifdef _MSC_VER
@@ -67,7 +67,6 @@ WINAPI
 Net_SendRawPacket(
 	_In_ HANDLE FilterHandle,
 	_In_ RawPacket *RawPacketToSend,
-	_In_ int SendSize,
 	_In_ int AdapterIndex
 );
 #endif //_APICORENDIS_
