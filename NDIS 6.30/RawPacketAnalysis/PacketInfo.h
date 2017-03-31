@@ -19,6 +19,7 @@
 #define INFO_IPv6    10
 #define INFO_QICQ    11
 #define INFO_NTP     12
+#define INFO_SSDPv4  13 
 
 //ARP->opcode
 #define ARP_REQUEST  1

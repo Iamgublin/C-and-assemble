@@ -37,6 +37,10 @@ void AnalyseUdp(PPacketInfo Info, int IpHeaderLen)
 	{
 		SET_INFO_TYPE(Info, INFO_NTP);
 	}
+	else if (Tranverse16(Info->protocol1.Udp.sourcePort) == 1900 || Tranverse16(Info->protocol1.Udp.destinationPort) == 1900)
+	{
+		SET_INFO_TYPE(Info, INFO_SSDPv4);
+	}
 }
 void AnalyseIcmp(PPacketInfo Info, int IpHeaderLen)
 {
