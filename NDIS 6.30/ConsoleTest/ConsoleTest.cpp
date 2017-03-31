@@ -6,7 +6,7 @@
 #pragma comment(lib,"..\\lib\\RawPacketAnalysis.lib")
 #pragma comment(lib,"..\\lib\\NdisCoreApi.lib")
 #include<locale.h>
-char pro[14][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6","QICQ","NTP","SSDPv4"};
+char pro[13][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6","QICQ","NTP"};
 void SetConsole()
 {
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
