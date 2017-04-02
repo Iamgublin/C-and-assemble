@@ -6,7 +6,7 @@
 #pragma comment(lib,"..\\lib\\RawPacketAnalysis.lib")
 #pragma comment(lib,"..\\lib\\NdisCoreApi.lib")
 #include<locale.h>
-char pro[13][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6","QICQ","NTP"};
+char pro[14][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6","QICQ","NTP","SSDPv4"};
 void SetConsole()
 {
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -23,7 +23,7 @@ int main()
 	printf("%p\n", hF);
 	PIO_Packet Output = (PIO_Packet)malloc(sizeof(IO_Packet));
 	PacketInfo Info = { 0 };
-	Net_StartFilter(hF, NULL);
+	Net_StartFilter(hF, NULL);          //NULL表示打开所有过滤器
 	Net_ShowAdapter(hF, Output);
 	printf("0x%x\n", GetLastError());
 	printf("Adapter Num:%d\n", Output->Packet.ShowAdapter.Num);
@@ -47,7 +47,11 @@ int main()
 			{
 				if (Info.Type == INFO_UNKNOWN)
 				{
-					printf("Unknown protocol:%x\n", Info.Mac.type);
+					printf("Unknown protocol:%02x%02x\n", Info.RawPacket[20],Info.RawPacket[21]);
+				}
+				else
+				{
+					printf("IPv6\n");
 				}
 				continue;
 			}
@@ -55,7 +59,14 @@ int main()
 			{
 				UCHAR* saddr = Info.protocol.Arp.saddr;
 				UCHAR* daddr = Info.protocol.Arp.daddr;
-				printf("%03d.%03d.%03d.%03d\t%03d.%03d.%03d.%03d\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3], daddr[0], daddr[1], daddr[2], daddr[3], Info.Size,pro[Info.Type]);
+				if ((Info.Mac.dst[0] == 0xff) || (Info.Mac.dst[1] == 0xff))
+				{
+					printf("%03d.%03d.%03d.%03d\t%BOARDCAST\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3],Info.Size, pro[Info.Type]);
+				}
+				else
+				{
+					printf("%03d.%03d.%03d.%03d\t%03d.%03d.%03d.%03d\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3], daddr[0], daddr[1], daddr[2], daddr[3], Info.Size, pro[Info.Type]);
+				}
 				if (Tranverse16(Info.protocol.Arp.opcode) == ARP_REQUEST)
 				{
 					printf("who has ip %03d.%03d.%03d.%03d? tell %03d.%03d.%03d.%03d\n", Info.protocol.Arp.daddr[0],
@@ -98,6 +109,15 @@ int main()
 				{
 					printf("port:%d->%d\n", Tranverse16(Info.protocol1.Udp.sourcePort), Tranverse16(Info.protocol1.Udp.destinationPort));
 				}
+				else if (Info.Type == INFO_SSDPv4)
+				{
+					int len = sizeof(MAC) + (Info.protocol.Ip.iphVerLen & 0x0f) * 4 + sizeof(UDPPacket);
+					for (int i = len; i < len + 30; i++)
+					{
+						printf("%c",Info.RawPacket[i]);
+					}
+					printf("\n");
+				}
 				else
 				{
 					printf("\n");
@@ -105,11 +125,6 @@ int main()
 			}
 		}
 	}
-	/*printf("size:%d\n", Output->Packet.Net_Packet_Output.Size);
-	for (int b = 0; b < 2000; b++)
-	{
-		printf("%02x ", Output->Packet.Net_Packet_Output.Buffer[b]);
-	}*/
 	Sleep(INFINITE);
 	return 0;
 }

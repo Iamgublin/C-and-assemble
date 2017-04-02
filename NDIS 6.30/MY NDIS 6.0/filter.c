@@ -95,18 +95,20 @@ VOID FilterSendNetBufferListsComplete(
 	/*DbgBreakPoint();*/
 	//如果是Filter发送的包，不应该调用NdisFSendNetBufferListsComplete，直接释放资源
 	PFILTER_CONTEXT context = FilterModuleContext;
-	if (NET_BUFFER_LIST_CONTEXT_DATA_SIZE(NetBufferLists) != 0)
+	if (NetBufferLists->Context)
 	{
-		NET_BUFFER_LIST_CONTEXT NetContext = *((PNET_BUFFER_LIST_CONTEXT)NET_BUFFER_LIST_CONTEXT_DATA_START(NetBufferLists));
-		PMY_NET_Buffer_Context MyCon = (PMY_NET_Buffer_Context)&NetContext.ContextData;
-		if (strcmp(MyCon->Magic, "zlz") == 0)
+		if (NET_BUFFER_LIST_CONTEXT_DATA_SIZE(NetBufferLists) == sizeof(MY_NET_Buffer_Context))
 		{
-			NdisFreeMdl(MyCon->Mdl);
-			NdisFreeMemoryWithTag(MyCon->VirAddress, 'u');
-			NdisFreeNetBufferList(NetBufferLists);
-			return;
-		}
+			PMY_NET_Buffer_Context NetContext = (PMY_NET_Buffer_Context)NET_BUFFER_LIST_CONTEXT_DATA_START(NetBufferLists);
+			if (strcmp(NetContext->Magic, "zlz") == 0)
+			{
+				NdisFreeMdl(NetContext->Mdl);
+				NdisFreeMemoryWithTag(NetContext->VirAddress, 'u');
+				NdisFreeNetBufferList(NetBufferLists);
+				return;
+			}
 
+		}
 	}
 	NdisFSendNetBufferListsComplete(context->FilterHandle, NetBufferLists, SendCompleteFlags);
 }

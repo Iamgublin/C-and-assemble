@@ -1,5 +1,5 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  NdisCoreApi.cpp
+  源.cpp
     正在创建库 ..\lib\NdisCoreApi.lib 和对象 ..\lib\NdisCoreApi.exp
   NdisCoreApi.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Debug\..\..\DebugX64\NdisCoreApi.dll
   NdisCoreApi.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Debug\..\..\DebugX64\NdisCoreApi.pdb (Full PDB)
