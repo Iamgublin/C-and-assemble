@@ -1,5 +1,5 @@
 ﻿  Building 'MY NDIS 6.0' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
-  Stamping x64\Debug\MyDriver7.inf [Version] section with DriverVer=04/01/2017,15.18.38.19
+  Stamping x64\Debug\MyDriver7.inf [Version] section with DriverVer=04/06/2017,13.26.19.165
   MyDriver7.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Debug\zlzndislwf.sys
   MyDriver7.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Debug\zlzndislwf.pdb (Full PDB)
   Done Adding Additional Store

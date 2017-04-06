@@ -6,20 +6,34 @@
 #pragma comment(lib,"..\\lib\\RawPacketAnalysis.lib")
 #pragma comment(lib,"..\\lib\\NdisCoreApi.lib")
 #include<locale.h>
+HANDLE hF = NULL;
 char pro[14][8] = {"UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6","QICQ","NTP","SSDPv4"};
+BOOL WINAPI HandleConsole(DWORD dwCtrlType)
+{
+	switch (dwCtrlType)
+	{
+	case CTRL_CLOSE_EVENT:
+		Net_StopFilter(hF, NULL);
+		return TRUE;
+	default:
+		return FALSE;
+		break;
+	}
+}
 void SetConsole()
 {
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD size;
 	size.X = 2000;
 	size.Y = 2000;
-	SetConsoleScreenBufferSize(hOut, size);
+	SetConsoleScreenBufferSize(hOut, size);     //设置控制台大小
+	SetConsoleCtrlHandler(HandleConsole, TRUE); //设置控制台退出回调
 }
 int main()
 {
 	SetConsole();
 	setlocale(LC_ALL, "chs");
-	HANDLE hF = Net_OpenFilter();
+	hF = Net_OpenFilter();
 	printf("%p\n", hF);
 	PIO_Packet Output = (PIO_Packet)malloc(sizeof(IO_Packet));
 	PacketInfo Info = { 0 };
@@ -61,7 +75,7 @@ int main()
 				UCHAR* daddr = Info.protocol.Arp.daddr;
 				if ((Info.Mac.dst[0] == 0xff) || (Info.Mac.dst[1] == 0xff))
 				{
-					printf("%03d.%03d.%03d.%03d\t%BOARDCAST\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3],Info.Size, pro[Info.Type]);
+					printf("%03d.%03d.%03d.%03d\tBOARDCAST\t%4d\t%5s\t", saddr[0], saddr[1], saddr[2], saddr[3],Info.Size, pro[Info.Type]);
 				}
 				else
 				{
@@ -114,6 +128,11 @@ int main()
 					int len = sizeof(MAC) + (Info.protocol.Ip.iphVerLen & 0x0f) * 4 + sizeof(UDPPacket);
 					for (int i = len; i < len + 30; i++)
 					{
+						if (Info.RawPacket[i] == '\n')
+						{
+							printf("\t");
+							continue;
+						}
 						printf("%c",Info.RawPacket[i]);
 					}
 					printf("\n");
