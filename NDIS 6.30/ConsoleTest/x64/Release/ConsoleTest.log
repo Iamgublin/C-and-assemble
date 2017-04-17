@@ -1,9 +1,0 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  ConsoleTest.cpp
-ConsoleTest.cpp(64): warning C4476: "printf": 格式说明符中的类型字段字符“B”未知
-  stdafx.cpp
-  正在生成代码
-  All 9 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  已完成代码的生成
-  ConsoleTest.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Release\..\..\ReleaseX64\ConsoleTest.exe
-  ConsoleTest.vcxproj -> E:\VS2013工程文件\NDIS 6.30\x64\Release\..\..\ReleaseX64\ConsoleTest.pdb (Full PDB)

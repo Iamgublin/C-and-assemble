@@ -105,6 +105,10 @@ VOID ZlzInitShowAdapterPacket(PIO_Packet IoPacket)
 NTSTATUS CopyNetBuffer(PIO_Packet Packet, int i)
 {
 	Packet->Type = PACKET_TYPE_NETPACKET;
+	if (i >= Global.contextnum || i < 0)
+	{
+		return STATUS_UNSUCCESSFUL;
+	}
 	if (Global.context[i] == NULL)
 	{
 		return STATUS_UNSUCCESSFUL;
@@ -190,7 +194,7 @@ NTSTATUS ZlzStartFilter(int StartNum)
 	}
 	else 
 	{
-		if (StartNum > Global.contextnum || StartNum < 0)
+		if (StartNum >= Global.contextnum || StartNum < 0)
 		{
 			return STATUS_UNSUCCESSFUL;
 		}
@@ -231,7 +235,7 @@ NTSTATUS ZlzStopFilter(int StopNum)
 	}
 	else 
 	{
-		if (StopNum > Global.contextnum || StopNum < 0)
+		if (StopNum >= Global.contextnum || StopNum < 0)
 		{
 			return STATUS_UNSUCCESSFUL;
 		}
