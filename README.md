@@ -8,7 +8,7 @@ C-and-assemble
 ![效果图](https://github.com/Iamgublin/C-and-assemble/blob/master/NDIS%206.30/效果图.png)
 
 2017年4月17日更新：设计了GUI界面
-![效果图](https://github.com/Iamgublin/C-and-assemble/blob/master/NDIS%206.30/GUI效果图.png)
+![效果图](https://github.com/Iamgublin/C-and-assemble/blob/master/NDIS%206.30/GUl效果图.png)
 
 2. [VirtualDisk](https://github.com/Iamgublin/C-and-assemble/tree/master/VirtualDisk):基于Windows-Driver-Sample的VirtualDisk改写（源代码为WDF框架的驱动，改写为WDM框架的），文件系统为FAT12，FAT16。基于内存虚拟化的磁盘驱动程序。
 ![效果图](https://github.com/Iamgublin/C-and-assemble/blob/master/VirtualDisk/效果图.png)
