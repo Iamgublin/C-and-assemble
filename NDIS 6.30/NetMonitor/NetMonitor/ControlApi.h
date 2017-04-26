@@ -2,6 +2,7 @@
 #include"global.h"
 #include"Winproc.h"
 #include"..\..\RawPacketAnalysis\PacketInfo.h"
+#define ARPPACKETLENGTH 60
 extern map<int, PacketInfo> ListInfo;
 typedef struct _ListViewInfo
 {
@@ -22,4 +23,8 @@ void Refresh();
 void ShowOutput(LPNMLISTVIEW Mlv);              //Static控件显示详细信息
 void AddListView(PListViewInfo Info);
 void ChangeListInfoMap(int index, PacketInfo Info, BOOLEAN Deleted);
+void ShowRawData(HWND hDlg, int Index);
+void ShowAnalysisData(HWND hDlg, int Index);
+void StartScan(HWND hDlg);                     //内网ARP扫描
+void Attack(HWND Hdlg);
 extern int CurrentNum;

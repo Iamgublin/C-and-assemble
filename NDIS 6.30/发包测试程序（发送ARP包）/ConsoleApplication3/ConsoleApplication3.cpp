@@ -21,7 +21,7 @@ int main()
 	Packet.Osi.protocol.Arp.maclen = 6;
 	Packet.Osi.protocol.Arp.iplen = 4;
 	Packet.Osi.protocol.Arp.opcode = Tranverse16(ARP_REQUEST);
-	UCHAR saddr[4] = { 192,168,1,15 };      //制定源IP
+	UCHAR saddr[4] = { 192,168,1,105 };      //制定源IP
 	UCHAR daddr[4] = { 192,168,1,1 };        //想要获取MAC地址的IP
 	RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, daddr, sizeof(daddr));
 	RtlCopyMemory(Packet.Osi.protocol.Arp.saddr, saddr, sizeof(saddr));

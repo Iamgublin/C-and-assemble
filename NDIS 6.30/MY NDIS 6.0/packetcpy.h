@@ -47,6 +47,10 @@ int ZlzCalcBufSizeOrCopy(PS_PACKET Packet, PNET_BUFFER_LIST Nbl, int num, int Md
 	if (num)
 	{
 		Packet->mdllist = (PMDL*)ExAllocatePool(NonPagedPool, sizeof(PMDL)*MdlNum);
+		if (Packet->mdllist == NULL)
+		{
+			KeBugCheckEx(IRQL_NOT_LESS_OR_EQUAL, 0, 0, 0, 0);
+		}
 	}
 	nb = NET_BUFFER_LIST_FIRST_NB(nbltemp);
 	do

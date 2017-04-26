@@ -1,4 +1,5 @@
 #include"ControlApi.h"
+#include<IPHlpApi.h>
 #pragma warning(disable:4996)
 void InitListInfo(PacketInfo Info, ListViewInfo *ListViewInfo)
 {
@@ -190,7 +191,7 @@ void FindCard(HWND hDlg)
 	}
 	else
 	{
-		MessageBox(NULL, "Device Open Error!", "NetMonitor", MB_OK);
+		MessageBox(NULL, "Device Open Error!", "NetMonitor", MB_OK|MB_ICONERROR);
 	}
 }
 void ShowOutput(LPNMLISTVIEW Mlv)
@@ -275,4 +276,155 @@ void ChangeListInfoMap(int index, PacketInfo Info,BOOLEAN Deleted)
 			ListInfo.erase(iter);
 		}
 	}
+}
+void ShowRawData(HWND hDlg,int Index)
+{
+	PacketInfo Info = ListInfo[Index];
+	int Bufsize = Info.Size * 5;
+	char *Buf = (char*)malloc(Bufsize);
+	ZeroMemory(Buf, Bufsize);
+	for (int i = 0; i < Info.Size; i++)
+	{
+		char temp[4] = { 0 };
+		sprintf(temp, "%02X ", Info.RawPacket[i]);    //用大写，小写会导致对不齐的情况
+		strcat_s(Buf, Bufsize, temp);
+	}
+	HWND Edit = GetDlgItem(hDlg, IDC_RAWDATA);
+	SetDlgItemText(hDlg, IDC_RAWDATA, Buf);
+	free(Buf);
+}
+
+void PrintChar(int i,char *Buf,int Num,PacketInfo Info,int Bufsize)
+{
+	char temp[10] = { 0 };
+	strcat_s(Buf, Bufsize, "\t\t");
+	for (int j = 0; j < Num; j++)
+	{
+		if (Info.RawPacket[i + j] == 0 || Info.RawPacket[i + j] == '\n' || Info.RawPacket[i + j] == '\r')
+		{
+			sprintf(temp, ". ");
+		}
+		else
+		{
+			char a = Info.RawPacket[i + j];
+			sprintf(temp, "%c", a);
+		}
+		strcat_s(Buf, Bufsize, temp);
+	}
+	strcat_s(Buf, Bufsize, "\r\n");
+}
+void ShowAnalysisData(HWND hDlg, int Index)
+{
+	char temp[10] = { 0 };
+	PacketInfo Info = ListInfo[Index];
+	int Bufsize = Info.Size * 6;
+	char *Buf = (char*)malloc(Bufsize);
+	ZeroMemory(Buf, Bufsize);
+	for (int i = 0; i < Info.Size; i++)
+	{
+		if (i % 16 == 0 && i != 0)
+		{
+			PrintChar(i - 16, Buf, 16, Info, Bufsize);
+		}
+		else if (i % 8 == 0 && i != 0)
+		{
+			strcat_s(Buf, Bufsize, "\t\t");
+		}
+		sprintf(temp, "%02X ", Info.RawPacket[i]);      //用大写，小写会导致对不齐的情况
+		strcat_s(Buf, Bufsize, temp);
+	}
+	int al = Info.Size % 16;                              //最后一行的对齐
+	if (al)
+	{
+		for (int i = 0; i < 16 - al;i++)
+		{
+			sprintf(temp, "   ");
+			strcat_s(Buf, Bufsize, temp);
+		}
+		strcat_s(Buf, Bufsize, "\t\t");
+		PrintChar(Info.Size - al, Buf, al, Info, Bufsize);
+	}
+	HWND Edit = GetDlgItem(hDlg, IDC_RAWDATA);
+	SetDlgItemText(hDlg, IDC_RAWDATA, Buf);
+	free(Buf);
+}
+
+void StartScan(HWND hDlg)
+{
+	UCHAR IpStart[4] = { 0 };
+	UCHAR IpEnd[4] = { 0 };
+	UCHAR SourceAddr[4] = { 0 };
+	UCHAR* Mac;
+	
+	HWND HIpStart = GetDlgItem(hDlg, IDC_IPSTART);
+	HWND HIpEnd = GetDlgItem(hDlg, IDC_IPEND);
+	HWND HSip = GetDlgItem(hDlg, IDC_LOCALIP);
+	DWORD dwAddr;
+	SendMessage(HIpStart, IPM_GETADDRESS, 0, (LPARAM)&dwAddr);
+	IpStart[0] = FIRST_IPADDRESS(dwAddr);
+	IpStart[1] = SECOND_IPADDRESS(dwAddr);
+	IpStart[2] = THIRD_IPADDRESS(dwAddr);
+	IpStart[3] = FOURTH_IPADDRESS(dwAddr);
+	SendMessage(HIpEnd, IPM_GETADDRESS, 0, (LPARAM)&dwAddr);
+	IpEnd[0] = FIRST_IPADDRESS(dwAddr);
+	IpEnd[1] = SECOND_IPADDRESS(dwAddr);
+	IpEnd[2] = THIRD_IPADDRESS(dwAddr);
+	IpEnd[3] = FOURTH_IPADDRESS(dwAddr);
+	SendMessage(HSip, IPM_GETADDRESS, 0, (LPARAM)&dwAddr);
+	SourceAddr[0] = FIRST_IPADDRESS(dwAddr);
+	SourceAddr[1] = SECOND_IPADDRESS(dwAddr);
+	SourceAddr[2] = THIRD_IPADDRESS(dwAddr);
+	SourceAddr[3] = FOURTH_IPADDRESS(dwAddr);
+	if (FilterHandle != NULL)
+	{
+		IO_Packet Packet = { 0 };
+		Net_ShowAdapter(FilterHandle, &Packet);
+		Mac = Packet.Packet.ShowAdapter.AdapterInfo[StartIndex].MacAddress;
+	}
+	else
+	{
+		return;
+	}
+	RawPacket Packet = { 0 };
+	for (int i = 0; i < 6; i++)
+	{
+		Packet.Osi.Mac.sou[i] = Mac[i];
+		Packet.Osi.Mac.dst[i] = 0xff;
+	}
+	Packet.Osi.Mac.type = Tranverse16(PACKET_ARP);
+	Packet.Osi.protocol.Arp.eth_type = Tranverse16(PACKET_IP);
+	Packet.Osi.protocol.Arp.hrd = Tranverse16(1);
+	Packet.Osi.protocol.Arp.maclen = 6;
+	Packet.Osi.protocol.Arp.iplen = 4;
+	Packet.Osi.protocol.Arp.opcode = Tranverse16(ARP_REQUEST);
+	RtlCopyMemory(Packet.Osi.protocol.Arp.smac, Mac, sizeof(Packet.Osi.Mac.sou));
+	RtlCopyMemory(Packet.Osi.protocol.Arp.saddr, SourceAddr, sizeof(SourceAddr));
+	/*UCHAR daddr[4] = { 192,168,1,1 };        //想要获取MAC地址的IP
+	RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, daddr, sizeof(daddr));*/
+	for (int a = IpStart[0]; a <= IpEnd[0]; a++)
+	{
+		for (int b = IpStart[1];  b<= IpEnd[1]; b++)
+		{
+			for (int c = IpStart[2]; c <= IpEnd[2]; c++)
+			{
+				for (int d = IpStart[3]; d <= IpEnd[3]; d++)
+				{
+					UCHAR DestAddr[4] = { a,b,c,d };
+					RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, DestAddr, sizeof(DestAddr));
+					Net_SendRawPacket(FilterHandle, &Packet, ARPPACKETLENGTH, StartIndex);
+				}
+			}
+		}
+	}
+	/*for (int i = 0; i < 255; i++)
+	{
+		UCHAR daddr[4] = { 192,168,1,i };        //想要获取MAC地址的IP
+		RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, daddr, sizeof(daddr));
+		Net_SendRawPacket(FilterHandle, &Packet, 60, 0);
+	}*/
+}
+
+void Attack(HWND Hdlg)
+{
+
 }

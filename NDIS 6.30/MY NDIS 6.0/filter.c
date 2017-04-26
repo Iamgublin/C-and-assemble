@@ -176,12 +176,12 @@ VOID FilterDetach(
 {
 	/*DbgBreakPoint();*/
 	PFILTER_CONTEXT context = FilterModuleContext;
-	ZlzCleanList(context);
-	context->IsFiltering = FALSE;
-	context->IsRunning = FALSE;
-	NdisFreeNetBufferListPool(context->NetBufferPool);
-	Global.context[context->FliterIndex] = NULL;
-	ExFreePool(context);
+	ZlzCleanList(context);                                          //清理包池
+	context->IsFiltering = FALSE;                                    
+	context->IsRunning = FALSE;                                     //设置过滤状态
+	NdisFreeNetBufferListPool(context->NetBufferPool);				//清空包池占用的系统内存
+	Global.context[context->FliterIndex] = NULL;					//上下文置为空
+	ExFreePool(context);											//清理上下文空间
 	Global.contextnum--;
 }
 
