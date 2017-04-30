@@ -39,6 +39,7 @@ INT_PTR CALLBACK SelCard(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG:
 	{
+		InitSelCardTreeView(GetDlgItem(hDlg, IDC_CARDLIST));
 		FindCard(hDlg);
 		return (INT_PTR)FALSE;
 	}
@@ -89,12 +90,15 @@ INT_PTR CALLBACK Scan(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		char buf[20] = { 0 };
 		sprintf_s(buf, "%02x-%02x-%02x-%02x-%02x-%02x\n", Mac[0], Mac[1], Mac[2], Mac[3], Mac[4], Mac[5]);
 		SetDlgItemText(hDlg, IDC_MACADDRESS, buf);
+		InitAttackTreeView(GetDlgItem(hDlg, IDC_ATTACKLIST));
+		SetTimer(hDlg, 4, 100, FindAttackTarget);
 		return (INT_PTR)TRUE;
 	}
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
 		{
 			EndDialog(hDlg, LOWORD(wParam));
+			KillTimer(hDlg, 4);
 			return (INT_PTR)TRUE;
 		}
 		int wmId = LOWORD(wParam);
@@ -103,7 +107,10 @@ INT_PTR CALLBACK Scan(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_STARTSCAN:
 			StartScan(hDlg);
+			break;
 		case IDC_ATTACK:
+			Attack(hDlg);
+			break;
 		default:
 			break;
 		}

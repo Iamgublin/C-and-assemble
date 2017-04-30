@@ -4,6 +4,7 @@
 #include"..\..\RawPacketAnalysis\PacketInfo.h"
 #define ARPPACKETLENGTH 60
 extern map<int, PacketInfo> ListInfo;
+extern map<vector<UCHAR>, vector<UCHAR>> ScanIpMac;
 typedef struct _ListViewInfo
 {
 	char TimeOrIndex[20];
@@ -14,7 +15,7 @@ typedef struct _ListViewInfo
 	char Information[255];
 }ListViewInfo, *PListViewInfo;
 void InitListInfo(PacketInfo Info, ListViewInfo *ListViewInfo);
-VOID CALLBACK GetRawPacket(HWND hwnd, UINT msg, UINT_PTR timeid, DWORD systemtime);
+VOID CALLBACK FindAttackTarget(HWND hwnd, UINT msg, UINT_PTR timeid, DWORD systemtime);
 void StartFilter(HWND hDlg);
 void StopFilter(HWND hDlg);
 void FindCard(HWND hDlg);
@@ -26,5 +27,5 @@ void ChangeListInfoMap(int index, PacketInfo Info, BOOLEAN Deleted);
 void ShowRawData(HWND hDlg, int Index);
 void ShowAnalysisData(HWND hDlg, int Index);
 void StartScan(HWND hDlg);                     //ÄÚÍøARPÉ¨Ãè
-void Attack(HWND Hdlg);
+void Attack(HWND hDlg);
 extern int CurrentNum;

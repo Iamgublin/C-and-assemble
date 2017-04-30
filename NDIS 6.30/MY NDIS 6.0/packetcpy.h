@@ -174,6 +174,10 @@ NTSTATUS ZlzCopyNdlToBufferAndInsert(PFILTER_CONTEXT Context, PNET_BUFFER_LIST N
 	do
 	{
 		PNET_BUFFER_LIST CloneNbl = NdisAllocateCloneNetBufferList(nbltemp, Context->NetBufferPool, NULL, 0); //FLAG=0时初始化并拷贝所有MDL，注意clone包不会把链表上的所有NBL都克隆，只会克隆一个，且clone包的Next会置为NULL
+		if (CloneNbl == NULL)
+		{
+			return STATUS_UNSUCCESSFUL;
+		}
 		PS_PACKET Packet = (PS_PACKET)ExAllocatePool(NonPagedPool, sizeof(S_PACKET));
 		int MdlNum = ZlzCalcBufSizeOrCopy(Packet, CloneNbl, 0, 0);
 		ZlzCalcBufSizeOrCopy(Packet, CloneNbl, 1, MdlNum);

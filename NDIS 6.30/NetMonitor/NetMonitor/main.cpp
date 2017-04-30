@@ -16,6 +16,7 @@ int AdapterNum = 0;
 int StartIndex = 0;
 int CurrentNum = 0;
 map<int, PacketInfo> ListInfo;
+map<vector<UCHAR>, vector<UCHAR>> ScanIpMac;
 char pro[14][8] = { "UNKNOWN","ARP","RARP","TCP","UDP","ICMP","IGMP","HTTP","NAT","DHCP","IPv6","QICQ","NTP","SSDPv4" };
 
 

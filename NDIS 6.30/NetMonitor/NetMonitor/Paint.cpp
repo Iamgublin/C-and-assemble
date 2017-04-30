@@ -121,3 +121,45 @@ bool Paint(HWND hwnd)
 		WS_VISIBLE | WS_CHILD, 0, 0, 100, 100, hwnd, NULL, hInst, NULL);*/
 	return TRUE;
 }
+void InitAttackTreeView(HWND TreeView)
+{
+	LVCOLUMN lvColumn;
+	lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+	lvColumn.fmt = LVCFMT_LEFT;
+	lvColumn.cx = 120;
+	SetWindowLong(TreeView, GWL_STYLE,
+		WS_TABSTOP | WS_CHILD | WS_BORDER | WS_VISIBLE | LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS);
+	int         i;
+	TCHAR       szString[2][20] = { TEXT("Target IP"),
+		TEXT("Target MAC"),};
+	for (i = 0; i < 2; i++)
+	{
+		lvColumn.pszText = szString[i];
+		ListView_InsertColumn(TreeView, i, &lvColumn);
+	}
+	//
+	return;
+}
+void InitSelCardTreeView(HWND TreeView)
+{
+	LVCOLUMN lvColumn;
+	lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+	lvColumn.fmt = LVCFMT_LEFT;
+	lvColumn.cx = 150;
+	SetWindowLong(TreeView, GWL_STYLE,
+		WS_TABSTOP | WS_CHILD | WS_BORDER | WS_VISIBLE | LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS);
+	TCHAR       szString[4][20] = { TEXT("NetCardName"),
+		TEXT("Mac"),
+		TEXT("DevPathName"),
+		TEXT("IsFiltering") };
+	for (int i = 0; i < 4; i++)
+	{
+		lvColumn.pszText = szString[i];
+		if (i == 2)
+		{
+			lvColumn.cx = 200;
+		}
+		ListView_InsertColumn(TreeView, i, &lvColumn);
+	}
+
+}
