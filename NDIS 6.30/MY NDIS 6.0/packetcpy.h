@@ -7,38 +7,6 @@
 *                                                                               *
 ********************************************************************************/
 #include "Struct.h"
-/*int ZlzCalcBufSizeOrCopy(PVOID DestBuf, PNET_BUFFER_LIST Nbl, int num)   //调用两次该函数，第一次获取大小，分配内存，第二次拷贝。
-{
-	PNET_BUFFER_LIST nbltemp = Nbl;
-	PNET_BUFFER nb = NULL;
-	int size = 0;
-	char *buf = (char*)DestBuf;
-	do
-	{
-		nb = NET_BUFFER_LIST_FIRST_NB(nbltemp);
-		do
-		{
-			if (nb != NULL)
-			{
-				for (PMDL mdl = NET_BUFFER_FIRST_MDL(nb); mdl != NULL; mdl=mdl->Next)
-				{
-
-					int mdlsize = MmGetMdlByteCount(mdl);
-					size += mdlsize;
-					if (num)
-					{
-						PVOID mdladdress = MmGetSystemAddressForMdlSafe(mdl, IoPriorityNormal);
-						memcpy(buf, mdladdress, mdlsize);
-						buf += mdlsize;
-					}
-				}
-			}
-			nb = NET_BUFFER_NEXT_NB(nb);
-		} while (nb != NULL);
-		nbltemp = NET_BUFFER_LIST_NEXT_NBL(nbltemp);
-	} while (nbltemp != NULL);
-	return size;
-}*/
 int ZlzCalcBufSizeOrCopy(PS_PACKET Packet, PNET_BUFFER_LIST Nbl, int num, int MdlNum)   //调用两次该函数，第一次获取MDL数目，分配内存，第二次拷贝地址。
 {
 	PNET_BUFFER_LIST nbltemp = Nbl;
@@ -206,3 +174,35 @@ NTSTATUS ZlzGetNetworkAdapterInformation(PFILTER_CONTEXT Context)
 	ExFreePoolWithTag(TempPath, 'asd');
 	return STATUS_SUCCESS;
 }
+/*int ZlzCalcBufSizeOrCopy(PVOID DestBuf, PNET_BUFFER_LIST Nbl, int num)   //调用两次该函数，第一次获取大小，分配内存，第二次拷贝。
+{
+	PNET_BUFFER_LIST nbltemp = Nbl;
+	PNET_BUFFER nb = NULL;
+	int size = 0;
+	char *buf = (char*)DestBuf;
+	do
+	{
+		nb = NET_BUFFER_LIST_FIRST_NB(nbltemp);
+		do
+		{
+			if (nb != NULL)
+			{
+				for (PMDL mdl = NET_BUFFER_FIRST_MDL(nb); mdl != NULL; mdl = mdl->Next)
+				{
+
+					int mdlsize = MmGetMdlByteCount(mdl);
+					size += mdlsize;
+					if (num)
+					{
+						PVOID mdladdress = MmGetSystemAddressForMdlSafe(mdl, IoPriorityNormal);
+						memcpy(buf, mdladdress, mdlsize);
+						buf += mdlsize;
+					}
+				}
+			}
+			nb = NET_BUFFER_NEXT_NB(nb);
+		} while (nb != NULL);
+		nbltemp = NET_BUFFER_LIST_NEXT_NBL(nbltemp);
+	} while (nbltemp != NULL);
+	return size;
+}*/

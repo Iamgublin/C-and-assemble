@@ -394,15 +394,15 @@ void StartScan(HWND hDlg)
 	Packet.Osi.protocol.Arp.opcode = Tranverse16(ARP_REQUEST);
 	RtlCopyMemory(Packet.Osi.protocol.Arp.smac, Mac, sizeof(Packet.Osi.Mac.sou));
 	RtlCopyMemory(Packet.Osi.protocol.Arp.saddr, SourceAddr, sizeof(SourceAddr));
-	for (UCHAR a = IpStart[0]; a <= IpEnd[0]; a++)
+	for (int a = IpStart[0]; a <= IpEnd[0]; a++)
 	{
-		for (UCHAR b = IpStart[1];  b<= IpEnd[1]; b++)
+		for (int b = IpStart[1];  b<= IpEnd[1]; b++)
 		{
-			for (UCHAR c = IpStart[2]; c <= IpEnd[2]; c++)
+			for (int c = IpStart[2]; c <= IpEnd[2]; c++)
 			{
-				for (UCHAR d = IpStart[3]; d <= IpEnd[3]; d++)
+				for (int d = IpStart[3]; d <= IpEnd[3]; d++)
 				{
-					UCHAR DestAddr[4] = { a,b,c,d };
+					UCHAR DestAddr[4] = { (UCHAR)a,(UCHAR)b,(UCHAR)c,(UCHAR)d };
 					RtlCopyMemory(Packet.Osi.protocol.Arp.daddr, DestAddr, sizeof(DestAddr));
 					Net_SendRawPacket(FilterHandle, &Packet, ARPPACKETLENGTH, StartIndex);
 				}
@@ -475,15 +475,15 @@ void Attack(HWND hDlg)
 	Packet.Osi.protocol.Arp.opcode = Tranverse16(ARP_REPLY);
 	for (int times = 0; times < AttackTimes;times++)
 	{
-		for (UCHAR a = IpStart[0]; a <= IpEnd[0]; a++)
+		for (int a = IpStart[0]; a <= IpEnd[0]; a++)
 		{
-			for (UCHAR b = IpStart[1]; b <= IpEnd[1]; b++)
+			for (int b = IpStart[1]; b <= IpEnd[1]; b++)
 			{
-				for (UCHAR c = IpStart[2]; c <= IpEnd[2]; c++)
+				for (int c = IpStart[2]; c <= IpEnd[2]; c++)
 				{
-					for (UCHAR d = IpStart[3]; d <= IpEnd[3]; d++)
+					for (int d = IpStart[3]; d <= IpEnd[3]; d++)
 					{
-						vector<UCHAR> VDestAddr = { a,b,c,d };
+						vector<UCHAR> VDestAddr = { (UCHAR)a,(UCHAR)b,(UCHAR)c,(UCHAR)d };
 						if (FindIp(VDestAddr, MacTarget))
 						{
 							/*DebugBreak();*/
@@ -517,7 +517,7 @@ VOID CALLBACK FindAttackTarget(HWND hwnd, UINT msg, UINT_PTR timeid, DWORD syste
 		for (auto col : ScanIpMac)
 		{
 			sprintf_s(Ip, "%03d.%03d.%03d.%03d", col.first[0], col.first[1], col.first[2], col.first[3]);
-			sprintf(Mac, "%02x-%02x-%02x-%02x-%02x-%02x", col.second[0], col.second[1], col.second[2],
+			sprintf(Mac, "%02X-%02X-%02X-%02X-%02X-%02X", col.second[0], col.second[1], col.second[2],
 				col.second[3], col.second[4], col.second[5]);
 
 			LVITEM lvi;
@@ -536,4 +536,30 @@ VOID CALLBACK FindAttackTarget(HWND hwnd, UINT msg, UINT_PTR timeid, DWORD syste
 	{
 		return;
 	}
+}
+
+void DeleteAllTarget(HWND hDlg)
+{
+	HWND TreeView = GetDlgItem(hDlg, IDC_ATTACKLIST);
+	ScanIpMac.clear();
+	ListView_DeleteAllItems(TreeView);
+}
+
+void ShowMoreInformation(HWND hDlg,int Index)
+{
+	char Output[1000] = { 0 };
+	PacketInfo Packet = ListInfo[Index];
+	if (Packet.Type == INFO_ICMP)
+	{
+		sprintf(Output, "Checksum:%d\r\ncode:%d\r\nid:%d\r\ntype:%d\r\n", Packet.protocol1.Icmp.icmp_checksum,
+			Packet.protocol1.Icmp.icmp_code, Packet.protocol1.Icmp.icmp_id, Packet.protocol1.Icmp.icmp_type);
+	}
+	else if (Packet.Type == INFO_TCP)
+	{
+		TCPPacket *Tcp = &Packet.protocol1.Tcp;
+		sprintf(Output, "acknowledgeNumber:%d\r\nchecksum:%d\r\nsourceport:%d\r\n"
+			"destinationport:%d\r\nwindows:%d\r\n", Tcp->acknowledgeNumber, Tcp->checksum,
+			Tcp->sourcePort,Tcp->destinationPort,Tcp->windows);
+	}
+	SetDlgItemText(hDlg, IDC_MOREINFORMATION, Output);
 }

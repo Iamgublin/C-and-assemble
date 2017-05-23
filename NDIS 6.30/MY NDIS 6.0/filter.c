@@ -36,6 +36,9 @@ VOID FilterReturnNetBufferLists(                               //·µ»¹Ð¡¶Ë¿Ú·ÖÅäµ
 	}
 }
 
+//Note  NdisFReturnNetBufferLists should not be called for NBLs indicated with 
+//NDIS_RECEIVE_FLAGS_RESOURCES flag set in a corresponding FilterReceiveNetBufferLists call.
+//Such NBLs are returned to NDIS synchronously by returning from the FilterReceiveNetBufferLists routine.
 _Use_decl_annotations_
 VOID FilterReceiveNetBufferLists(
 	_In_ NDIS_HANDLE      FilterModuleContext,
@@ -44,9 +47,6 @@ VOID FilterReceiveNetBufferLists(
 	_In_ ULONG            NumberOfNetBufferLists,
 	_In_ ULONG            ReceiveFlags
 )
-//Note  NdisFReturnNetBufferLists should not be called for NBLs indicated with 
-//NDIS_RECEIVE_FLAGS_RESOURCES flag set in a corresponding FilterReceiveNetBufferLists call.
-//Such NBLs are returned to NDIS synchronously by returning from the FilterReceiveNetBufferLists routine.
 {
 	/*DbgBreakPoint();*/
 	PFILTER_CONTEXT context = FilterModuleContext;
@@ -58,7 +58,8 @@ VOID FilterReceiveNetBufferLists(
 		{
 			NDIS_SET_RETURN_FLAG(ReturnFlags, NDIS_RETURN_FLAGS_DISPATCH_LEVEL);
 		}
-		if (!NDIS_TEST_RECEIVE_CANNOT_PEND(ReceiveFlags))     //ÓÐNDIS_RECEIVE_FLAGS_RESOURCES±êÖ¾Ê± return ¾ÍÊÍ·Å,²»ÐèÒªµ÷ÓÃNdisFReturnNetBufferLists
+		//ÓÐNDIS_RECEIVE_FLAGS_RESOURCES±êÖ¾Ê± return ¾ÍÊÍ·Å,²»ÐèÒªµ÷ÓÃNdisFReturnNetBufferLists
+		if (!NDIS_TEST_RECEIVE_CANNOT_PEND(ReceiveFlags))   
 		{
 			NdisFReturnNetBufferLists(context->FilterHandle, NetBufferLists, ReturnFlags);
 		}
@@ -189,7 +190,7 @@ _Use_decl_annotations_
 NDIS_STATUS FilterAttach(
 	_In_ NDIS_HANDLE                    NdisFilterHandle,
 	_In_ NDIS_HANDLE                    FilterDriverContext,
-	_In_ PNDIS_FILTER_ATTACH_PARAMETERS AttachParameters                   //Çý¶¯³õÊ¼»¯ºÍÓÐÍø¿¨½ÓÈëÊ±¾ù»áµ÷ÓÃ
+	_In_ PNDIS_FILTER_ATTACH_PARAMETERS AttachParameters         //Çý¶¯³õÊ¼»¯ºÍÓÐÍø¿¨½ÓÈëÊ±¾ù»áµ÷ÓÃ
 )
 {
 	/*DbgBreakPoint();*/
@@ -239,7 +240,9 @@ NDIS_STATUS FilterAttach(
 	KeInitializeSpinLock(&context->NetBufferListLock);
 	RtlInitUnicodeString(&context->DevInfo.DevName, AttachParameters->BaseMiniportInstanceName->Buffer);
 	RtlInitUnicodeString(&context->DevInfo.DevPathName, AttachParameters->BaseMiniportName->Buffer);
-	RtlCopyMemory(context->DevInfo.MacAddress, AttachParameters->CurrentMacAddress, sizeof(AttachParameters->CurrentMacAddress));
+	RtlCopyMemory(context->DevInfo.MacAddress,
+		AttachParameters->CurrentMacAddress,
+		sizeof(AttachParameters->CurrentMacAddress));
 	ZlzGetNetworkAdapterInformation(context);
 	//³õÊ¼»¯±äÁ¿
 	InitializeListHead(&context->PacketRecvList);

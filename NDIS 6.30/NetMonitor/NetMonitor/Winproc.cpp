@@ -11,6 +11,7 @@ INT_PTR CALLBACK MoreInformaiton(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 		TrueIndex = (int)lParam;
 		Button_SetCheck(GetDlgItem(hDlg, IDC_RADIO1), 1);
 		ShowRawData(hDlg, TrueIndex);
+		ShowMoreInformation(hDlg, TrueIndex);
 		return (INT_PTR)TRUE;
 	}
 	case WM_COMMAND:
@@ -91,7 +92,7 @@ INT_PTR CALLBACK Scan(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		sprintf_s(buf, "%02x-%02x-%02x-%02x-%02x-%02x\n", Mac[0], Mac[1], Mac[2], Mac[3], Mac[4], Mac[5]);
 		SetDlgItemText(hDlg, IDC_MACADDRESS, buf);
 		InitAttackTreeView(GetDlgItem(hDlg, IDC_ATTACKLIST));
-		SetTimer(hDlg, 4, 100, FindAttackTarget);
+		SetTimer(hDlg, 4, 5000, FindAttackTarget);
 		return (INT_PTR)TRUE;
 	}
 	case WM_COMMAND:
@@ -110,6 +111,9 @@ INT_PTR CALLBACK Scan(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDC_ATTACK:
 			Attack(hDlg);
+			break;
+		case IDC_DELETETARGET:
+			DeleteAllTarget(hDlg);
 			break;
 		default:
 			break;

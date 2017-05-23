@@ -28,4 +28,6 @@ void ShowRawData(HWND hDlg, int Index);
 void ShowAnalysisData(HWND hDlg, int Index);
 void StartScan(HWND hDlg);                     //ÄÚÍøARPÉ¨Ãè
 void Attack(HWND hDlg);
+void DeleteAllTarget(HWND hDlg);
+void ShowMoreInformation(HWND hDlg, int Index);
 extern int CurrentNum;

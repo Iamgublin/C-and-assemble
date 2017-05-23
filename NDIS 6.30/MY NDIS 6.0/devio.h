@@ -3,7 +3,7 @@
 *                                                                               *
 * devio.h --  Handle zlzndislwf Driver I/O With R3                              *
 *                                                                               *
-* Copyright Arch-Vile. All rights reserved.                     *
+* Copyright Arch-Vile. All rights reserved.                                     *
 *                                                                               *
 ********************************************************************************/
 #include"Struct.h"

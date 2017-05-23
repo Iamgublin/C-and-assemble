@@ -83,7 +83,14 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT driver, PUNICODE_STRING str)
 	{
 		return STATUS_UNSUCCESSFUL;
 	}
-	IoCreateDevice(driver, 0, &devname, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &Global.FilterDev);
+
+	IoCreateDevice(driver,
+		0,
+		&devname,
+		FILE_DEVICE_UNKNOWN,
+		FILE_DEVICE_SECURE_OPEN, FALSE,
+		&Global.FilterDev);
+
 	Global.FilterDev->Flags = DO_BUFFERED_IO;
 	Global.FilterDev->Flags &= ~DO_DEVICE_INITIALIZING;
 	if (Global.FilterDev)
