@@ -41,7 +41,7 @@ UCHAR shellcode3[13] =
 "\xFF\xE0";                                //11
 typedef ULONG (*CLOSEINTERUPT)();
 typedef VOID (*OPENINTERUPT)(ULONG old_cr0);
-typedef NTSTATUS(__fastcall *OLDCREATEFILE)(                         //一定要是fastcall，否则会出问题！
+typedef __kernel_entry NTSTATUS (NTAPI *OLDCREATEFILE)(                         //一定要是fastcall，否则会出问题！
 	_Out_    PHANDLE            FileHandle,
 	_In_     ACCESS_MASK        DesiredAccess,
 	_In_     POBJECT_ATTRIBUTES ObjectAttributes,
@@ -63,11 +63,13 @@ typedef struct ServiceDescriptorEntry {
 } ServiceDescriptorTableEntry_t, *PServiceDescriptorTableEntry_t;
 ULONGLONG GetKeServiceDescriptorTable64();
 int findserviceid(PVOID address);
-ULONG getaddressoffset(PServiceDescriptorTableEntry_t enteraddress,INT64 address);
+ULONG getaddressoffset(PServiceDescriptorTableEntry_t enteraddress, INT64 address, CHAR ParamCount);
 PVOID changessdt(PServiceDescriptorTableEntry_t address, int service_id);
 ULONG closeinterupt();
 void startinteript(ULONG old_cr0);
-NTSTATUS __fastcall myfunc(
+__kernel_entry
+NTSTATUS
+__fastcall myfunc(
 	_Out_    PHANDLE            FileHandle,
 	_In_     ACCESS_MASK        DesiredAccess,
 	_In_     POBJECT_ATTRIBUTES ObjectAttributes,
@@ -168,7 +170,7 @@ PVOID changessdt(PServiceDescriptorTableEntry_t address, int service_id)
 	memcpy(shellcode3 + 2, &myfuncaddress, 8);
 	old_cr0 = closeinterupt();
 	memcpy(KeBugCheckEx, shellcode3, 13);
-	servicetableaddr[service_id] = getaddressoffset(address, (INT64)KeBugCheckEx);
+	servicetableaddr[service_id] = getaddressoffset(address, (INT64)KeBugCheckEx,11);
 	startinteript(old_cr0);
 	return (PVOID)add;
 }
@@ -197,7 +199,9 @@ void startinteript(ULONG old_cr0)
 	func(old_cr0);
 	ExFreePool(func);
 }
-NTSTATUS __fastcall myfunc(
+__kernel_entry 
+NTSTATUS
+__fastcall myfunc(
 	_Out_    PHANDLE            FileHandle,
 	_In_     ACCESS_MASK        DesiredAccess,
 	_In_     POBJECT_ATTRIBUTES ObjectAttributes,
@@ -214,8 +218,42 @@ NTSTATUS __fastcall myfunc(
 	return NtCreateFile(FileHandle, DesiredAccess, ObjectAttributes, IoStatusBlock, AllocationSize, FileAttributes, ShareAccess,
 		CreateDisposition, CreateOptions, EaBuffer, EaLength);
 }
-ULONG getaddressoffset(PServiceDescriptorTableEntry_t enteraddress, INT64 address)
+
+
+//原版的HOOK (S)SSDT代码有小BUG，会导致HOOK超过4个参数的函数出问题。
+//链接：http://www.vbasm.com/thread-7994-1-1.html
+#define SETBIT(x,y) x|=(1<<y) //将X的第Y位置1
+#define CLRBIT(x,y) x&=~(1<<y) //将X的第Y位清0
+#define GETBIT(x,y) (x & (1 << y)) //取X的第Y位，返回0或非0
+ULONG getaddressoffset(PServiceDescriptorTableEntry_t enteraddress, INT64 address,CHAR ParamCount)
 {
-	ULONG offset = (ULONG)(address - (INT64)enteraddress->ServiceTableBase);
-	return offset << 4;
+	//错误的写法
+	/*ULONG offset = (ULONG)(address - (INT64)enteraddress->ServiceTableBase);
+	return offset << 4;*/
+	//正确的写法
+	LONG dwtmp = 0, i;
+	CHAR b = 0, bits[4] = { 0 };
+	PULONG ServiceTableBase = NULL;
+	ServiceTableBase = (PULONG)enteraddress->ServiceTableBase;
+	dwtmp = (LONG)(address - (ULONGLONG)ServiceTableBase);
+	dwtmp = dwtmp << 4;
+	//处理参数
+	if (ParamCount>4)
+		ParamCount = ParamCount - 4;
+	else
+		ParamCount = 0;
+	//获得dwtmp的第一个字节
+	memcpy(&b, &dwtmp, 1);
+	//处理低四位，填写参数个数
+	for (i = 0; i<4; i++)
+	{
+		bits[i] = GETBIT(ParamCount, i);
+		if (bits[i])
+			SETBIT(b, i);
+		else
+			CLRBIT(b, i);
+	}
+	//把数据复制回去
+	memcpy(&dwtmp, &b, 1);
+	return dwtmp;
 }
