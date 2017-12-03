@@ -1,7 +1,0 @@
-C:\Users\zlzPC\Desktop\my-Little-Ransomware-master\Ransomware\Ransomware\bin\Debug\Ransomware.exe
-C:\Users\zlzPC\Desktop\my-Little-Ransomware-master\Ransomware\Ransomware\bin\Debug\Ransomware.pdb
-C:\Users\zlzPC\Desktop\my-Little-Ransomware-master\Ransomware\Ransomware\obj\Debug\Ransomware.csprojResolveAssemblyReference.cache
-C:\Users\zlzPC\Desktop\my-Little-Ransomware-master\Ransomware\Ransomware\obj\Debug\Ransomware.Properties.Resources.resources
-C:\Users\zlzPC\Desktop\my-Little-Ransomware-master\Ransomware\Ransomware\obj\Debug\Ransomware.csproj.GenerateResource.Cache
-C:\Users\zlzPC\Desktop\my-Little-Ransomware-master\Ransomware\Ransomware\obj\Debug\Ransomware.exe
-C:\Users\zlzPC\Desktop\my-Little-Ransomware-master\Ransomware\Ransomware\obj\Debug\Ransomware.pdb
