@@ -1,0 +1,8 @@
+[  
+      implicit_handle(handle_t RpcService_Binding)  
+]  
+
+interface RpcService
+{
+    RpcCall();
+}

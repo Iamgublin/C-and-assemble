@@ -1,0 +1,24 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+    uuid("8457600F-988B-4C84-866B-69CD93B5CF77"),
+    version(1.0)
+]
+
+interface RpcService
+{
+    HRESULT RpcCall([in, string]wchar_t* lpParam);
+}
+
+[
+    uuid("BC47C629-BC9C-4668-AAD4-19928D9392FD"),
+    version(1.0),
+    helpstring("rpc Library")
+]
+
+library RpcLib
+{
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+};
