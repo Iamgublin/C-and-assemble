@@ -1,6 +1,25 @@
 import "oaidl.idl";
 import "ocidl.idl";
 
+typedef struct _ParamA
+{
+    int a;
+}ParamA;
+
+typedef [switch_type(int)] union _UNIONPARAM
+{
+    [case(1)] ParamA	Param;
+    [case(2)]  int b;
+    [case(3)] int c;
+    [case(4)] int d;
+}UNIONPARAM;
+
+typedef struct _Param
+{
+    int Type;
+    [switch_is(Type)] UNIONPARAM uParam;
+}Param,*PParam;
+
 [
     uuid("8457600F-988B-4C84-866B-69CD93B5CF77"),
     version(1.0)
@@ -8,7 +27,8 @@ import "ocidl.idl";
 
 interface RpcService
 {
-    HRESULT RpcCall([in, string]wchar_t* lpParam);
+    HRESULT RpcCall([in, out]PParam lpParam);
+    void    RpcAsyncCall([in, out]PParam lpParam);
 }
 
 [

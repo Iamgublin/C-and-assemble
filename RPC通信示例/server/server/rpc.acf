@@ -5,4 +5,5 @@
 interface RpcService
 {
     RpcCall();
+	[async] RpcAsyncCall();
 }
