@@ -352,7 +352,6 @@ IN UINT                                     PacketSize
 	PNDIS_PACKET newpacket = NULL;
 	NDIS_STATUS ndissta;
 	padapercontext context = ProtocolBindingContext;
-	KeWaitForSingleObject(&context->recveve, Executive, KernelMode, FALSE, NULL);
 	packet = NdisGetReceivedPacket(global.bindinghandle[context->contextno], MacReceiveContext);
 	if (packet == NULL)
 	{
