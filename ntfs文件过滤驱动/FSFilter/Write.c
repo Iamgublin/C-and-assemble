@@ -7,14 +7,15 @@ NTSTATUS FsFilterDispatchWriteComplete(PDEVICE_OBJECT dev, PIRP irp, PVOID conte
 	UNREFERENCED_PARAMETER(dev);
 	UNREFERENCED_PARAMETER(context);
 	PFILE_CONTEXT Ctx = (PFILE_CONTEXT)context;
-	if (irp->PendingReturned == TRUE)            //有pending标记一定要mark
+    //1.返回STATUS_CONTINUE_COMPLETION时才需要IoMarkIrpPending
+    //2.如果底层驱动是同步返回的，则底层驱动不会调用IoMarkIrpPending，那么PendingReturned为FALSE，这个情况下我们不需要调用KeSetEvent，FsFilterDispatchWrite直接走else逻辑
+    //3.如果底层驱动是异步返回的(STATUS_PENDING)，则底层驱动会调用IoMarkIrpPending，那么在I/O完成时，调用我们的完成回调，此时PendingReturned为TRUE。而FsFilterDispatchWrite
+    //卡在KeWaitForSingleObject(Ctx.WaitEvent)这个情况下我们需要调用KeSetEvent来让KeWaitForSingleObject接着往后走
+	if (irp->PendingReturned == TRUE)
 	{
 		DEBUG_ENTER_FUNCTION("write pending");
-		IoMarkIrpPending(irp);
 		KeSetEvent(&Ctx->WaitEvent, IO_NO_INCREMENT, FALSE);
-		return STATUS_PENDING;
 	}
-	KeSetEvent(&Ctx->WaitEvent, IO_NO_INCREMENT, FALSE);
 	return STATUS_MORE_PROCESSING_REQUIRED;
 }
 NTSTATUS FsFilterDispatchWrite(PDEVICE_OBJECT DeviceObject, PIRP irp)
@@ -49,7 +50,8 @@ NTSTATUS FsFilterDispatchWrite(PDEVICE_OBJECT DeviceObject, PIRP irp)
 		{
 			DEBUG_ENTER_FUNCTION("write wait......");
 			KeWaitForSingleObject(&Ctx.WaitEvent, Executive, KernelMode, FALSE, NULL);
-			/*IoCompleteRequest(irp, IO_NO_INCREMENT);*/
+            sta = irp->IoStatus.Status;
+			IoCompleteRequest(irp, IO_NO_INCREMENT);
 			if (irp->IoStatus.Status == STATUS_SUCCESS)
 			{
 				if (irp->MdlAddress)
